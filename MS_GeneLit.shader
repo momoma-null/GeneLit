@@ -7,37 +7,37 @@
         [SingleLine] _Color ("Color", Color) = (1,1,1,1)
         [ScaleOffset]
         [SingleLine(_Color)] _MainTex ("Albedo", 2D) = "white" {}
-        [If(_AlphaToMask, 1)]_Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
+        [IfDef(_ALPHATEST_ON)]_Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
         [SingleLine(, _MASKMAP)] _MaskMap ("Mask Map", 2D) = "white" {}
-        [IfNot(Shading_Model, 2)] _Metallic ("Metallic", Range(0,1)) = 0.0
+        [IfNDef(SHADING_MODEL_CLOTH)] _Metallic ("Metallic", Range(0,1)) = 0.0
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _OcclusionStrength ("Occlusion", Range(0,1)) = 1.0
         _IoR ("IoR", Range(0.01, 5)) = 1.5
         [SingleLine] _BumpScale ("Normal Scale", Float) = 1.0
         [SingleLine(_BumpScale, _NORMALMAP)][Normal] _BumpMap ("Normal Map", 2D) = "bump" {}
-        [LightmapFlags]
+        [Emission]
         [SingleLine][HDR] _EmissionColor ("Emission Color", Color) = (0,0,0,1)
         [SingleLine(_EmissionColor)] _EmissionMap ("Emission", 2D) = "white" {}
 
-        [If(Shading_Model, 1)] _SubsurfaceThickness ("Thickness", Float) = 0.5
-        [If(Shading_Model, 1)] _SubsurfacePower ("Subsurface Power", Float) = 12.234
-        [If(Shading_Model, 1)] _SubsurfaceColor ("Subsurface Color", Color) = (1,1,1,1)
+        [IfDef(SHADING_MODEL_SUBSURFACE)] _SubsurfaceThickness ("Thickness", Float) = 0.5
+        [IfDef(SHADING_MODEL_SUBSURFACE)] _SubsurfacePower ("Subsurface Power", Float) = 12.234
+        [IfDef(SHADING_MODEL_SUBSURFACE)] _SubsurfaceColor ("Subsurface Color", Color) = (1,1,1,1)
 
-        [ToggleHeader(_ANISOTROPY)] _UseAnisotropy ("Anisotropy", float) = 0.0
-        [If(_UseAnisotropy, 1)] _Anisotropy ("Anisotropy", Vector) = (1, 0, 0, 0)
+        [ToggleHeader(_ANISOTROPY)]
+        [IfDef(_ANISOTROPY)] _Anisotropy ("Anisotropy", Vector) = (1, 0, 0, 0)
 
-        [ToggleHeader(_CLEAR_COAT)] _UseClearCoat ("Clear Coat", float) = 0.0
-        [If(_UseClearCoat, 1)] _ClearCoat ("Clear Coat", Float) = 1.0
-        [If(_UseClearCoat, 1)] _ClearCoatRoughness ("Clear Coat Roughness", Range(0,1)) = 0.0
+        [ToggleHeader(_CLEAR_COAT)]
+        [IfDef(_CLEAR_COAT)] _ClearCoat ("Clear Coat", Float) = 1.0
+        [IfDef(_CLEAR_COAT)] _ClearCoatRoughness ("Clear Coat Roughness", Range(0,1)) = 0.0
 
-        [ToggleHeader(_REFRACTION)] _UseRefraction ("Refraction", float) = 0.0
-        [If(_UseRefraction, 1)] _Thickness ("Thickness", Float) = 0.5
-        [If(_UseRefraction, 1)] _Absorption ("Absorption", Range(0,1)) = 0.0
-        [If(_UseRefraction, 1)] _Transmission ("Transmission", Range(0,1)) = 0.0
+        [ToggleHeader(_REFRACTION)]
+        [IfDef(_REFRACTION)] _Thickness ("Thickness", Float) = 0.5
+        [IfDef(_REFRACTION)] _Absorption ("Absorption", Range(0,1)) = 0.0
+        [IfDef(_REFRACTION)] _Transmission ("Transmission", Range(0,1)) = 0.0
 
-        [ToggleHeader(_SHEEN)] _UseSheen ("Sheen", float) = 0.0
-        [If(_UseSheen, 1)] _SheenColor ("Sheen Color", Color) = (0,0,0,1)
-        [If(_UseSheen, 1)] _SheenRoughness ("Sheen Roughness", Range(0,1)) = 0.0
+        [ToggleHeader(_SHEEN)]
+        [IfDef(_SHEEN)] _SheenColor ("Sheen Color", Color) = (0,0,0,1)
+        [IfDef(_SHEEN)] _SheenRoughness ("Sheen Roughness", Range(0,1)) = 0.0
 
         [HideInInspector] _DFG ("_DFG", 2D) = "black" {}
 
