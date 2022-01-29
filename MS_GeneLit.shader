@@ -5,6 +5,7 @@
         [BlendMode] _Mode ("Blend Mode", Float) = 0.0
         [KeywordEnum(STANDARD, SUBSURFACE, CLOTH)] Shading_Model ("Model Type", Float) = 0
         [SingleLine] _Color ("Color", Color) = (1,1,1,1)
+        [ScaleOffset]
         [SingleLine(_Color)] _MainTex ("Albedo", 2D) = "white" {}
         [If(_AlphaToMask, 1)]_Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
         [SingleLine(, _MASKMAP)] _MaskMap ("Mask Map", 2D) = "white" {}
