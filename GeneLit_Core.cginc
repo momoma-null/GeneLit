@@ -11,7 +11,11 @@
     struct v2f
     {
         UNITY_POSITION(pos);
-        float2 uv : TEXCOORD0;
+        #if defined(_DETAIL_MULX2)
+            float4 uv : TEXCOORD0;
+        #else
+            float2 uv : TEXCOORD0;
+        #endif
         float4 tSpace0 : TEXCOORD1;
         float4 tSpace1 : TEXCOORD2;
         float4 tSpace2 : TEXCOORD3;
@@ -127,7 +131,17 @@
         UNITY_TRANSFER_INSTANCE_ID(v, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
         o.pos = UnityObjectToClipPos(v.vertex);
-        o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
+        o.uv.xy = TRANSFORM_TEX(v.texcoord, _MainTex);
+        #if defined(_DETAIL_MULX2)
+            UNITY_BRANCH
+            switch(UNITY_ACCESS_INSTANCED_PROP(Prop, _UVSec))
+            {
+                case 0: o.uv.zw = TRANSFORM_TEX(v.texcoord, _DetailAlbedoMap); break;
+                case 1: o.uv.zw = TRANSFORM_TEX(v.texcoord1, _DetailAlbedoMap); break;
+                case 2: o.uv.zw = TRANSFORM_TEX(v.texcoord2, _DetailAlbedoMap); break;
+                case 3: o.uv.zw = TRANSFORM_TEX(v.texcoord3, _DetailAlbedoMap); break;
+            }
+        #endif
         float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
         float3 worldNormal = UnityObjectToWorldNormal(v.normal);
         fixed3 worldTangent = UnityObjectToWorldDir(v.tangent.xyz);
@@ -155,7 +169,12 @@
 
         // Initialize the inputs to sensible default values, see material_inputs.fs
         MaterialInputs inputs;
-        initMaterial(IN.uv, inputs);
+        
+        #if defined(_DETAIL_MULX2)
+            initMaterial(IN.uv.xy, IN.uv.zw, inputs);
+        #else
+            initMaterial(IN.uv, 0, inputs);
+        #endif
         prepareMaterial(inputs, shadingData);
 
         fragColor = evaluateMaterial(inputs, shadingData);

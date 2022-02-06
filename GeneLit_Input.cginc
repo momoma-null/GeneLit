@@ -2,12 +2,14 @@
     #define FILAMENT_INPUT_INCLUDED
 
     #include "UnityCG.cginc"
+    #include "UnityStandardUtils.cginc"
 
     #define FILAMENT_QUALITY_LOW    0
     #define FILAMENT_QUALITY_NORMAL 1
     #define FILAMENT_QUALITY_HIGH   2
 
     UNITY_DECLARE_TEX2D(_MainTex);
+    float4 _MainTex_ST;
     #if defined(_MASKMAP)
         UNITY_DECLARE_TEX2D_NOSAMPLER(_MaskMap);
     #endif
@@ -15,8 +17,12 @@
         UNITY_DECLARE_TEX2D_NOSAMPLER(_BumpMap);
     #endif
     UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissionMap);
-
-    float4 _MainTex_ST;
+    #if defined(_DETAIL_MULX2)
+        UNITY_DECLARE_TEX2D(_DetailAlbedoMap);
+        UNITY_DECLARE_TEX2D_NOSAMPLER(_DetailNormalMap);
+        UNITY_DECLARE_TEX2D_NOSAMPLER(_DetailMaskMap);        
+        float4 _DetailAlbedoMap_ST;
+    #endif
 
     UNITY_INSTANCING_BUFFER_START(Props)
     UNITY_DEFINE_INSTANCED_PROP(half4, _Color)
@@ -38,6 +44,10 @@
     UNITY_DEFINE_INSTANCED_PROP(half, _Transmission)
     UNITY_DEFINE_INSTANCED_PROP(half4, _SheenColor)
     UNITY_DEFINE_INSTANCED_PROP(half, _SheenRoughness)
+    UNITY_DEFINE_INSTANCED_PROP(half, _UVSec)
+    UNITY_DEFINE_INSTANCED_PROP(half, _DetailNormalMapScale)
+    UNITY_DEFINE_INSTANCED_PROP(half, _DetailMetallic)
+    UNITY_DEFINE_INSTANCED_PROP(half, _DetailGlossiness)
     UNITY_INSTANCING_BUFFER_END(Props)
 
     struct MaterialInputs
@@ -105,7 +115,7 @@
         #endif
     };
 
-    void initMaterial(in float2 uv, out MaterialInputs material)
+    void initMaterial(in float2 uv, in float2 uv2, out MaterialInputs material)
     {
         UNITY_INITIALIZE_OUTPUT(MaterialInputs, material);
         material.baseColor = UNITY_SAMPLE_TEX2D(_MainTex, uv) * UNITY_ACCESS_INSTANCED_PROP(Props, _Color);
@@ -120,6 +130,29 @@
             material.reflectance = 0.5;
         #endif
         material.ambientOcclusion = UNITY_ACCESS_INSTANCED_PROP(Props, _OcclusionStrength) * mods.g;
+
+        #if defined(_NORMALMAP)
+            material.normal = UnpackScaleNormal(UNITY_SAMPLE_TEX2D_SAMPLER(_BumpMap, _MainTex, uv), UNITY_ACCESS_INSTANCED_PROP(Props, _BumpScale));
+        #else
+            material.normal = float3(0.0, 0.0, 1.0);
+        #endif
+        #if defined(MATERIAL_HAS_BENT_NORMAL)
+            material.bentNormal = float3(0.0, 0.0, 1.0);
+        #endif
+
+        #if defined(_DETAIL_MULX2)
+            float detailMask = mods.b;
+            float3 detailAlbedo = UNITY_SAMPLE_TEX2D(_DetailAlbedoMap, uv2).rgb;
+            material.baseColor.rgb *= lerp(1.0, detailAlbedo * unity_ColorSpaceDouble.rgb, detailMask);
+            float4 detailMods = UNITY_SAMPLE_TEX2D_SAMPLER(_DetailMaskMap, _DetailAlbedoMap, uv2);
+            material.roughness = lerp(material.roughness, 1.0 - UNITY_ACCESS_INSTANCED_PROP(Props, _DetailGlossiness) * detailMods.a, detailMask);
+            #if !defined(SHADING_MODEL_CLOTH)
+                material.metallic = lerp(material.metallic, UNITY_ACCESS_INSTANCED_PROP(Props, _DetailMetallic) * detailMods.r, detailMask);
+            #endif
+            material.ambientOcclusion = lerp(material.ambientOcclusion, detailMods.g, detailMask);
+            half3 detailNormalTangent = UnpackScaleNormal(UNITY_SAMPLE_TEX2D_SAMPLER(_DetailNormalMap, _DetailAlbedoMap, uv2), UNITY_ACCESS_INSTANCED_PROP(Props, _DetailNormalMapScale));
+            material.normal = lerp(material.normal, BlendNormals(material.normal, detailNormalTangent), detailMask);
+        #endif
         material.emissive = UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionMap, _MainTex, uv) * UNITY_ACCESS_INSTANCED_PROP(Props, _EmissionColor);
 
         #if defined(_ALPHATEST_ON)
@@ -152,15 +185,6 @@
             #endif
         #endif
 
-        #if defined(_NORMALMAP)
-            material.normal = UnpackNormalWithScale(UNITY_SAMPLE_TEX2D_SAMPLER(_BumpMap, _MainTex, uv), UNITY_ACCESS_INSTANCED_PROP(Props, _BumpScale));
-        #else
-            material.normal = float3(0.0, 0.0, 1.0);
-        #endif
-        #if defined(MATERIAL_HAS_BENT_NORMAL)
-            material.bentNormal = float3(0.0, 0.0, 1.0);
-        #endif
-        
         #if defined(_CLEAR_COAT)
             material.clearCoat = UNITY_ACCESS_INSTANCED_PROP(Props, _ClearCoat);
             material.clearCoatRoughness = UNITY_ACCESS_INSTANCED_PROP(Props, _ClearCoatRoughness);

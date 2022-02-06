@@ -8,10 +8,12 @@ namespace MomomaAssets.GeneLit
     {
         readonly static float s_lineHeight = EditorStyles.toolbar.CalcHeight(GUIContent.none, 0) + EditorGUIUtility.standardVerticalSpacing;
 
+        readonly GUIContent _title;
         readonly string _keyword;
 
-        public ToggleHeaderDecorator(string keyword)
+        public ToggleHeaderDecorator(string title, string keyword)
         {
+            _title = EditorGUIUtility.TrTextContent(title);
             _keyword = keyword;
         }
 
@@ -37,7 +39,7 @@ namespace MomomaAssets.GeneLit
                 EditorGUI.showMixedValue = mixed;
                 EditorGUI.BeginChangeCheck();
                 GUI.Box(position, GUIContent.none, EditorStyles.toolbar);
-                enabled = EditorGUI.ToggleLeft(position, label, enabled);
+                enabled = EditorGUI.ToggleLeft(position, _title, enabled);
                 if (EditorGUI.EndChangeCheck())
                 {
                     editor.RegisterPropertyChangeUndo("Material Keyword");

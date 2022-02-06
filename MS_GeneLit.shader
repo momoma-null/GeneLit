@@ -15,27 +15,36 @@
         _IoR ("IoR", Range(0.01, 5)) = 1.5
         [SingleLine] _BumpScale ("Normal Scale", Float) = 1.0
         [SingleLine(_BumpScale, _NORMALMAP)][Normal] _BumpMap ("Normal Map", 2D) = "bump" {}
-        [Emission]
         [SingleLine][HDR] _EmissionColor ("Emission Color", Color) = (0,0,0,1)
+        [Emission]
         [SingleLine(_EmissionColor)] _EmissionMap ("Emission", 2D) = "white" {}
 
         [IfDef(SHADING_MODEL_SUBSURFACE)] _SubsurfaceThickness ("Thickness", Float) = 0.5
         [IfDef(SHADING_MODEL_SUBSURFACE)] _SubsurfacePower ("Subsurface Power", Float) = 12.234
         [IfDef(SHADING_MODEL_SUBSURFACE)] _SubsurfaceColor ("Subsurface Color", Color) = (1,1,1,1)
 
-        [ToggleHeader(_ANISOTROPY)]
+        [ToggleHeader(Detail Map, _DETAIL_MULX2)]
+        [IfDef(_DETAIL_MULX2)][Enum(UV0,0,UV1,1,UV2,2,UV3,3)] _UVSec ("UV Set", Float) = 0
+        [ScaleOffset][IfDef(_DETAIL_MULX2)][SingleLine] _DetailAlbedoMap ("Albedo", 2D) = "grey" {}
+        [IfDef(_DETAIL_MULX2)][SingleLine] _DetailMaskMap ("Mask Map", 2D) = "white" {}
+        [IfDef(_DETAIL_MULX2)][SingleLine] _DetailNormalMapScale ("Normal Scale", Float) = 1.0
+        [IfDef(_DETAIL_MULX2)][SingleLine(_DetailNormalMapScale)][Normal] _DetailNormalMap ("Normal Map", 2D) = "bump" {}
+        [IfDef(_DETAIL_MULX2)][IfNDef(SHADING_MODEL_CLOTH)] _DetailMetallic ("Metallic", Range(0,1)) = 0.0
+        [IfDef(_DETAIL_MULX2)] _DetailGlossiness ("Smoothness", Range(0,1)) = 0.5
+
+        [ToggleHeader(Anisotropy, _ANISOTROPY)]
         [IfDef(_ANISOTROPY)] _Anisotropy ("Anisotropy", Vector) = (1, 0, 0, 0)
 
-        [ToggleHeader(_CLEAR_COAT)]
+        [ToggleHeader(ClearCoat, _CLEAR_COAT)]
         [IfDef(_CLEAR_COAT)] _ClearCoat ("Clear Coat", Float) = 1.0
         [IfDef(_CLEAR_COAT)] _ClearCoatRoughness ("Clear Coat Roughness", Range(0,1)) = 0.0
 
-        [ToggleHeader(_REFRACTION)]
+        [ToggleHeader(Refraction, _REFRACTION)]
         [IfDef(_REFRACTION)] _Thickness ("Thickness", Float) = 0.5
         [IfDef(_REFRACTION)] _Absorption ("Absorption", Range(0,1)) = 0.0
         [IfDef(_REFRACTION)] _Transmission ("Transmission", Range(0,1)) = 0.0
 
-        [ToggleHeader(_SHEEN)]
+        [ToggleHeader(Sheen, _SHEEN)]
         [IfDef(_SHEEN)] _SheenColor ("Sheen Color", Color) = (0,0,0,1)
         [IfDef(_SHEEN)] _SheenRoughness ("Sheen Roughness", Range(0,1)) = 0.0
 
@@ -82,6 +91,7 @@
             #pragma shader_feature_local _REFRACTION
             #pragma shader_feature_local _MASKMAP
             #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local _DETAIL_MULX2
 
             #include "GeneLit_Core.cginc"
             ENDCG
@@ -110,6 +120,7 @@
             #pragma shader_feature_local _REFRACTION
             #pragma shader_feature_local _MASKMAP
             #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local _DETAIL_MULX2
 
             #include "GeneLit_Core.cginc"
             ENDCG
