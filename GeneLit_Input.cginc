@@ -3,6 +3,7 @@
 
     #include "UnityCG.cginc"
     #include "UnityStandardUtils.cginc"
+    #include "GeneLit_LightingCommon.cginc"
 
     #define FILAMENT_QUALITY_LOW    0
     #define FILAMENT_QUALITY_NORMAL 1
@@ -10,6 +11,7 @@
 
     UNITY_DECLARE_TEX2D(_MainTex);
     float4 _MainTex_ST;
+    float4 _MainTex_TexelSize;
     #if defined(_MASKMAP)
         UNITY_DECLARE_TEX2D_NOSAMPLER(_MaskMap);
     #endif
@@ -26,6 +28,7 @@
 
     UNITY_INSTANCING_BUFFER_START(Props)
     UNITY_DEFINE_INSTANCED_PROP(half4, _Color)
+    UNITY_DEFINE_INSTANCED_PROP(half, _NoiseHeight)
     UNITY_DEFINE_INSTANCED_PROP(half, _Cutoff)
     UNITY_DEFINE_INSTANCED_PROP(half, _Metallic)
     UNITY_DEFINE_INSTANCED_PROP(half, _Glossiness)
@@ -49,6 +52,8 @@
     UNITY_DEFINE_INSTANCED_PROP(half, _DetailMetallic)
     UNITY_DEFINE_INSTANCED_PROP(half, _DetailGlossiness)
     UNITY_INSTANCING_BUFFER_END(Props)
+
+    #include "GeneLit_NoTile.cginc"
 
     struct MaterialInputs
     {
@@ -115,12 +120,23 @@
         #endif
     };
 
-    void initMaterial(in float2 uv, in float2 uv2, out MaterialInputs material)
+    void initMaterial(ShadingData shadingData, out MaterialInputs material)
     {
         UNITY_INITIALIZE_OUTPUT(MaterialInputs, material);
-        material.baseColor = UNITY_SAMPLE_TEX2D(_MainTex, uv) * UNITY_ACCESS_INSTANCED_PROP(Props, _Color);
+        material.baseColor = UNITY_ACCESS_INSTANCED_PROP(Props, _Color);
+        #if defined(_TILEMODE_NO_TILE)
+            SAMPLE_TEX2DTILE_WIEGHT(_MainTex, baseColor, shadingData.position, shadingData.geometricNormal)
+            material.baseColor *= baseColor;
+        #else
+            float2 uv = shadingData.uv.xy;
+            material.baseColor *= UNITY_SAMPLE_TEX2D(_MainTex, uv);
+        #endif
         #if defined(_MASKMAP)
-            float4 mods = UNITY_SAMPLE_TEX2D_SAMPLER(_MaskMap, _MainTex, uv);
+            #if defined(_TILEMODE_NO_TILE)
+                SAMPLE_TEX2DTILE_SAMPLER_WIEGHT(_MaskMap, _MainTex, mods)
+            #else
+                float4 mods = UNITY_SAMPLE_TEX2D_SAMPLER(_MaskMap, _MainTex, uv);
+            #endif
         #else
             float4 mods = 1;
         #endif
@@ -132,7 +148,12 @@
         material.ambientOcclusion = UNITY_ACCESS_INSTANCED_PROP(Props, _OcclusionStrength) * mods.g;
 
         #if defined(_NORMALMAP)
-            material.normal = UnpackScaleNormal(UNITY_SAMPLE_TEX2D_SAMPLER(_BumpMap, _MainTex, uv), UNITY_ACCESS_INSTANCED_PROP(Props, _BumpScale));
+            #if defined(_TILEMODE_NO_TILE)
+                SAMPLE_TEX2DTILE_SAMPLER_WIEGHT(_BumpMap, _MainTex, normalMap)
+            #else
+                float4 normalMap = UNITY_SAMPLE_TEX2D_SAMPLER(_BumpMap, _MainTex, uv);
+            #endif
+            material.normal = UnpackScaleNormal(normalMap, UNITY_ACCESS_INSTANCED_PROP(Props, _BumpScale));
         #else
             material.normal = float3(0.0, 0.0, 1.0);
         #endif
@@ -141,6 +162,7 @@
         #endif
 
         #if defined(_DETAIL_MULX2)
+            float2 uv2 = shadingData.uv.zw;
             float detailMask = mods.b;
             float3 detailAlbedo = UNITY_SAMPLE_TEX2D(_DetailAlbedoMap, uv2).rgb;
             material.baseColor.rgb *= lerp(1.0, detailAlbedo * unity_ColorSpaceDouble.rgb, detailMask);
@@ -153,7 +175,14 @@
             half3 detailNormalTangent = UnpackScaleNormal(UNITY_SAMPLE_TEX2D_SAMPLER(_DetailNormalMap, _DetailAlbedoMap, uv2), UNITY_ACCESS_INSTANCED_PROP(Props, _DetailNormalMapScale));
             material.normal = lerp(material.normal, BlendNormals(material.normal, detailNormalTangent), detailMask);
         #endif
-        material.emissive = UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionMap, _MainTex, uv) * UNITY_ACCESS_INSTANCED_PROP(Props, _EmissionColor);
+        
+        material.emissive = UNITY_ACCESS_INSTANCED_PROP(Props, _EmissionColor);
+        #if defined(_TILEMODE_NO_TILE)
+            SAMPLE_TEX2DTILE_SAMPLER_WIEGHT(_EmissionMap, _MainTex, emissive)
+            material.emissive *= emissive;
+        #else
+            material.emissive *= UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionMap, _MainTex, uv);
+        #endif
 
         #if defined(_ALPHATEST_ON)
             material.maskThreshold = UNITY_ACCESS_INSTANCED_PROP(Props, _Cutoff);

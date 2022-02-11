@@ -95,6 +95,7 @@
 
         UNITY_LIGHT_ATTENUATION(atten, IN, shadingData.position);
         shadingData.atten = atten;
+        shadingData.uv = IN.uv;
     }
 
     /**
@@ -170,11 +171,7 @@
         // Initialize the inputs to sensible default values, see material_inputs.fs
         MaterialInputs inputs;
         
-        #if defined(_DETAIL_MULX2)
-            initMaterial(IN.uv.xy, IN.uv.zw, inputs);
-        #else
-            initMaterial(IN.uv, 0, inputs);
-        #endif
+        initMaterial(shadingData, inputs);
         prepareMaterial(inputs, shadingData);
 
         fragColor = evaluateMaterial(inputs, shadingData);

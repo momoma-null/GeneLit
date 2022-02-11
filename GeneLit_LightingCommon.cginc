@@ -82,11 +82,14 @@
         #endif
 
         float2 normalizedViewportCoord;
-
         half3 ambient;
         half4 lightmapUV;
-
         float atten;
+        #if defined(_DETAIL_MULX2)
+            float4 uv;
+        #else
+            float2 uv;
+        #endif
     };
 
     float computeMicroShadowing(float NoL, float visibility)

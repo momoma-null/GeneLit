@@ -5,6 +5,8 @@
         [BlendMode] _Mode ("Blend Mode", Float) = 0.0
         [KeywordEnum(STANDARD, SUBSURFACE, CLOTH)] Shading_Model ("Model Type", Float) = 0
         [SingleLine] _Color ("Color", Color) = (1,1,1,1)
+        [KeywordEnum(NORMAL_TILE, NO_TILE)] _TileMode ("Tile Mode", Float) = 0
+        [IfDef(_TILEMODE_NO_TILE)] _NoiseHeight ("Noise Height", Range(5.0, 20.0)) = 12.0
         [ScaleOffset]
         [SingleLine(_Color)] _MainTex ("Albedo", 2D) = "white" {}
         [IfDef(_ALPHATEST_ON)]_Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
@@ -85,6 +87,7 @@
             #pragma multi_compile_instancing
             #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
             #pragma shader_feature_local SHADING_MODEL_STANDARD SHADING_MODEL_SUBSURFACE SHADING_MODEL_CLOTH
+            #pragma shader_feature_local _TILEMODE_NORMAL_TILE _TILEMODE_NO_TILE
             #pragma shader_feature_local _ANISOTROPY
             #pragma shader_feature_local _CLEAR_COAT
             #pragma shader_feature_local _SHEEN
@@ -114,6 +117,7 @@
             #pragma multi_compile_fwdadd_fullshadows
             #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
             #pragma shader_feature_local SHADING_MODEL_STANDARD SHADING_MODEL_SUBSURFACE SHADING_MODEL_CLOTH
+            #pragma shader_feature_local _TILEMODE_NORMAL_TILE _TILEMODE_NO_TILE
             #pragma shader_feature_local _ANISOTROPY
             #pragma shader_feature_local _CLEAR_COAT
             #pragma shader_feature_local _SHEEN
