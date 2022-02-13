@@ -19,8 +19,9 @@
         float4 tSpace0 : TEXCOORD1;
         float4 tSpace1 : TEXCOORD2;
         float4 tSpace2 : TEXCOORD3;
-        half4 ambientOrLightmapUV : TEXCOORD4;
-        UNITY_LIGHTING_COORDS(5,6)
+        half4 color : TEXCOORD4;
+        half4 ambientOrLightmapUV : TEXCOORD5;
+        UNITY_LIGHTING_COORDS(6,7)
         UNITY_VERTEX_INPUT_INSTANCE_ID
         UNITY_VERTEX_OUTPUT_STEREO
     };
@@ -151,6 +152,7 @@
         o.tSpace0 = float4(worldTangent.x, worldBinormal.x, worldNormal.x, worldPos.x);
         o.tSpace1 = float4(worldTangent.y, worldBinormal.y, worldNormal.y, worldPos.y);
         o.tSpace2 = float4(worldTangent.z, worldBinormal.z, worldNormal.z, worldPos.z);
+        o.color = v.color;
         o.ambientOrLightmapUV = VertexGIForward(v, worldPos, worldNormal);
         UNITY_TRANSFER_LIGHTING(o, v.texcoord1);
         return o;
@@ -170,7 +172,8 @@
 
         // Initialize the inputs to sensible default values, see material_inputs.fs
         MaterialInputs inputs;
-        
+        UNITY_INITIALIZE_OUTPUT(MaterialInputs, inputs);
+        inputs.baseColor = IN.color;
         initMaterial(shadingData, inputs);
         prepareMaterial(inputs, shadingData);
 

@@ -120,10 +120,9 @@
         #endif
     };
 
-    void initMaterial(ShadingData shadingData, out MaterialInputs material)
+    void initMaterial(ShadingData shadingData, inout MaterialInputs material)
     {
-        UNITY_INITIALIZE_OUTPUT(MaterialInputs, material);
-        material.baseColor = UNITY_ACCESS_INSTANCED_PROP(Props, _Color);
+        material.baseColor *= UNITY_ACCESS_INSTANCED_PROP(Props, _Color);
         #if defined(_TILEMODE_NO_TILE)
             SAMPLE_TEX2DTILE_WIEGHT(_MainTex, baseColor, shadingData.position, shadingData.geometricNormal)
             material.baseColor *= baseColor;
