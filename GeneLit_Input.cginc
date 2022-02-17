@@ -27,8 +27,9 @@
     #endif
 
     UNITY_INSTANCING_BUFFER_START(Props)
-    UNITY_DEFINE_INSTANCED_PROP(half4, _Color)
     UNITY_DEFINE_INSTANCED_PROP(half, _NoiseHeight)
+    UNITY_DEFINE_INSTANCED_PROP(half, _VertexColorMode)
+    UNITY_DEFINE_INSTANCED_PROP(half4, _Color)
     UNITY_DEFINE_INSTANCED_PROP(half, _Cutoff)
     UNITY_DEFINE_INSTANCED_PROP(half, _Metallic)
     UNITY_DEFINE_INSTANCED_PROP(half, _Glossiness)
@@ -122,7 +123,14 @@
 
     void initMaterial(ShadingData shadingData, inout MaterialInputs material)
     {
-        material.baseColor *= UNITY_ACCESS_INSTANCED_PROP(Props, _Color);
+        float4 color = UNITY_ACCESS_INSTANCED_PROP(Props, _Color);
+        switch(UNITY_ACCESS_INSTANCED_PROP(Props, _VertexColorMode))
+        {
+            case 1:material.baseColor *= color;break;
+            case 2:material.baseColor += color;break;
+            case 3:material.baseColor =  material.baseColor + color - material.baseColor * color;break;
+            default:material.baseColor = color;break;
+        }
         #if defined(_TILEMODE_NO_TILE)
             SAMPLE_TEX2DTILE_WIEGHT(_MainTex, baseColor, shadingData.position, shadingData.geometricNormal)
             material.baseColor *= baseColor;

@@ -4,11 +4,11 @@
     {
         [BlendMode] _Mode ("Blend Mode", Float) = 0.0
         [KeywordEnum(STANDARD, SUBSURFACE, CLOTH)] Shading_Model ("Model Type", Float) = 0
-        [SingleLine] _Color ("Color", Color) = (1,1,1,1)
         [KeywordEnum(NORMAL_TILE, NO_TILE)] _TileMode ("Tile Mode", Float) = 0
         [IfDef(_TILEMODE_NO_TILE)] _NoiseHeight ("Noise Height", Range(5.0, 20.0)) = 12.0
-        [ScaleOffset]
-        [SingleLine(_Color)] _MainTex ("Albedo", 2D) = "white" {}
+        [Enum(None,0,Multiply,1,Add,2,Screen,3)] _VertexColorMode ("Vertex Color Mode", Float) = 0.0
+        [SingleLine] _Color ("Color", Color) = (1,1,1,1)
+        [ScaleOffset][SingleLine(_Color)] _MainTex ("Albedo", 2D) = "white" {}
         [IfDef(_ALPHATEST_ON)]_Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
         [SingleLine(, _MASKMAP)] _MaskMap ("Mask Map", 2D) = "white" {}
         [IfNDef(SHADING_MODEL_CLOTH)] _Metallic ("Metallic", Range(0,1)) = 0.0
