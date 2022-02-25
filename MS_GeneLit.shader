@@ -3,6 +3,7 @@
     Properties
     {
         [BlendMode] _Mode ("Blend Mode", Float) = 0.0
+        [Enum(UnityEngine.Rendering.CullMode)] _CullMode ("Cull Mode", Float) = 2.0
         [KeywordEnum(STANDARD, SUBSURFACE, CLOTH)] Shading_Model ("Model Type", Float) = 0
         [KeywordEnum(NORMAL_TILE, NO_TILE)] _TileMode ("Tile Mode", Float) = 0
         [IfDef(_TILEMODE_NO_TILE)] _NoiseHeight ("Noise Height", Range(5.0, 20.0)) = 12.0
@@ -46,9 +47,10 @@
         [IfDef(_REFRACTION)] _Absorption ("Absorption", Range(0,1)) = 0.0
         [IfDef(_REFRACTION)] _Transmission ("Transmission", Range(0,1)) = 0.0
 
+        [IfNDef(SHADING_MODEL_CLOTH)]
         [ToggleHeader(Sheen, _SHEEN)]
         [IfDef(_SHEEN)] _SheenColor ("Sheen Color", Color) = (0,0,0,1)
-        [IfDef(_SHEEN)] _SheenRoughness ("Sheen Roughness", Range(0,1)) = 0.0
+        [IfNDef(SHADING_MODEL_CLOTH)][IfDef(_SHEEN)] _SheenRoughness ("Sheen Roughness", Range(0,1)) = 0.0
 
         [HideInInspector] _DFG ("_DFG", 2D) = "black" {}
 
@@ -75,6 +77,7 @@
             Name "FORWARD"
             Tags { "LightMode"="ForwardBase" }
 
+            Cull [_CullMode]
             Blend [_SrcBlend] [_DstBlend]
             ZWrite [_ZWrite]
 
@@ -105,6 +108,7 @@
             Name "FORWARD_DELTA"
             Tags { "LightMode"="ForwardAdd" }
 
+            Cull [_CullMode]
             Blend [_SrcBlend] One
             Fog { Color (0,0,0,0) }
             ZWrite Off
@@ -130,9 +134,12 @@
             ENDCG
         }
 
-        Pass {
+        Pass
+        {
             Name "ShadowCaster"
             Tags { "LightMode" = "ShadowCaster" }
+
+            Cull [_CullMode]
 
             CGPROGRAM
             #pragma target 3.5
