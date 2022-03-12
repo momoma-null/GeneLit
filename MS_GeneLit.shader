@@ -18,6 +18,8 @@
         _IoR ("IoR", Range(0.01, 5)) = 1.5
         [SingleLine] _BumpScale ("Normal Scale", Float) = 1.0
         [SingleLine(_BumpScale, _NORMALMAP)][Normal] _BumpMap ("Normal Map", 2D) = "bump" {}
+        [SingleLine] _Parallax ("Height Scale", Range (0.005, 0.08)) = 0.02
+        [IfNDef(_TILEMODE_NO_TILE)][SingleLine(_Parallax, _PARALLAXMAP)] _ParallaxMap ("Height Map", 2D) = "white" {}
         [SingleLine][HDR] _EmissionColor ("Emission Color", Color) = (0,0,0,1)
         [Emission]
         [SingleLine(_EmissionColor)] _EmissionMap ("Emission", 2D) = "white" {}
@@ -97,6 +99,7 @@
             #pragma shader_feature_local _REFRACTION
             #pragma shader_feature_local _MASKMAP
             #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local _PARALLAXMAP
             #pragma shader_feature_local _DETAIL_MULX2
 
             #include "GeneLit_Core.cginc"
@@ -128,6 +131,7 @@
             #pragma shader_feature_local _REFRACTION
             #pragma shader_feature_local _MASKMAP
             #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local _PARALLAXMAP
             #pragma shader_feature_local _DETAIL_MULX2
 
             #include "GeneLit_Core.cginc"

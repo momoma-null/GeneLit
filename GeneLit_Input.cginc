@@ -18,6 +18,9 @@
     #if defined(_NORMALMAP)
         UNITY_DECLARE_TEX2D_NOSAMPLER(_BumpMap);
     #endif
+    #if defined(_PARALLAXMAP)
+        UNITY_DECLARE_TEX2D_NOSAMPLER(_ParallaxMap);
+    #endif
     UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissionMap);
     #if defined(_DETAIL_MULX2)
         UNITY_DECLARE_TEX2D(_DetailAlbedoMap);
@@ -36,6 +39,7 @@
     UNITY_DEFINE_INSTANCED_PROP(half, _OcclusionStrength)
     UNITY_DEFINE_INSTANCED_PROP(half, _IoR)
     UNITY_DEFINE_INSTANCED_PROP(half, _BumpScale)
+    UNITY_DEFINE_INSTANCED_PROP(half, _Parallax)
     UNITY_DEFINE_INSTANCED_PROP(half4, _EmissionColor)
     UNITY_DEFINE_INSTANCED_PROP(half4, _Anisotropy)
     UNITY_DEFINE_INSTANCED_PROP(half, _SubsurfaceThickness)
@@ -136,6 +140,14 @@
             material.baseColor *= baseColor;
         #else
             float2 uv = shadingData.uv.xy;
+            #if defined(_PARALLAXMAP)
+                float3 oViewDir = normalize(mul(shadingData.view, shadingData.tangentToWorld));
+                float2 uvShift = oViewDir.xy / oViewDir.z * UNITY_ACCESS_INSTANCED_PROP(Props, _Parallax);
+                float height = (1.0 - UNITY_SAMPLE_TEX2D_SAMPLER(_ParallaxMap, _MainTex, uv).g);
+                float2 huv = uv - uvShift * height;
+                height = (1.0 - UNITY_SAMPLE_TEX2D_SAMPLER(_ParallaxMap, _MainTex, huv).g);
+                uv = uv - uvShift * height;
+            #endif
             material.baseColor *= UNITY_SAMPLE_TEX2D(_MainTex, uv);
         #endif
         #if defined(_MASKMAP)
