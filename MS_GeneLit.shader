@@ -16,9 +16,9 @@
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _OcclusionStrength ("Occlusion", Range(0,1)) = 1.0
         _IoR ("IoR", Range(0.01, 5)) = 1.5
-        [SingleLine] _BumpScale ("Normal Scale", Float) = 1.0
+        [IfDef(_NORMALMAP)][SingleLine] _BumpScale ("Normal Scale", Float) = 1.0
         [SingleLine(_BumpScale, _NORMALMAP)][Normal] _BumpMap ("Normal Map", 2D) = "bump" {}
-        [SingleLine] _Parallax ("Height Scale", Range (0.005, 0.08)) = 0.02
+        [IfDef(_PARALLAXMAP)][SingleLine] _Parallax ("Height Scale", Range (0.005, 0.08)) = 0.02
         [IfNDef(_TILEMODE_NO_TILE)][SingleLine(_Parallax, _PARALLAXMAP)] _ParallaxMap ("Height Map", 2D) = "white" {}
         [SingleLine][HDR] _EmissionColor ("Emission Color", Color) = (0,0,0,1)
         [Emission]
