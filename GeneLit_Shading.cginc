@@ -31,7 +31,7 @@
         #if defined(_ALPHATEST_ON)
             // Use derivatives to smooth alpha tested edges
             float alpha = baseColor.a;
-            baseColor.a = (alpha - material.maskThreshold) / max(fwidth(alpha), 1e-3) + 0.5;
+            baseColor.a = saturate((alpha - material.maskThreshold) / max(fwidth(alpha), 1e-3) + 0.5);
         #endif
     }
 
