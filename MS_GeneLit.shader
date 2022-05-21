@@ -24,7 +24,7 @@
         [Emission]
         [SingleLine(_EmissionColor)] _EmissionMap ("Emission", 2D) = "white" {}
 
-        [IfDef(SHADING_MODEL_SUBSURFACE)] _SubsurfaceThickness ("Thickness", Float) = 0.5
+        [IfDef(SHADING_MODEL_SUBSURFACE)] _SubsurfaceThickness ("Thickness", Range(0,1)) = 0.5
         [IfDef(SHADING_MODEL_SUBSURFACE)] _SubsurfacePower ("Subsurface Power", Float) = 12.234
         [IfDef(SHADING_MODEL_SUBSURFACE)] _SubsurfaceColor ("Subsurface Color", Color) = (1,1,1,1)
 
