@@ -77,7 +77,7 @@
             half3 realtimeColor = DecodeRealtimeLightmap (realtimeColorTex);
 
             #ifdef DIRLIGHTMAP_COMBINED
-                half4 realtimeDirTex = UNITY_SAMPLE_TEX2D_SAMPLER(unity_DynamicDirectionality, unity_DynamicLightmap, shadingData._lightmapUV.zw);
+                half4 realtimeDirTex = UNITY_SAMPLE_TEX2D_SAMPLER(unity_DynamicDirectionality, unity_DynamicLightmap, shadingData.lightmapUV.zw);
                 irradiance += DecodeDirectionalLightmap (realtimeColor, realtimeDirTex, normalWorld);
             #else
                 irradiance += realtimeColor;
