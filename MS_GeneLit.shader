@@ -54,6 +54,9 @@
         [IfDef(_SHEEN)] _SheenColor ("Sheen Color", Color) = (0,0,0,1)
         [IfNDef(SHADING_MODEL_CLOTH)][IfDef(_SHEEN)] _SheenRoughness ("Sheen Roughness", Range(0,1)) = 0.0
 
+        [Header(Experimental)]
+        [Toggle(CAPSULE_AO)] _Capsule_AO ("Capsule AO", float) = 0
+
         [HideInInspector] _DFG ("_DFG", 2D) = "black" {}
 
         [HideInInspector] _SrcBlend ("__src", Float) = 1.0
@@ -101,6 +104,7 @@
             #pragma shader_feature_local _NORMALMAP
             #pragma shader_feature_local _PARALLAXMAP
             #pragma shader_feature_local _DETAIL_MULX2
+            #pragma shader_feature_local CAPSULE_AO
 
             #include "GeneLit_Core.cginc"
             ENDCG

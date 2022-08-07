@@ -84,6 +84,8 @@
             #endif
         #endif
 
+        irradiance *= shadingData.atten;
+
         return irradiance;
     }
 
@@ -381,6 +383,7 @@
         Fr = E * prefilteredRadiance(r, pixel.perceptualRoughness, shadingData.position);
 
         float diffuseAO = material.ambientOcclusion;
+
         #if defined(MATERIAL_HAS_BENT_NORMAL)
             float specAO = specularAO(shadingData.NoV, diffuseAO, pixel.roughness, shadingData.bentNormal, shadingData.reflected);
         #else

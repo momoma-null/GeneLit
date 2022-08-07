@@ -7,6 +7,9 @@
     #include "GeneLit_Utils.cginc"
     #include "GeneLit_LightingCommon.cginc"
     #include "GeneLit_Shading.cginc"
+    #if defined(CAPSULE_AO)
+        #include "GeneLit_CapsuleAO.cginc"
+    #endif
 
     struct v2f
     {
@@ -176,6 +179,12 @@
         inputs.baseColor = IN.color;
         initMaterial(shadingData, inputs);
         prepareMaterial(inputs, shadingData);
+
+        #if defined(CAPSULE_AO)
+            float capsuleShadow;
+            inputs.ambientOcclusion *= clculateAllCapOcclusion(shadingData.position, shadingData.normal, capsuleShadow);
+            shadingData.atten *= capsuleShadow;
+        #endif
 
         fragColor = evaluateMaterial(inputs, shadingData);
 
