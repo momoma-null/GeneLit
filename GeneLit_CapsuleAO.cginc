@@ -20,7 +20,7 @@
         float3 d = pa - h * ba;
         float l = length(d);
         float o = saturate(1.0 - dot(-d, n) * r * r / (l * l * l));
-        return o * o * 0.8 + 0.2;
+        return o * o;
     }
 
     // The MIT License
@@ -34,27 +34,20 @@
 
         // closest distance between ray and segment
         float3 n = normalize(cross(ba, cross(ba, oa)));
-        float3 oar = oa;// - r * n * sign(dot(n, -rd));
-        float oad  = dot(oar, rd);
+        float oad  = dot(oa, rd);
         float dba  = dot(rd, ba);
         float baba = dot(ba, ba);
-        float oaba = dot(oar, ba);
+        float oaba = dot(oa, ba);
         float th = saturate((oaba - oad * dba) / (baba - dba * dba + 0.000001));
 
         float3 p = a + ba * th;
-        // float pd = max(abs(dot(p - ro, rd)), 0.0001);
-        // float3 q = ro + rd * pd;
-        // float d = length(p - q) - r;
-
         float3 oc = ro - p;
         float ocd = dot(oc, rd);
         float c = dot(oc, oc) - r * r;
         float h = ocd - c / ocd;
 
-        // fake shadow
-        // float s = saturate(k * d / pd + 0.5);
         float s = saturate(h * k);
-        return r > 0 ? s * s * (3.0 - 2.0 * s) : 1;// ;
+        return r > 0 && ocd < 0 ? s * s * (3.0 - 2.0 * s) : 1;
     }
 
     half3 GetSHLength()
@@ -78,8 +71,8 @@
         for (uint i = 0; i < CAPSULE_COUNT; ++i)
         {
             float4 t = _topAndRadius[i];
-            ao *= capOcclusion(p, n, t.xyz, _bottom[i].xyz, t.w);
-            //shadow *= capShadow(p, l, t.xyz, _bottom[i].xyz, t.w, 4.0);
+            ao *= capOcclusion(p, n, t.xyz, _bottom[i].xyz, t.w) * 0.8 + 0.2;
+            //shadow = min(capShadow(p, l, t.xyz, _bottom[i].xyz, t.w, 10.0) * 0.8 + 0.2, shadow);
         }
         return ao;
     }
