@@ -49,22 +49,7 @@ void evaluateDirectionalLight(const MaterialInputs material, const PixelParams p
     FilamentLight light = getDirectionalLight(shadingData.normal);
 
     float visibility = shadingData.atten;
-    #if defined(SHADOWS_SCREEN) || defined(SHADOWS_DEPTH) || defined(SHADOWS_CUBE)
-        if (light.NoL > 0.0)
-        {
-            float ssContactShadowOcclusion = 0.0;
-            if (false && visibility > 0.0)
-            {
-                //ssContactShadowOcclusion = screenSpaceContactShadow(light.l);
-            }
-
-            visibility *= 1.0 - ssContactShadowOcclusion;
-
-            #if defined(MATERIAL_HAS_AMBIENT_OCCLUSION)
-                visibility *= computeMicroShadowing(light.NoL, material.ambientOcclusion);
-            #endif
-        }
-    #endif
+    visibility *= computeMicroShadowing(light.NoL, material.ambientOcclusion);
 
     color.rgb += surfaceShading(pixel, light, shadingData, visibility);
 }
