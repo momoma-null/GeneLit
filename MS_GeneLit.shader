@@ -45,8 +45,9 @@
         [IfDef(_CLEAR_COAT)] _ClearCoatRoughness ("Clear Coat Roughness", Range(0,1)) = 0.0
 
         [ToggleHeader(Refraction, _REFRACTION)]
+        [IfDef(_REFRACTION)][KeywordEnum(Solid, Thin)] Refraction_Type ("Refraction Type", Float) = 0.0
         [IfDef(_REFRACTION)] _Thickness ("Thickness", Float) = 0.5
-        [IfDef(_REFRACTION)] _Absorption ("Absorption", Range(0,1)) = 0.0
+        [IfDef(_REFRACTION)] _TransmittanceColor ("Transmittance Color", Color) = (0, 0, 0, 1)
         [IfDef(_REFRACTION)] _Transmission ("Transmission", Range(0,1)) = 0.0
 
         [IfNDef(SHADING_MODEL_CLOTH)]
@@ -105,6 +106,7 @@
             #pragma shader_feature_local _PARALLAXMAP
             #pragma shader_feature_local _DETAIL_MULX2
             #pragma shader_feature_local CAPSULE_AO
+            #pragma shader_feature_local REFRACTION_TYPE_SOLID REFRACTION_TYPE_THIN
 
             #include "GeneLit_Core.cginc"
             ENDCG

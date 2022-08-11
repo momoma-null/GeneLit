@@ -48,7 +48,7 @@
     UNITY_DEFINE_INSTANCED_PROP(half, _ClearCoat)
     UNITY_DEFINE_INSTANCED_PROP(half, _ClearCoatRoughness)
     UNITY_DEFINE_INSTANCED_PROP(half, _Thickness)
-    UNITY_DEFINE_INSTANCED_PROP(half, _Absorption)
+    UNITY_DEFINE_INSTANCED_PROP(half4, _TransmittanceColor)
     UNITY_DEFINE_INSTANCED_PROP(half, _Transmission)
     UNITY_DEFINE_INSTANCED_PROP(half4, _SheenColor)
     UNITY_DEFINE_INSTANCED_PROP(half, _SheenRoughness)
@@ -118,7 +118,7 @@
                 float thickness;
                 float3 absorption;
                 float transmission;
-                #if defined(MATERIAL_HAS_MICRO_THICKNESS) && (REFRACTION_TYPE == REFRACTION_TYPE_THIN)
+                #if defined(MATERIAL_HAS_MICRO_THICKNESS) && defined(REFRACTION_TYPE_THIN)
                     float microThickness;
                 #endif
             #endif
@@ -245,9 +245,9 @@
             material.ior = UNITY_ACCESS_INSTANCED_PROP(Props, _IoR);
             #if defined(_REFRACTION)
                 material.thickness = UNITY_ACCESS_INSTANCED_PROP(Props, _Thickness);
-                material.absorption = UNITY_ACCESS_INSTANCED_PROP(Props, _Absorption);
+                material.absorption = -log(UNITY_ACCESS_INSTANCED_PROP(Props, _TransmittanceColor).rgb) / max(material.thickness, 1e-5);
                 material.transmission = UNITY_ACCESS_INSTANCED_PROP(Props, _Transmission);
-                #if defined(MATERIAL_HAS_MICRO_THICKNESS) && (REFRACTION_TYPE == REFRACTION_TYPE_THIN)
+                #if defined(MATERIAL_HAS_MICRO_THICKNESS) && defined(REFRACTION_TYPE_THIN)
                     material.microThickness = 0.0;
                 #endif
             #endif

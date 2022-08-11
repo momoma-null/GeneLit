@@ -252,10 +252,6 @@
     }
 
     #if defined(_REFRACTION)
-        #define REFRACTION_TYPE_SOLID 0
-        #define REFRACTION_TYPE_THIN 1
-
-        #define REFRACTION_TYPE REFRACTION_TYPE_SOLID
 
         struct Refraction
         {
@@ -311,12 +307,12 @@
         {
             Refraction ray;
 
-            #if REFRACTION_TYPE == REFRACTION_TYPE_SOLID
+            #if defined(REFRACTION_TYPE_SOLID)
                 refractionSolidSphere(pixel, p, n0, -v, ray);
-            #elif REFRACTION_TYPE == REFRACTION_TYPE_THIN
+            #elif defined(REFRACTION_TYPE_THIN)
                 refractionThinSphere(pixel, p, n0, -v, ray);
             #else
-                #error invalid REFRACTION_TYPE
+                return;
             #endif
 
             // compute transmission T
@@ -326,7 +322,7 @@
             // of 1.5 has full microfacet refraction
             float perceptualRoughness = lerp(pixel.perceptualRoughnessUnclamped, 0.0,
             saturate(pixel.etaIR * 3.0 - 2.0));
-            #if REFRACTION_TYPE == REFRACTION_TYPE_THIN
+            #if defined(REFRACTION_TYPE_THIN)
                 // For thin surfaces, the light will bounce off at the second interface in the direction of
                 // the reflection, effectively adding to the specular, but this process will repeat itself.
                 // Each time the ray exits the surface on the front side after the first bounce,
