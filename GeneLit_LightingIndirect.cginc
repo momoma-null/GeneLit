@@ -56,7 +56,6 @@
                 irradiance += DecodeDirectionalLightmap (bakedColor, bakedDirTex, normalWorld);
 
                 #if defined(LIGHTMAP_SHADOW_MIXING) && !defined(SHADOWS_SHADOWMASK) && defined(SHADOWS_SCREEN)
-                    ResetUnityLight(o_gi.light);
                     irradiance = SubtractMainLightWithRealtimeAttenuationFromLightmap(irradiance, data.atten, bakedColorTex, normalWorld);
                 #endif
 
@@ -64,7 +63,6 @@
                 irradiance += bakedColor;
 
                 #if defined(LIGHTMAP_SHADOW_MIXING) && !defined(SHADOWS_SHADOWMASK) && defined(SHADOWS_SCREEN)
-                    ResetUnityLight(o_gi.light);
                     irradiance = SubtractMainLightWithRealtimeAttenuationFromLightmap(irradiance, data.atten, bakedColorTex, normalWorld);
                 #endif
 
