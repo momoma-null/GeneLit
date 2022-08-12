@@ -69,12 +69,8 @@
 
         #if !defined(SHADING_MODEL_CLOTH)
             pixel.diffuseColor = computeDiffuseColor(baseColor, material.metallic);
-            #if !defined(SHADING_MODEL_SUBSURFACE)
-                float reflectance = iorToF0(max(1.0, material.ior), 1.0);
-            #else
-                // Assumes an interface from air to an IOR of 1.5 for dielectrics
-                float reflectance = computeDielectricF0(material.reflectance);
-            #endif
+            // Assumes an interface from air to an IOR of 1.5 for dielectrics
+            float reflectance = computeDielectricF0(material.reflectance);
             pixel.f0 = computeF0(baseColor, material.metallic, reflectance);
         #else
             pixel.diffuseColor = baseColor.rgb;
@@ -88,13 +84,8 @@
             #if defined(_REFRACTION)
                 // Air's Index of refraction is 1.000277 at STP but everybody uses 1.0
                 const float airIor = 1.0;
-                #if false
-                    // [common case] ior is not set in the material, deduce it from F0
-                    float materialor = f0ToIor(pixel.f0.g);
-                #else
-                    // if ior is set in the material, use it (can lead to unrealistic materials)
-                    float materialor = max(1.0, material.ior);
-                #endif
+                // [common case] ior is not set in the material, deduce it from F0
+                float materialor = f0ToIor(pixel.f0.g);
                 pixel.etaIR = airIor / materialor;  // air -> material
                 pixel.etaRI = materialor / airIor;  // material -> air
                 pixel.transmission = saturate(material.transmission);

@@ -37,7 +37,7 @@
     UNITY_DEFINE_INSTANCED_PROP(half, _Metallic)
     UNITY_DEFINE_INSTANCED_PROP(half, _Glossiness)
     UNITY_DEFINE_INSTANCED_PROP(half, _OcclusionStrength)
-    UNITY_DEFINE_INSTANCED_PROP(half, _IoR)
+    UNITY_DEFINE_INSTANCED_PROP(half, _Reflectance)
     UNITY_DEFINE_INSTANCED_PROP(half, _BumpScale)
     UNITY_DEFINE_INSTANCED_PROP(half, _Parallax)
     UNITY_DEFINE_INSTANCED_PROP(half4, _EmissionColor)
@@ -114,7 +114,6 @@
         #endif
 
         #if !defined(SHADING_MODEL_CLOTH) && !defined(SHADING_MODEL_SUBSURFACE)
-            float ior;
             #if defined(_REFRACTION)
                 float thickness;
                 float3 absorption;
@@ -163,7 +162,7 @@
         material.roughness = 1.0 - UNITY_ACCESS_INSTANCED_PROP(Props, _Glossiness) * mods.a;
         #if !defined(SHADING_MODEL_CLOTH)
             material.metallic = UNITY_ACCESS_INSTANCED_PROP(Props, _Metallic) * mods.r;
-            material.reflectance = 0.5;
+            material.reflectance = UNITY_ACCESS_INSTANCED_PROP(Props, _Reflectance);
         #endif
         material.ambientOcclusion = UNITY_ACCESS_INSTANCED_PROP(Props, _OcclusionStrength) * mods.g;
 
@@ -243,7 +242,6 @@
         #endif
 
         #if !defined(SHADING_MODEL_CLOTH) && !defined(SHADING_MODEL_SUBSURFACE)
-            material.ior = UNITY_ACCESS_INSTANCED_PROP(Props, _IoR);
             #if defined(_REFRACTION)
                 material.thickness = UNITY_ACCESS_INSTANCED_PROP(Props, _Thickness);
                 material.absorption = -log(UNITY_ACCESS_INSTANCED_PROP(Props, _TransmittanceColor).rgb) / max(material.thickness, 1e-5);
