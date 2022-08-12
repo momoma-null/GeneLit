@@ -37,8 +37,7 @@ float3 sampleSunAreaLight(const float3 lightDirection) {
 FilamentLight getDirectionalLight(const float3 n)
 {
     FilamentLight light;
-    light.colorIntensity = _LightColor0;
-    light.colorIntensity.w = 1;
+    light.colorIntensity = float4(_LightColor0.rgb, 1);
     light.l = sampleSunAreaLight(normalize(_WorldSpaceLightPos0.xyz + float3(0, 1e-8, 0)));
     light.attenuation = 1.0;
     light.NoL = saturate(dot(n, light.l));

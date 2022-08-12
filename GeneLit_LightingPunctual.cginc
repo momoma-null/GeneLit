@@ -33,8 +33,7 @@ FilamentLight getLight(float3 worldPosition, float3 normal)
 
     // and populate the Light structure
     FilamentLight light;
-    light.colorIntensity.rgb = _LightColor0.rgb;
-    light.colorIntensity.w = 1;
+    light.colorIntensity = float4(_LightColor0.rgb, 1);
     light.l = normalize(posToLight + float3(0, 1e-8, 0));
     light.attenuation = 1;
     light.NoL = saturate(dot(normal, light.l));
@@ -56,15 +55,6 @@ void evaluatePunctualLights(const MaterialInputs material, const PixelParams pix
     FilamentLight light = getLight(shadingData.position, shadingData.normal);
 
     float visibility = shadingData.atten;
-    #if defined(SHADOWS_SCREEN) || defined(SHADOWS_DEPTH) || defined(SHADOWS_CUBE)
-        if (light.NoL > 0.0)
-        {
-            if (false && visibility > 0.0)
-            {
-                //visibility *= 1.0 - screenSpaceContactShadow(light.l);
-            }
-        }
-    #endif
 
     color.rgb += surfaceShading(pixel, light, shadingData, visibility);
 }
