@@ -41,7 +41,7 @@
         [IfDef(_ANISOTROPY)] _Anisotropy ("Anisotropy", Vector) = (1, 0, 0, 0)
 
         [ToggleHeader(ClearCoat, _CLEAR_COAT)]
-        [IfDef(_CLEAR_COAT)] _ClearCoat ("Clear Coat", Float) = 1.0
+        [IfDef(_CLEAR_COAT)] _ClearCoat ("Clear Coat", Range(0,1)) = 1.0
         [IfDef(_CLEAR_COAT)] _ClearCoatRoughness ("Clear Coat Roughness", Range(0,1)) = 0.0
 
         [ToggleHeader(Refraction, _REFRACTION)]
