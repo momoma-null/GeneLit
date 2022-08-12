@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using UnityEditor;
+﻿using UnityEditor;
+using UnityEngine;
 
 namespace MomomaAssets.GeneLit
 {
@@ -15,7 +15,8 @@ namespace MomomaAssets.GeneLit
         {
             foreach (Material mat in prop.targets)
             {
-                if (mat.globalIlluminationFlags != MaterialGlobalIlluminationFlags.EmissiveIsBlack)
+                MaterialEditor.FixupEmissiveFlag(mat);
+                if (0 != (mat.globalIlluminationFlags & MaterialGlobalIlluminationFlags.AnyEmissive))
                     mat.EnableKeyword(k_EmissionKeyword);
                 else
                     mat.DisableKeyword(k_EmissionKeyword);
