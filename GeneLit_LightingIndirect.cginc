@@ -289,16 +289,12 @@
         void refractionThinSphere(const PixelParams pixel, const float3 p, const float3 n, float3 r, out Refraction ray)
         {
             float d = 0.0;
-            #if defined(MATERIAL_HAS_MICRO_THICKNESS)
-                // note: we need the refracted ray to calculate the distance traveled
-                // we could use shading_NoV, but we would lose the dependency on ior.
-                float3 rr = refract(r, n, pixel.etaIR);
-                float NoR = dot(n, rr);
-                d = pixel.uThickness / max(-NoR, 0.001);
-                ray.position = p + rr * d;
-            #else
-                ray.position = p;
-            #endif
+            // note: we need the refracted ray to calculate the distance traveled
+            // we could use shading_NoV, but we would lose the dependency on ior.
+            float3 rr = refract(r, n, pixel.etaIR);
+            float NoR = dot(n, rr);
+            d = pixel.uThickness / max(-NoR, 0.001);
+            ray.position = p + rr * d;
             ray.direction = r;
             ray.d = d;
         }

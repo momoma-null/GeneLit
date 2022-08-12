@@ -100,7 +100,7 @@
                 pixel.transmission = saturate(material.transmission);
                 pixel.absorption = max(0, material.absorption);
                 pixel.thickness = max(0.0, material.thickness);
-                #if defined(MATERIAL_HAS_MICRO_THICKNESS) && (REFRACTION_TYPE == REFRACTION_TYPE_THIN)
+                #if defined(REFRACTION_TYPE_THIN)
                     pixel.uThickness = max(0.0, material.microThickness);
                 #else
                     pixel.uThickness = 0.0;

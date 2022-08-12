@@ -47,6 +47,7 @@
         [ToggleHeader(Refraction, _REFRACTION)]
         [IfDef(_REFRACTION)][KeywordEnum(Solid, Thin)] Refraction_Type ("Refraction Type", Float) = 0.0
         [IfDef(_REFRACTION)] _Thickness ("Thickness", Float) = 0.5
+        [IfDef(_REFRACTION)][IfDef(REFRACTION_TYPE_THIN)] _MicroThickness ("MicroThickness", Float) = 0.01
         [IfDef(_REFRACTION)] _TransmittanceColor ("Transmittance Color", Color) = (0, 0, 0, 1)
         [IfDef(_REFRACTION)] _Transmission ("Transmission", Range(0,1)) = 0.0
 
