@@ -237,9 +237,7 @@
             // We always evaluate the IBL as not having one is going to be uncommon,
             // it also saves 1 shader variant
             evaluateIBL(material, pixel, shadingData, color);
-            #if defined(USING_DIRECTIONAL_LIGHT)
-                evaluateDirectionalLight(material, pixel, shadingData, color);
-            #endif
+            evaluateDirectionalLight(material, pixel, shadingData, color);
         #elif UNITY_PASS_FORWARDADD
             evaluatePunctualLights(material, pixel, shadingData, color);
         #endif
