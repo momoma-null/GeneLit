@@ -67,6 +67,9 @@
     {
         UNITY_INITIALIZE_OUTPUT(ShadingData, shadingData);
 
+        // on build, unity_OcclusionMaskSelector may be 0 without any directional light
+        unity_OcclusionMaskSelector = sum(unity_OcclusionMaskSelector) == 0 ? fixed4(1, 0, 0, 0) : unity_OcclusionMaskSelector;
+
         float3 t = normalize(float3(IN.tSpace0.x, IN.tSpace1.x, IN.tSpace2.x));
         float3 b = normalize(float3(IN.tSpace0.y, IN.tSpace1.y, IN.tSpace2.y));
         float3 n = normalize(float3(IN.tSpace0.z, IN.tSpace1.z, IN.tSpace2.z));
