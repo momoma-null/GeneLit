@@ -2,6 +2,7 @@
     #define GENELIT_NOTILE_INCLUDED
 
     #include "UnityCG.cginc"
+    #include "GeneLit_Utils.cginc"
 
     struct TileInfo
     {
@@ -31,13 +32,6 @@
     float4 b##col = UNITY_SAMPLE_TEX2D_SAMPLER_LOD(tex, samplertex, coord + tileInfo.offb, tileInfo.mip);\
     float4 col = lerp(a##col, b##col, smoothstep(0.2, 0.8, tileInfo.f - 0.1 * sum(a##col - b##col)));
 
-    inline float2 hash22(float2 p)
-    {
-        static const float2 k = float2(0.3183099, 0.3678794);
-        p = p * k + k.yx;
-        return frac(16.0 * k * frac(p.x * p.y * (p.x + p.y))) * 2.0 - 1.0;
-    }
-
     float simplexNoise2D(float2 p)
     {
         const float K1 = 0.366025404;//(sqrt(3)-1)/2;
@@ -52,11 +46,6 @@
         float3 n = h * h * h * h * float3(dot(a, hash22(i)), dot(b, hash22(i + o)), dot(c, hash22(i + 1.0)));
 
         return (n.x + n.y + n.z) * 35.0 + 0.5;
-    }
-
-    inline float sum(float3 v)
-    {
-        return v.x + v.y + v.z;
     }
 
     inline float ComputeTextureLOD(float2 uvdx, float2 uvdy, float2 texelSize)

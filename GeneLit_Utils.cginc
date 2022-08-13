@@ -248,4 +248,21 @@
             return saturate(f0 * (f0 * (0.941892 - 0.263008 * f0) + 0.346479) - 0.0285998);
         #endif
     }
+
+    inline float sum(const float3 v)
+    {
+        return v.x + v.y + v.z;
+    }
+
+    inline float sum(const float4 v)
+    {
+        return v.x + v.y + v.z + v.w;
+    }
+
+    inline float2 hash22(float2 p)
+    {
+        static const float2 k = float2(0.3183099, 0.3678794);
+        p = p * k + k.yx;
+        return frac(16.0 * k * frac(p.x * p.y * (p.x + p.y))) * 2.0 - 1.0;
+    }
 #endif
