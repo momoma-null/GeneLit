@@ -243,7 +243,7 @@
     void evaluateSubsurfaceIBL(const PixelParams pixel, const ShadingData shadingData, const float3 diffuseIrradiance, inout float3 Fd, inout float3 Fr)
     {
         #if defined(SHADING_MODEL_SUBSURFACE)
-            float3 viewDependent = prefilteredRadiance(-shadingData.view, pixel.roughness, 1.0 + pixel.subsurfaceThickness);
+            float3 viewDependent = prefilteredRadiance(-shadingData.view, pixel.roughness, 1.0 + pixel.subsurfaceThickness, shadingData.position);
             float attenuation = (1.0 - pixel.subsurfaceThickness) / (2.0 * PI);
             Fd += pixel.subsurfaceColor * (diffuseIrradiance + viewDependent) * attenuation;
         #elif defined(SHADING_MODEL_CLOTH) && defined(MATERIAL_HAS_SUBSURFACE_COLOR)
