@@ -91,8 +91,11 @@
         //    shadingData.normalizedViewportCoord = p.xy * 0.5 / p.w + 0.5
         shadingData.normalizedViewportCoord = ComputeScreenPos(UnityWorldToClipPos(shadingData.position));
 
-
-        #if defined(LIGHTMAP_ON) || defined(DYNAMICLIGHTMAP_ON)
+        #if defined(LIGHTMAP_ON)
+            half4 bakedColorTex = UNITY_SAMPLE_TEX2D(unity_Lightmap, IN.ambientOrLightmapUV.xy);
+            shadingData.ambient = DecodeLightmap(bakedColorTex);
+            shadingData.lightmapUV = IN.ambientOrLightmapUV;
+        #elif defined(DYNAMICLIGHTMAP_ON)
             shadingData.ambient = 0;
             shadingData.lightmapUV = IN.ambientOrLightmapUV;
         #else
@@ -127,6 +130,12 @@
         #if defined(_CLEAR_COAT)
             #if defined(_CLEAR_COAT_NORMAL)
                 shadingData.clearCoatNormal = normalize(mul(shadingData.tangentToWorld, material.clearCoatNormal));
+            #endif
+        #endif
+
+        #if defined(LIGHTMAP_ON)
+            #if defined(LIGHTMAP_SHADOW_MIXING) && !defined(SHADOWS_SHADOWMASK) && defined(SHADOWS_SCREEN)
+                shadingData.ambient = SubtractMainLightWithRealtimeAttenuationFromLightmap(shadingData.ambient, shadingData.atten, 0, shadingData.normal);
             #endif
         #endif
     }

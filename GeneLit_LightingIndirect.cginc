@@ -41,26 +41,9 @@
 
     float3 diffuseIrradiance(const float3 normalWorld, const ShadingData shadingData)
     {
-        float3 irradiance = 0;
+        float3 irradiance = shadingData.ambient;
         #if UNITY_SHOULD_SAMPLE_SH
-            irradiance = ShadeSHPerPixel(normalWorld, shadingData.ambient, shadingData.position);
-        #endif
-
-        #if defined(LIGHTMAP_ON)
-            // Baked lightmaps
-            half4 bakedColorTex = UNITY_SAMPLE_TEX2D(unity_Lightmap, shadingData.lightmapUV.xy);
-            half3 bakedColor = DecodeLightmap(bakedColorTex);
-
-            #ifdef DIRLIGHTMAP_COMBINED
-                fixed4 bakedDirTex = UNITY_SAMPLE_TEX2D_SAMPLER (unity_LightmapInd, unity_Lightmap, shadingData.lightmapUV.xy);
-                irradiance += DecodeDirectionalLightmap (bakedColor, bakedDirTex, normalWorld);
-            #else // not directional lightmap
-                irradiance += bakedColor;
-            #endif
-
-            #if defined(LIGHTMAP_SHADOW_MIXING) && !defined(SHADOWS_SHADOWMASK) && defined(SHADOWS_SCREEN)
-                irradiance = SubtractMainLightWithRealtimeAttenuationFromLightmap(irradiance, shadingData.atten, bakedColorTex, normalWorld);
-            #endif
+            irradiance = ShadeSHPerPixel(normalWorld, irradiance, shadingData.position);
         #endif
 
         #ifdef DYNAMICLIGHTMAP_ON
