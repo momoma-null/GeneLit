@@ -54,18 +54,12 @@
             #ifdef DIRLIGHTMAP_COMBINED
                 fixed4 bakedDirTex = UNITY_SAMPLE_TEX2D_SAMPLER (unity_LightmapInd, unity_Lightmap, shadingData.lightmapUV.xy);
                 irradiance += DecodeDirectionalLightmap (bakedColor, bakedDirTex, normalWorld);
-
-                #if defined(LIGHTMAP_SHADOW_MIXING) && !defined(SHADOWS_SHADOWMASK) && defined(SHADOWS_SCREEN)
-                    irradiance = SubtractMainLightWithRealtimeAttenuationFromLightmap(irradiance, data.atten, bakedColorTex, normalWorld);
-                #endif
-
             #else // not directional lightmap
                 irradiance += bakedColor;
+            #endif
 
-                #if defined(LIGHTMAP_SHADOW_MIXING) && !defined(SHADOWS_SHADOWMASK) && defined(SHADOWS_SCREEN)
-                    irradiance = SubtractMainLightWithRealtimeAttenuationFromLightmap(irradiance, data.atten, bakedColorTex, normalWorld);
-                #endif
-
+            #if defined(LIGHTMAP_SHADOW_MIXING) && !defined(SHADOWS_SHADOWMASK) && defined(SHADOWS_SCREEN)
+                irradiance = SubtractMainLightWithRealtimeAttenuationFromLightmap(irradiance, shadingData.atten, bakedColorTex, normalWorld);
             #endif
         #endif
 
