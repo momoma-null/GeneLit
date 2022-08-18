@@ -142,12 +142,12 @@
             float2 uv = shadingData.uv.xy;
             #if defined(_PARALLAXMAP)
                 float3 oViewDir = normalize(mul(shadingData.view, shadingData.tangentToWorld));
-                float2 uvShift = oViewDir.xy * UNITY_ACCESS_INSTANCED_PROP(Props, _Parallax);
-                float height = 1.0 - UNITY_SAMPLE_TEX2D_SAMPLER(_ParallaxMap, _MainTex, uv).g;
-                float2 huv = uv - uvShift * height;
-                float height2 = 1.0 - UNITY_SAMPLE_TEX2D_SAMPLER(_ParallaxMap, _MainTex, huv).g;
-                height = lerp(height, height2, 0.5 + 0.5 * height2 * height2);
-                uv = uv - uvShift * height;
+                float2 uvShift = oViewDir.xy / (oViewDir.z + 0.42) * UNITY_ACCESS_INSTANCED_PROP(Props, _Parallax);
+                float h1 = 1.0 - UNITY_SAMPLE_TEX2D_SAMPLER(_ParallaxMap, _MainTex, uv).g;
+                float2 huv = uv - h1 * 0.5 * uvShift;
+                float h2 = 1.0 - UNITY_SAMPLE_TEX2D_SAMPLER(_ParallaxMap, _MainTex, huv).g;
+                float height = (h1 + h2) * 0.5;
+                uv -= uvShift * height;
             #endif
             material.baseColor *= UNITY_SAMPLE_TEX2D(_MainTex, uv);
         #endif
