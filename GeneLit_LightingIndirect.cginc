@@ -245,7 +245,7 @@
             ray.position = p + r * d;
             ray.d = d;
             float3 n1 = normalize(NoR * r - n * 0.5);
-            ray.direction = refract(r, n1,  pixel.etaRI);
+            ray.direction = refract(r, n1, pixel.etaRI);
         }
 
         void refractionSolidBox(const PixelParams pixel, const float3 p, const float3 n, float3 r, out Refraction ray)
@@ -310,7 +310,7 @@
             #if REFRACTION_MODE == REFRACTION_MODE_CUBEMAP
                 // when reading from the cubemap, we are not pre-exposed so we apply iblLuminance
                 // which is not the case when we'll read from the screen-space buffer
-                float3 Ft = prefilteredRadiance(ray.direction, perceptualRoughness, p);
+                float3 Ft = prefilteredRadiance(ray.direction, perceptualRoughness, ray.position);
             #else
                 // compute the point where the ray exits the medium, if needed
                 float4 screenPos = UnityWorldToClipPos(ray.position);
