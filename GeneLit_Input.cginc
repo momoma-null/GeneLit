@@ -144,9 +144,12 @@
                 float3 oViewDir = normalize(mul(shadingData.view, shadingData.tangentToWorld));
                 float2 uvShift = oViewDir.xy / (oViewDir.z + 0.42) * UNITY_ACCESS_INSTANCED_PROP(Props, _Parallax);
                 float h1 = 1.0 - UNITY_SAMPLE_TEX2D_SAMPLER(_ParallaxMap, _MainTex, uv).g;
-                float2 huv = uv - h1 * 0.5 * uvShift;
+                float shift1 = h1 * 0.5;
+                float2 huv = uv - shift1 * uvShift;
                 float h2 = 1.0 - UNITY_SAMPLE_TEX2D_SAMPLER(_ParallaxMap, _MainTex, huv).g;
-                float height = (h1 + h2) * 0.5;
+                float a = (oViewDir.z + 0.42) * shift1 + 1e-4;
+                float b = h2 - h1;
+                float height = (b + sqrt(b * b + 4 * a * h1)) / a * shift1;
                 uv -= uvShift * height;
             #endif
             material.baseColor *= UNITY_SAMPLE_TEX2D(_MainTex, uv);
