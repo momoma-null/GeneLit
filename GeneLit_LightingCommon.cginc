@@ -95,7 +95,7 @@
     float computeMicroShadowing(float NoL, float visibility)
     {
         // Chan 2018, "Material Advances in Call of Duty: WWII"
-        float aperture = rsqrt(1.0 - visibility);
+        float aperture = rsqrt(1.001 - visibility);
         float microShadow = saturate(NoL * aperture);
         return microShadow * microShadow;
     }
