@@ -50,29 +50,16 @@
         return r > 0 && ocd < 0 ? s * s * (3.0 - 2.0 * s) : 1;
     }
 
-    half3 GetSHLength()
-    {
-        half3 x, x1;
-        x.r = length(unity_SHAr);
-        x.g = length(unity_SHAg);
-        x.b = length(unity_SHAb);
-        x1.r = length(unity_SHBr);
-        x1.g = length(unity_SHBg);
-        x1.b = length(unity_SHBb);
-        return x + x1;
-    }
-
-    float clculateAllCapOcclusion(float3 p, float3 n, out float shadow)
+    float clculateAllCapOcclusion(float3 p, float3 n, float3 l, out float shadow)
     {
         float ao = 1;
         shadow = 1;
-        float3 l = normalize(GetSHLength() + float3(0, 1e-6, 0));
         UNITY_UNROLL
         for (uint i = 0; i < CAPSULE_COUNT; ++i)
         {
             float4 t = _topAndRadius[i];
             ao *= capOcclusion(p, n, t.xyz, _bottom[i].xyz, t.w) * 0.8 + 0.2;
-            //shadow = min(capShadow(p, l, t.xyz, _bottom[i].xyz, t.w, 10.0) * 0.8 + 0.2, shadow);
+            shadow = min(capShadow(p, l, t.xyz, _bottom[i].xyz, t.w, 4.0) * 0.5 + 0.5, shadow);
         }
         return ao;
     }

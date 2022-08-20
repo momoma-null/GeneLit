@@ -8,6 +8,18 @@
     #include "GeneLit_LightingIndirect.cginc"
     #include "GeneLit_LightingPunctual.cginc"
 
+    #if defined(CAPSULE_AO)
+        #include "GeneLit_CapsuleAO.cginc"
+    #endif
+
+    #if defined(SHADING_MODEL_SUBSURFACE)
+        #include "GeneLit_Model_Subsurface.cginc"
+    #elif defined(SHADING_MODEL_CLOTH)
+        #include "GeneLit_Model_Cloth.cginc"
+    #else
+        #include "GeneLit_Model_Standard.cginc"
+    #endif
+
     //------------------------------------------------------------------------------
     // Lighting
     //------------------------------------------------------------------------------
@@ -216,10 +228,11 @@
     *
     * Returns a pre-exposed HDR RGBA color in linear space.
     */
-    float4 evaluateLights(const MaterialInputs material, const ShadingData shadingData)
+    float4 evaluateLights(const MaterialInputs material, const ShadingData shadingData, float atten)
     {
         PixelParams pixel;
         UNITY_INITIALIZE_OUTPUT(PixelParams, pixel);
+        pixel.attenuation = atten;
         getCommonPixelParams(material, pixel);
         getSheenPixelParams(material, shadingData, pixel);
         getClearCoatPixelParams(material, shadingData, pixel);
@@ -232,15 +245,29 @@
         // until the very end but it costs more ALUs on mobile. The gains are
         // currently not worth the extra operations
         float3 color = 0.0;
-
+        float visibility = 1.0;
+        FilamentLight light;
+        UNITY_INITIALIZE_OUTPUT(FilamentLight, light)
         #if UNITY_PASS_FORWARDBASE
+            light = getDirectionalLight(shadingData);
+            float occlusion = material.ambientOcclusion;
+
+            #if defined(CAPSULE_AO)
+                float capsuleShadow;
+                occlusion *= clculateAllCapOcclusion(shadingData.position, shadingData.normal, light.l, capsuleShadow);
+                pixel.attenuation *= lerp(1.0, capsuleShadow, max3(light.colorIntensity.rgb));
+            #endif
+
             // We always evaluate the IBL as not having one is going to be uncommon,
             // it also saves 1 shader variant
-            evaluateIBL(material, pixel, shadingData, color);
-            evaluateDirectionalLight(material, pixel, shadingData, color);
+            evaluateIBL(pixel, shadingData, occlusion, color);
+
+            visibility = pixel.attenuation * computeMicroShadowing(light.NoL, occlusion);
         #elif UNITY_PASS_FORWARDADD
-            evaluatePunctualLights(material, pixel, shadingData, color);
+            light = getPunctualLights(shadingData);
+            visibility = pixel.attenuation;
         #endif
+        color.rgb += surfaceShading(pixel, light, shadingData, visibility);
 
         return float4(color, computeDiffuseAlpha(material.baseColor.a));
     }
@@ -257,9 +284,9 @@
     *
     * Returns a pre-exposed HDR RGBA color in linear space.
     */
-    float4 evaluateMaterial(const MaterialInputs material, const ShadingData shadingData)
+    float4 evaluateMaterial(const MaterialInputs material, const ShadingData shadingData, float atten)
     {
-        float4 color = evaluateLights(material, shadingData);
+        float4 color = evaluateLights(material, shadingData, atten);
         #if UNITY_PASS_FORWARDBASE
             addEmissive(material, color);
         #endif

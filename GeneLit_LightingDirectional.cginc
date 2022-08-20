@@ -5,14 +5,6 @@
 #include "GeneLit_LightingCommon.cginc"
 #include "GeneLit_Utils.cginc"
 
-#if defined(SHADING_MODEL_SUBSURFACE)
-    #include "GeneLit_Model_Subsurface.cginc"
-#elif defined(SHADING_MODEL_CLOTH)
-    #include "GeneLit_Model_Cloth.cginc"
-#else
-    #include "GeneLit_Model_Standard.cginc"
-#endif
-
 //------------------------------------------------------------------------------
 // Directional light evaluation
 //------------------------------------------------------------------------------
@@ -62,14 +54,4 @@ FilamentLight getDirectionalLight(const ShadingData shadingData)
     light.attenuation = 1.0;
     light.NoL = saturate(dot(shadingData.normal, light.l));
     return light;
-}
-
-void evaluateDirectionalLight(const MaterialInputs material, const PixelParams pixel, const ShadingData shadingData, inout float3 color)
-{
-    FilamentLight light = getDirectionalLight(shadingData);
-
-    float visibility = shadingData.atten;
-    visibility *= computeMicroShadowing(light.NoL, material.ambientOcclusion);
-
-    color.rgb += surfaceShading(pixel, light, shadingData, visibility);
 }

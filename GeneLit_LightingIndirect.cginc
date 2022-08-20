@@ -49,17 +49,15 @@
         #ifdef DYNAMICLIGHTMAP_ON
             // Dynamic lightmaps
             fixed4 realtimeColorTex = UNITY_SAMPLE_TEX2D(unity_DynamicLightmap, shadingData.lightmapUV.zw);
-            half3 realtimeColor = DecodeRealtimeLightmap (realtimeColorTex);
+            half3 realtimeColor = DecodeRealtimeLightmap(realtimeColorTex);
 
             #ifdef DIRLIGHTMAP_COMBINED
                 half4 realtimeDirTex = UNITY_SAMPLE_TEX2D_SAMPLER(unity_DynamicDirectionality, unity_DynamicLightmap, shadingData.lightmapUV.zw);
-                irradiance += DecodeDirectionalLightmap (realtimeColor, realtimeDirTex, normalWorld);
+                irradiance += DecodeDirectionalLightmap(realtimeColor, realtimeDirTex, normalWorld);
             #else
                 irradiance += realtimeColor;
             #endif
         #endif
-
-        irradiance *= shadingData.atten;
 
         return irradiance;
     }
@@ -341,7 +339,7 @@
         }
     #endif
 
-    void evaluateIBL(const MaterialInputs material, const PixelParams pixel, const ShadingData shadingData, inout float3 color)
+    void evaluateIBL(const PixelParams pixel, const ShadingData shadingData, float occlusion, inout float3 color)
     {
         // specular layer
         float3 Fr;
@@ -349,7 +347,7 @@
         float3 r = getReflectedVector(pixel, shadingData.view, shadingData.normal, shadingData.reflected);
         Fr = E * prefilteredRadiance(r, pixel.perceptualRoughness, shadingData.position);
 
-        float diffuseAO = material.ambientOcclusion;
+        float diffuseAO = occlusion;
 
         #if defined(MATERIAL_HAS_BENT_NORMAL)
             float specAO = specularAO(shadingData.NoV, diffuseAO, pixel.roughness, shadingData.bentNormal, shadingData.reflected);
@@ -369,7 +367,7 @@
             float3 diffuseNormal = shadingData.normal;
         #endif
 
-        float3 irradiance = diffuseIrradiance(diffuseNormal, shadingData);
+        float3 irradiance = diffuseIrradiance(diffuseNormal, shadingData) * pixel.attenuation;
         float3 Fd = pixel.diffuseColor * irradiance * saturate(1.0 - E) * diffuseBRDF;
 
         // subsurface layer

@@ -3,58 +3,26 @@
 #include "UnityLightingCommon.cginc"
 #include "GeneLit_LightingCommon.cginc"
 
-#if defined(SHADING_MODEL_SUBSURFACE)
-    #include "GeneLit_Model_Subsurface.cginc"
-#elif defined(SHADING_MODEL_CLOTH)
-    #include "GeneLit_Model_Cloth.cginc"
-#else
-    #include "GeneLit_Model_Standard.cginc"
-#endif
-
 //------------------------------------------------------------------------------
-// Punctual lights evaluation
+// Punctual lights
 //------------------------------------------------------------------------------
 
-/**
-* Returns a Light structure (see common_lighting.fs) describing a point or spot light.
-* The colorIntensity field will store the *pre-exposed* intensity of the light
-* in the w component.
-*
-* The light parameters used to compute the Light structure are fetched from the
-* lightsUniforms uniform buffer.
-*/
-
-FilamentLight getLight(float3 worldPosition, float3 normal)
+FilamentLight getPunctualLights(const ShadingData shadingData)
 {
     // retrieve the light data from the UBO
 
     // poition-to-light vector
-    float3 posToLight = _WorldSpaceLightPos0.xyz - worldPosition * _WorldSpaceLightPos0.w;
+    float3 posToLight = _WorldSpaceLightPos0.xyz - shadingData.position * _WorldSpaceLightPos0.w;
 
     // and populate the Light structure
     FilamentLight light;
     light.colorIntensity = float4(_LightColor0.rgb, 1);
     light.l = normalize(posToLight + float3(0, 1e-8, 0));
     light.attenuation = 1;
-    light.NoL = saturate(dot(normal, light.l));
+    light.NoL = saturate(dot(shadingData.normal, light.l));
     #ifdef SPOT
-        unityShadowCoord4 lightCoord = mul(unity_WorldToLight, unityShadowCoord4(worldPosition, 1));
+        unityShadowCoord4 lightCoord = mul(unity_WorldToLight, unityShadowCoord4(shadingData.position, 1));
         light.attenuation *= UnitySpotCookie(lightCoord) * UnitySpotAttenuate(lightCoord.xyz);
     #endif
     return light;
-}
-
-/**
-* Evaluates all punctual lights that my affect the current fragment.
-* The result of the lighting computations is accumulated in the color
-* parameter, as linear HDR RGB.
-*/
-void evaluatePunctualLights(const MaterialInputs material, const PixelParams pixel, const ShadingData shadingData, inout float3 color)
-{
-    // Iterate point lights
-    FilamentLight light = getLight(shadingData.position, shadingData.normal);
-
-    float visibility = shadingData.atten;
-
-    color.rgb += surfaceShading(pixel, light, shadingData, visibility);
 }

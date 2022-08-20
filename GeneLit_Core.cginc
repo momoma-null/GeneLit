@@ -7,9 +7,6 @@
     #include "GeneLit_Utils.cginc"
     #include "GeneLit_LightingCommon.cginc"
     #include "GeneLit_Shading.cginc"
-    #if defined(CAPSULE_AO)
-        #include "GeneLit_CapsuleAO.cginc"
-    #endif
 
     struct v2f
     {
@@ -103,8 +100,6 @@
             shadingData.lightmapUV = 0;
         #endif
 
-        UNITY_LIGHT_ATTENUATION(atten, IN, shadingData.position);
-        shadingData.atten = atten;
         shadingData.uv = IN.uv;
     }
 
@@ -191,14 +186,9 @@
         inputs.baseColor = IN.color;
         initMaterial(shadingData, inputs);
         prepareMaterial(inputs, shadingData);
+        UNITY_LIGHT_ATTENUATION(atten, IN, shadingData.position);
 
-        #if defined(CAPSULE_AO)
-            float capsuleShadow;
-            inputs.ambientOcclusion *= clculateAllCapOcclusion(shadingData.position, shadingData.normal, capsuleShadow);
-            shadingData.atten *= capsuleShadow;
-        #endif
-
-        fragColor = evaluateMaterial(inputs, shadingData);
+        fragColor = evaluateMaterial(inputs, shadingData, atten);
 
         #if defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2)
             float l = distance(shadingData.position, _WorldSpaceCameraPos);

@@ -18,6 +18,7 @@
         float  roughness;
         float3 dfg;
         float3 energyCompensation;
+        float attenuation;
 
         #if defined(_CLEAR_COAT)
             float clearCoat;
@@ -84,7 +85,6 @@
         float2 normalizedViewportCoord;
         half3 ambient;
         half4 lightmapUV;
-        float atten;
         #if defined(_DETAIL_MULX2)
             float4 uv;
         #else
