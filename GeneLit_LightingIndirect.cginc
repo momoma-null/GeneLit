@@ -66,12 +66,44 @@
     // IBL specular
     //------------------------------------------------------------------------------
 
+    inline float4 cylIntersect(float3 ro, float3 rd, float3 c, float pMin, float pMax, float ra)
+    {
+        float2 ho = ro.xz - c.xz;
+        float rdl = length(rd.xz);
+        float b = dot(ho, rd.xz / rdl);
+        float d = b * b + ra * ra - dot(ho, ho);
+        float k = (-b + sqrt(max(d, 0.0))) / rdl;
+        float rbmax = (pMax - ro.y) / rd.y;
+        float rbmin = (pMin - ro.y) / rd.y;
+        k = min(k, (rd.y > 0.0f) ? rbmax : rbmin);
+        return d < 0 ? -1.0 : float4(k * rd + ro, 1);
+    }
+
+    inline float3 CylinderProjectedCubemapDirection(float3 worldRefl, float3 worldPos, float4 cubemapCenter, float4 boxMin, float4 boxMax)
+    {
+        UNITY_BRANCH
+        if (cubemapCenter.w > 0.0)
+        {
+            float3 nrdir = normalize(worldRefl);
+            float r = min(min(abs(boxMin.x - cubemapCenter.x), abs(boxMin.z - cubemapCenter.z)), min(abs(boxMax.x - cubemapCenter.x), abs(boxMax.z - cubemapCenter.z)));
+            float4 intersectPos = cylIntersect(worldPos, nrdir, cubemapCenter.xyz, boxMin.y, boxMax.y, r);
+            worldRefl = intersectPos.w > 0 ? (intersectPos.xyz - cubemapCenter.xyz) : nrdir;
+        }
+        return worldRefl;
+    }
+
+    #if defined(REFLECTION_SPACE_CYLINDER)
+        #define GENELIT_PROJECTED_DIRECTION CylinderProjectedCubemapDirection
+    #else
+        #define GENELIT_PROJECTED_DIRECTION BoxProjectedCubemapDirection
+    #endif
+
     inline half3 indirectSpecular(float3 r, float lod, float3 worldPos)
     {
         half3 specular;
 
         #ifdef UNITY_SPECCUBE_BOX_PROJECTION
-            float3 refDir = BoxProjectedCubemapDirection(r, worldPos, unity_SpecCube0_ProbePosition, unity_SpecCube0_BoxMin, unity_SpecCube0_BoxMax);
+            float3 refDir = GENELIT_PROJECTED_DIRECTION(r, worldPos, unity_SpecCube0_ProbePosition, unity_SpecCube0_BoxMin, unity_SpecCube0_BoxMax);
         #else
             float3 refDir = r;
         #endif

@@ -58,6 +58,7 @@
 
         [Header(Experimental)]
         [Toggle(CAPSULE_AO)] _Capsule_AO ("Capsule AO", float) = 0
+        [KeywordEnum(Cube, Cylinder)] Reflection_Space ("Reflection Space", Float) = 0.0
 
         [HideInInspector] _DFG ("_DFG", 2D) = "black" {}
 
@@ -108,6 +109,7 @@
             #pragma shader_feature_local _DETAIL_MULX2
             #pragma shader_feature_local CAPSULE_AO
             #pragma shader_feature_local REFRACTION_TYPE_SOLID REFRACTION_TYPE_THIN
+            #pragma shader_feature_local REFLECTION_SPACE_CUBE REFLECTION_SPACE_CYLINDER
 
             #include "GeneLit_Core.cginc"
             ENDCG
