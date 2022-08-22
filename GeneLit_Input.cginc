@@ -149,7 +149,7 @@
                 float h2 = 1.0 - UNITY_SAMPLE_TEX2D_SAMPLER(_ParallaxMap, _MainTex, huv).g;
                 float a = (oViewDir.z + 0.42) * shift1 + 1e-4;
                 float b = h2 - h1;
-                float height = (b + sqrt(b * b + 4 * a * h1)) / a * shift1;
+                float height = shift1 * (b + sqrt(max(0.0, b * b + 4 * a * h1))) / (2.0 * a);
                 uv -= uvShift * height;
             #endif
             material.baseColor *= UNITY_SAMPLE_TEX2D(_MainTex, uv);
