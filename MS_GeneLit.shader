@@ -60,7 +60,7 @@
         [Toggle(CAPSULE_AO)] _Capsule_AO ("Capsule AO", float) = 0
         [KeywordEnum(Cube, Cylinder)] Reflection_Space ("Reflection Space", Float) = 0.0
 
-        [HideInInspector] _DFG ("_DFG", 2D) = "black" {}
+        [NonModifiableTextureData] _DFG ("_DFG", 2D) = "black" {}
 
         [HideInInspector] _SrcBlend ("__src", Float) = 1.0
         [HideInInspector] _DstBlend ("__dst", Float) = 0.0
