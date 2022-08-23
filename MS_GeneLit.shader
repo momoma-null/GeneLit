@@ -34,9 +34,9 @@
         [ToggleHeader(Detail Map, _DETAIL_MULX2)]
         [IfDef(_DETAIL_MULX2)][Enum(UV0,0,UV1,1,UV2,2,UV3,3)] _UVSec ("UV Set", Float) = 0
         [ScaleOffset][IfDef(_DETAIL_MULX2)][SingleLine] _DetailMap ("Albedo", 2D) = "grey" {}
-        [IfDef(_DETAIL_MULX2)] _DetailAlbedoScale ("Albedo Scale", Range(0, 1)) = 1.0
-        [IfDef(_DETAIL_MULX2)] _DetailNormalScale ("Normal Scale", Range(0, 1)) = 1.0
-        [IfDef(_DETAIL_MULX2)] _DetailSmoothnessScale ("Smoothness Scale", Range(0, 1)) = 1.0
+        [IfDef(_DETAIL_MULX2)] _DetailAlbedoScale ("Albedo Scale", Range(0, 2)) = 1.0
+        [IfDef(_DETAIL_MULX2)] _DetailNormalScale ("Normal Scale", Range(0, 2)) = 1.0
+        [IfDef(_DETAIL_MULX2)] _DetailSmoothnessScale ("Smoothness Scale", Range(0, 2)) = 1.0
 
         [ToggleHeader(ClearCoat, _CLEAR_COAT)]
         [IfDef(_CLEAR_COAT)] _ClearCoat ("Clear Coat", Range(0,1)) = 1.0
