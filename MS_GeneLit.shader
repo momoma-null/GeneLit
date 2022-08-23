@@ -13,9 +13,9 @@
         [IfDef(_ALPHATEST_ON)]_Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
         [SingleLine(, _MASKMAP)] _MaskMap ("Mask Map", 2D) = "white" {}
         [IfNDef(SHADING_MODEL_CLOTH)] _Metallic ("Metallic", Range(0,1)) = 0.0
+        [IfNDef(SHADING_MODEL_CLOTH)] _Reflectance ("Reflectance", Range(0.35, 1.0)) = 0.5
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _OcclusionStrength ("Occlusion", Range(0,1)) = 1.0
-        _Reflectance ("Reflectance", Range(0.35, 1.0)) = 0.5
         [IfDef(_NORMALMAP)][SingleLine] _BumpScale ("Normal Scale", Float) = 1.0
         [SingleLine(_BumpScale, _NORMALMAP)][Normal] _BumpMap ("Normal Map", 2D) = "bump" {}
         [IfDef(_PARALLAXMAP)][SingleLine] _Parallax ("Height Scale", Range (0.005, 0.08)) = 0.02
@@ -38,21 +38,28 @@
         [IfDef(_DETAIL_MULX2)] _DetailNormalScale ("Normal Scale", Range(0, 2)) = 1.0
         [IfDef(_DETAIL_MULX2)] _DetailSmoothnessScale ("Smoothness Scale", Range(0, 2)) = 1.0
 
+        [IfNDef(SHADING_MODEL_CLOTH)][IfNDef(SHADING_MODEL_SUBSURFACE)]
+        [ToggleHeader(Sheen, _SHEEN)]
+        [IfNDef(SHADING_MODEL_CLOTH)][IfNDef(SHADING_MODEL_SUBSURFACE)]
+        [IfDef(_SHEEN)] _SheenColor ("Sheen Color", Color) = (0,0,0,1)
+        [IfNDef(SHADING_MODEL_CLOTH)][IfNDef(SHADING_MODEL_SUBSURFACE)]
+        [IfDef(_SHEEN)] _SheenRoughness ("Sheen Roughness", Range(0,1)) = 0.0
+
         [ToggleHeader(ClearCoat, _CLEAR_COAT)]
         [IfDef(_CLEAR_COAT)] _ClearCoat ("Clear Coat", Range(0,1)) = 1.0
         [IfDef(_CLEAR_COAT)] _ClearCoatRoughness ("Clear Coat Roughness", Range(0,1)) = 0.0
 
+        [IfNDef(SHADING_MODEL_CLOTH)][IfNDef(SHADING_MODEL_SUBSURFACE)]
         [ToggleHeader(Refraction, _REFRACTION)]
         [IfDef(_REFRACTION)][KeywordEnum(Solid, Thin)] Refraction_Type ("Refraction Type", Float) = 0.0
+        [IfNDef(SHADING_MODEL_CLOTH)][IfNDef(SHADING_MODEL_SUBSURFACE)]
         [IfDef(_REFRACTION)] _Thickness ("Thickness", Float) = 0.5
+        [IfNDef(SHADING_MODEL_CLOTH)][IfNDef(SHADING_MODEL_SUBSURFACE)]
         [IfDef(_REFRACTION)][IfDef(REFRACTION_TYPE_THIN)] _MicroThickness ("MicroThickness", Float) = 0.01
+        [IfNDef(SHADING_MODEL_CLOTH)][IfNDef(SHADING_MODEL_SUBSURFACE)]
         [IfDef(_REFRACTION)] _TransmittanceColor ("Transmittance Color", Color) = (0, 0, 0, 1)
+        [IfNDef(SHADING_MODEL_CLOTH)][IfNDef(SHADING_MODEL_SUBSURFACE)]
         [IfDef(_REFRACTION)] _Transmission ("Transmission", Range(0,1)) = 0.0
-
-        [IfNDef(SHADING_MODEL_CLOTH)]
-        [ToggleHeader(Sheen, _SHEEN)]
-        [IfDef(_SHEEN)] _SheenColor ("Sheen Color", Color) = (0,0,0,1)
-        [IfNDef(SHADING_MODEL_CLOTH)][IfDef(_SHEEN)] _SheenRoughness ("Sheen Roughness", Range(0,1)) = 0.0
 
         [Header(Experimental)]
         [Toggle(CAPSULE_AO)] _Capsule_AO ("Capsule AO", float) = 0
