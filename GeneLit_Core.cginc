@@ -146,7 +146,7 @@
         o.uv.xy = TRANSFORM_TEX(v.texcoord, _MainTex);
         #if defined(_DETAIL_MULX2)
             UNITY_BRANCH
-            switch(UNITY_ACCESS_INSTANCED_PROP(Props, _UVSec))
+            switch(GENELIT_ACCESS_PROP(_UVSec))
             {
                 case 0: o.uv.zw = TRANSFORM_TEX(v.texcoord, _DetailMap); break;
                 case 1: o.uv.zw = TRANSFORM_TEX(v.texcoord1, _DetailMap); break;

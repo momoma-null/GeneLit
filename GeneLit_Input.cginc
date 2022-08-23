@@ -62,6 +62,8 @@
 
     #include "GeneLit_NoTile.cginc"
 
+    #define GENELIT_ACCESS_PROP(var) UNITY_ACCESS_INSTANCED_PROP(Props, var)
+
     struct MaterialInputs
     {
         float4  baseColor;
@@ -128,8 +130,8 @@
 
     void initMaterial(ShadingData shadingData, inout MaterialInputs material)
     {
-        float4 color = UNITY_ACCESS_INSTANCED_PROP(Props, _Color);
-        switch(UNITY_ACCESS_INSTANCED_PROP(Props, _VertexColorMode))
+        float4 color = GENELIT_ACCESS_PROP(_Color);
+        switch(GENELIT_ACCESS_PROP(_VertexColorMode))
         {
             case 1:material.baseColor *= color;break;
             case 2:material.baseColor += color;break;
@@ -143,7 +145,7 @@
             float2 uv = shadingData.uv.xy;
             #if defined(_PARALLAXMAP)
                 float3 oViewDir = normalize(mul(shadingData.view, shadingData.tangentToWorld));
-                float2 uvShift = oViewDir.xy / (oViewDir.z + 0.42) * UNITY_ACCESS_INSTANCED_PROP(Props, _Parallax);
+                float2 uvShift = oViewDir.xy / (oViewDir.z + 0.42) * GENELIT_ACCESS_PROP(_Parallax);
                 float h1 = 1.0 - UNITY_SAMPLE_TEX2D_SAMPLER(_ParallaxMap, _MainTex, uv).g;
                 float shift1 = h1 * 0.5;
                 float2 huv = uv - shift1 * uvShift;
@@ -164,12 +166,12 @@
         #else
             float4 mods = 1;
         #endif
-        material.roughness = 1.0 - UNITY_ACCESS_INSTANCED_PROP(Props, _Glossiness) * mods.a;
+        material.roughness = 1.0 - GENELIT_ACCESS_PROP(_Glossiness) * mods.a;
         #if !defined(SHADING_MODEL_CLOTH)
-            material.metallic = UNITY_ACCESS_INSTANCED_PROP(Props, _Metallic) * mods.r;
-            material.reflectance = UNITY_ACCESS_INSTANCED_PROP(Props, _Reflectance);
+            material.metallic = GENELIT_ACCESS_PROP(_Metallic) * mods.r;
+            material.reflectance = GENELIT_ACCESS_PROP(_Reflectance);
         #endif
-        material.ambientOcclusion = UNITY_ACCESS_INSTANCED_PROP(Props, _OcclusionStrength) * mods.g;
+        material.ambientOcclusion = GENELIT_ACCESS_PROP(_OcclusionStrength) * mods.g;
 
         #if defined(_NORMALMAP)
             #if defined(_TILEMODE_NO_TILE)
@@ -177,7 +179,7 @@
             #else
                 float4 normalMap = UNITY_SAMPLE_TEX2D_SAMPLER(_BumpMap, _MainTex, uv);
             #endif
-            material.normal = UnpackScaleNormal(normalMap, UNITY_ACCESS_INSTANCED_PROP(Props, _BumpScale));
+            material.normal = UnpackScaleNormal(normalMap, GENELIT_ACCESS_PROP(_BumpScale));
         #else
             material.normal = float3(0.0, 0.0, 1.0);
         #endif
@@ -193,23 +195,23 @@
             float detailSmoothness = detailMap.b - 0.5;
             float3 detailNormal = float3(detailMap.ag * 2.0 - 1.0, 0);
 
-            float albedoDetailSpeed = saturate(abs(detailAlbedo) * UNITY_ACCESS_INSTANCED_PROP(Props, _DetailAlbedoScale));
+            float albedoDetailSpeed = saturate(abs(detailAlbedo) * GENELIT_ACCESS_PROP(_DetailAlbedoScale));
             float3 baseColorOverlay = lerp(sqrt(material.baseColor.rgb), (detailAlbedo < 0.0) ? float3(0.0, 0.0, 0.0) : float3(1.0, 1.0, 1.0), albedoDetailSpeed * albedoDetailSpeed);
             baseColorOverlay *= baseColorOverlay;
             material.baseColor.rgb = lerp(material.baseColor.rgb, saturate(baseColorOverlay), detailMask);
 
             float smoothness = 1.0 - material.roughness;
-            float smoothnessDetailSpeed = saturate(abs(detailSmoothness) * UNITY_ACCESS_INSTANCED_PROP(Props, _DetailSmoothnessScale));
+            float smoothnessDetailSpeed = saturate(abs(detailSmoothness) * GENELIT_ACCESS_PROP(_DetailSmoothnessScale));
             float smoothnessOverlay = lerp(smoothness, (detailSmoothness < 0.0) ? 0.0 : 1.0, smoothnessDetailSpeed);
             smoothness = lerp(smoothness, saturate(smoothnessOverlay), detailMask);
             material.roughness = 1.0 - smoothness;
 
-            detailNormal.xy *= UNITY_ACCESS_INSTANCED_PROP(Props, _DetailNormalScale);
+            detailNormal.xy *= GENELIT_ACCESS_PROP(_DetailNormalScale);
             detailNormal.z = sqrt(saturate(1.0 - dot(detailNormal.xy, detailNormal.xy)));
             material.normal = lerp(material.normal, BlendNormals(material.normal, detailNormal), detailMask);
         #endif
 
-        material.emissive = UNITY_ACCESS_INSTANCED_PROP(Props, _EmissionColor);
+        material.emissive = GENELIT_ACCESS_PROP(_EmissionColor);
         #if defined(_TILEMODE_NO_TILE)
             SAMPLE_TEX2DTILE_SAMPLER_WIEGHT(_EmissionMap, _MainTex, emissive)
             material.emissive *= emissive;
@@ -218,18 +220,18 @@
         #endif
 
         #if defined(_ALPHATEST_ON)
-            material.maskThreshold = UNITY_ACCESS_INSTANCED_PROP(Props, _Cutoff);
+            material.maskThreshold = GENELIT_ACCESS_PROP(_Cutoff);
         #endif
 
         #if !defined(SHADING_MODEL_CLOTH) && !defined(SHADING_MODEL_SUBSURFACE)
             #if defined(_SHEEN)
-                material.sheenColor = UNITY_ACCESS_INSTANCED_PROP(Props, _SheenColor);
-                material.sheenRoughness = UNITY_ACCESS_INSTANCED_PROP(Props, _SheenRoughness);
+                material.sheenColor = GENELIT_ACCESS_PROP(_SheenColor);
+                material.sheenRoughness = GENELIT_ACCESS_PROP(_SheenRoughness);
             #endif
         #endif
 
         #if defined(_ANISOTROPY)
-            material.anisotropy = UNITY_ACCESS_INSTANCED_PROP(Props, _Anisotropy);
+            material.anisotropy = GENELIT_ACCESS_PROP(_Anisotropy);
             #if defined(_TILEMODE_NO_TILE)
                 SAMPLE_TEX2DTILE_SAMPLER_WIEGHT(_TangentMap, _MainTex, tangentMap)
             #else
@@ -239,21 +241,21 @@
         #endif
 
         #if defined(SHADING_MODEL_SUBSURFACE)
-            material.subsurfaceThickness = UNITY_ACCESS_INSTANCED_PROP(Props, _SubsurfaceThickness);
-            material.subsurfacePower = UNITY_ACCESS_INSTANCED_PROP(Props, _SubsurfacePower);
-            material.subsurfaceColor = UNITY_ACCESS_INSTANCED_PROP(Props, _SubsurfaceColor);
+            material.subsurfaceThickness = GENELIT_ACCESS_PROP(_SubsurfaceThickness);
+            material.subsurfacePower = GENELIT_ACCESS_PROP(_SubsurfacePower);
+            material.subsurfaceColor = GENELIT_ACCESS_PROP(_SubsurfaceColor);
         #endif
 
         #if defined(SHADING_MODEL_CLOTH)
             material.sheenColor = sqrt(material.baseColor.rgb);
             #if defined(MATERIAL_HAS_SUBSURFACE_COLOR)
-                material.subsurfaceColor = UNITY_ACCESS_INSTANCED_PROP(Props, _SubsurfaceColor);
+                material.subsurfaceColor = GENELIT_ACCESS_PROP(_SubsurfaceColor);
             #endif
         #endif
 
         #if defined(_CLEAR_COAT)
-            material.clearCoat = UNITY_ACCESS_INSTANCED_PROP(Props, _ClearCoat);
-            material.clearCoatRoughness = UNITY_ACCESS_INSTANCED_PROP(Props, _ClearCoatRoughness);
+            material.clearCoat = GENELIT_ACCESS_PROP(_ClearCoat);
+            material.clearCoatRoughness = GENELIT_ACCESS_PROP(_ClearCoatRoughness);
             #if defined(_CLEAR_COAT_NORMAL)
                 material.clearCoatNormal = float3(0.0, 0.0, 1.0);
             #endif
@@ -261,11 +263,11 @@
 
         #if !defined(SHADING_MODEL_CLOTH) && !defined(SHADING_MODEL_SUBSURFACE)
             #if defined(_REFRACTION)
-                material.thickness = UNITY_ACCESS_INSTANCED_PROP(Props, _Thickness);
-                material.absorption = -log(UNITY_ACCESS_INSTANCED_PROP(Props, _TransmittanceColor).rgb) / max(material.thickness, 1e-5);
-                material.transmission = UNITY_ACCESS_INSTANCED_PROP(Props, _Transmission);
+                material.thickness = GENELIT_ACCESS_PROP(_Thickness);
+                material.absorption = -log(GENELIT_ACCESS_PROP(_TransmittanceColor).rgb) / max(material.thickness, 1e-5);
+                material.transmission = GENELIT_ACCESS_PROP(_Transmission);
                 #if defined(REFRACTION_TYPE_THIN)
-                    material.microThickness = UNITY_ACCESS_INSTANCED_PROP(Props, _MicroThickness);
+                    material.microThickness = GENELIT_ACCESS_PROP(_MicroThickness);
                 #endif
             #endif
         #endif
