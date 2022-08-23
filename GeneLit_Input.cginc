@@ -189,9 +189,9 @@
             float detailMask = mods.b;
             float2 detailUV = shadingData.uv.zw;
             float4 detailMap = UNITY_SAMPLE_TEX2D(_DetailMap, detailUV);
-            float detailAlbedo = detailMap.r;
-            float detailSmoothness = detailMap.b;
-            float3 detailNormal = float3(detailMap.ag, 0);
+            float detailAlbedo = detailMap.r - 0.5;
+            float detailSmoothness = detailMap.b - 0.5;
+            float3 detailNormal = float3(detailMap.ag * 2.0 - 1.0, 0);
 
             float albedoDetailSpeed = saturate(abs(detailAlbedo) * UNITY_ACCESS_INSTANCED_PROP(Props, _DetailAlbedoScale));
             float3 baseColorOverlay = lerp(sqrt(material.baseColor.rgb), (detailAlbedo < 0.0) ? float3(0.0, 0.0, 0.0) : float3(1.0, 1.0, 1.0), albedoDetailSpeed * albedoDetailSpeed);
@@ -204,7 +204,6 @@
             smoothness = lerp(smoothness, saturate(smoothnessOverlay), detailMask);
             material.roughness = 1.0 - smoothness;
 
-            detailNormal.xy = detailNormal.xy * 2.0 - 1.0;
             detailNormal.xy *= UNITY_ACCESS_INSTANCED_PROP(Props, _DetailNormalScale);
             detailNormal.z = sqrt(saturate(1.0 - dot(detailNormal.xy, detailNormal.xy)));
             material.normal = lerp(material.normal, BlendNormals(material.normal, detailNormal), detailMask);
