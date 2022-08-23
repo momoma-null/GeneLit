@@ -26,10 +26,8 @@
         UNITY_DECLARE_TEX2D_NOSAMPLER(_TangentMap);
     #endif
     #if defined(_DETAIL_MULX2)
-        UNITY_DECLARE_TEX2D(_DetailAlbedoMap);
-        UNITY_DECLARE_TEX2D_NOSAMPLER(_DetailNormalMap);
-        UNITY_DECLARE_TEX2D_NOSAMPLER(_DetailMaskMap);        
-        float4 _DetailAlbedoMap_ST;
+        UNITY_DECLARE_TEX2D(_DetailMap);
+        float4 _DetailMap_ST;
     #endif
 
     UNITY_INSTANCING_BUFFER_START(Props)
@@ -57,9 +55,9 @@
     UNITY_DEFINE_INSTANCED_PROP(half4, _SheenColor)
     UNITY_DEFINE_INSTANCED_PROP(half, _SheenRoughness)
     UNITY_DEFINE_INSTANCED_PROP(half, _UVSec)
-    UNITY_DEFINE_INSTANCED_PROP(half, _DetailNormalMapScale)
-    UNITY_DEFINE_INSTANCED_PROP(half, _DetailMetallic)
-    UNITY_DEFINE_INSTANCED_PROP(half, _DetailGlossiness)
+    UNITY_DEFINE_INSTANCED_PROP(half, _DetailAlbedoScale)
+    UNITY_DEFINE_INSTANCED_PROP(half, _DetailNormalScale)
+    UNITY_DEFINE_INSTANCED_PROP(half, _DetailSmoothnessScale)
     UNITY_INSTANCING_BUFFER_END(Props)
 
     #include "GeneLit_NoTile.cginc"
@@ -188,20 +186,30 @@
         #endif
 
         #if defined(_DETAIL_MULX2)
-            float2 uv2 = shadingData.uv.zw;
             float detailMask = mods.b;
-            float3 detailAlbedo = UNITY_SAMPLE_TEX2D(_DetailAlbedoMap, uv2).rgb;
-            material.baseColor.rgb *= lerp(1.0, detailAlbedo * unity_ColorSpaceDouble.rgb, detailMask);
-            float4 detailMods = UNITY_SAMPLE_TEX2D_SAMPLER(_DetailMaskMap, _DetailAlbedoMap, uv2);
-            material.roughness = lerp(material.roughness, 1.0 - UNITY_ACCESS_INSTANCED_PROP(Props, _DetailGlossiness) * detailMods.a, detailMask);
-            #if !defined(SHADING_MODEL_CLOTH)
-                material.metallic = lerp(material.metallic, UNITY_ACCESS_INSTANCED_PROP(Props, _DetailMetallic) * detailMods.r, detailMask);
-            #endif
-            material.ambientOcclusion = lerp(material.ambientOcclusion, detailMods.g, detailMask);
-            half3 detailNormalTangent = UnpackScaleNormal(UNITY_SAMPLE_TEX2D_SAMPLER(_DetailNormalMap, _DetailAlbedoMap, uv2), UNITY_ACCESS_INSTANCED_PROP(Props, _DetailNormalMapScale));
-            material.normal = lerp(material.normal, BlendNormals(material.normal, detailNormalTangent), detailMask);
+            float2 detailUV = shadingData.uv.zw;
+            float4 detailMap = UNITY_SAMPLE_TEX2D(_DetailMap, detailUV);
+            float detailAlbedo = detailMap.r;
+            float detailSmoothness = detailMap.b;
+            float3 detailNormal = float3(detailMap.ag, 0);
+
+            float albedoDetailSpeed = saturate(abs(detailAlbedo) * UNITY_ACCESS_INSTANCED_PROP(Props, _DetailAlbedoScale));
+            float3 baseColorOverlay = lerp(sqrt(material.baseColor.rgb), (detailAlbedo < 0.0) ? float3(0.0, 0.0, 0.0) : float3(1.0, 1.0, 1.0), albedoDetailSpeed * albedoDetailSpeed);
+            baseColorOverlay *= baseColorOverlay;
+            material.baseColor.rgb = lerp(material.baseColor.rgb, saturate(baseColorOverlay), detailMask);
+
+            float smoothness = 1.0 - material.roughness;
+            float smoothnessDetailSpeed = saturate(abs(detailSmoothness) * UNITY_ACCESS_INSTANCED_PROP(Props, _DetailSmoothnessScale));
+            float smoothnessOverlay = lerp(smoothness, (detailSmoothness < 0.0) ? 0.0 : 1.0, smoothnessDetailSpeed);
+            smoothness = lerp(smoothness, saturate(smoothnessOverlay), detailMask);
+            material.roughness = 1.0 - smoothness;
+
+            detailNormal.xy = detailNormal.xy * 2.0 - 1.0;
+            detailNormal.xy *= UNITY_ACCESS_INSTANCED_PROP(Props, _DetailNormalScale);
+            detailNormal.z = sqrt(saturate(1.0 - dot(detailNormal.xy, detailNormal.xy)));
+            material.normal = lerp(material.normal, BlendNormals(material.normal, detailNormal), detailMask);
         #endif
-        
+
         material.emissive = UNITY_ACCESS_INSTANCED_PROP(Props, _EmissionColor);
         #if defined(_TILEMODE_NO_TILE)
             SAMPLE_TEX2DTILE_SAMPLER_WIEGHT(_EmissionMap, _MainTex, emissive)

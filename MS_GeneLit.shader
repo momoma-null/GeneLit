@@ -33,12 +33,10 @@
 
         [ToggleHeader(Detail Map, _DETAIL_MULX2)]
         [IfDef(_DETAIL_MULX2)][Enum(UV0,0,UV1,1,UV2,2,UV3,3)] _UVSec ("UV Set", Float) = 0
-        [ScaleOffset][IfDef(_DETAIL_MULX2)][SingleLine] _DetailAlbedoMap ("Albedo", 2D) = "grey" {}
-        [IfDef(_DETAIL_MULX2)][SingleLine] _DetailMaskMap ("Mask Map", 2D) = "white" {}
-        [IfDef(_DETAIL_MULX2)][SingleLine] _DetailNormalMapScale ("Normal Scale", Float) = 1.0
-        [IfDef(_DETAIL_MULX2)][SingleLine(_DetailNormalMapScale)][Normal] _DetailNormalMap ("Normal Map", 2D) = "bump" {}
-        [IfDef(_DETAIL_MULX2)][IfNDef(SHADING_MODEL_CLOTH)] _DetailMetallic ("Metallic", Range(0,1)) = 0.0
-        [IfDef(_DETAIL_MULX2)] _DetailGlossiness ("Smoothness", Range(0,1)) = 0.5
+        [ScaleOffset][IfDef(_DETAIL_MULX2)][SingleLine] _DetailMap ("Albedo", 2D) = "grey" {}
+        [IfDef(_DETAIL_MULX2)] _DetailAlbedoScale ("Albedo Scale", Range(0, 1)) = 1.0
+        [IfDef(_DETAIL_MULX2)] _DetailNormalScale ("Normal Scale", Range(0, 1)) = 1.0
+        [IfDef(_DETAIL_MULX2)] _DetailSmoothnessScale ("Smoothness Scale", Range(0, 1)) = 1.0
 
         [ToggleHeader(ClearCoat, _CLEAR_COAT)]
         [IfDef(_CLEAR_COAT)] _ClearCoat ("Clear Coat", Range(0,1)) = 1.0

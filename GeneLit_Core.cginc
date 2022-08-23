@@ -148,10 +148,10 @@
             UNITY_BRANCH
             switch(UNITY_ACCESS_INSTANCED_PROP(Props, _UVSec))
             {
-                case 0: o.uv.zw = TRANSFORM_TEX(v.texcoord, _DetailAlbedoMap); break;
-                case 1: o.uv.zw = TRANSFORM_TEX(v.texcoord1, _DetailAlbedoMap); break;
-                case 2: o.uv.zw = TRANSFORM_TEX(v.texcoord2, _DetailAlbedoMap); break;
-                case 3: o.uv.zw = TRANSFORM_TEX(v.texcoord3, _DetailAlbedoMap); break;
+                case 0: o.uv.zw = TRANSFORM_TEX(v.texcoord, _DetailMap); break;
+                case 1: o.uv.zw = TRANSFORM_TEX(v.texcoord1, _DetailMap); break;
+                case 2: o.uv.zw = TRANSFORM_TEX(v.texcoord2, _DetailMap); break;
+                case 3: o.uv.zw = TRANSFORM_TEX(v.texcoord3, _DetailMap); break;
             }
         #endif
         float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
