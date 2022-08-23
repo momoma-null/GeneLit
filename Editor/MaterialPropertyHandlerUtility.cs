@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 namespace MomomaAssets.GeneLit
 {
@@ -12,6 +12,7 @@ namespace MomomaAssets.GeneLit
         static readonly MethodInfo s_GetHandlerInfo = s_MaterialPropertyHandlerType.GetMethod("GetHandler", BindingFlags.NonPublic | BindingFlags.Static);
         static readonly FieldInfo s_m_PropertyDrawerInfo = s_MaterialPropertyHandlerType.GetField("m_PropertyDrawer", BindingFlags.NonPublic | BindingFlags.Instance);
         static readonly FieldInfo s_m_DecoratorDrawersInfo = s_MaterialPropertyHandlerType.GetField("m_DecoratorDrawers", BindingFlags.NonPublic | BindingFlags.Instance);
+        static readonly FieldInfo s_versionInfo = typeof(List<MaterialPropertyDrawer>).GetField("_version", BindingFlags.NonPublic | BindingFlags.Instance);
         static readonly Dictionary<object, EmptyDrawer> s_emptyDrawers = new Dictionary<object, EmptyDrawer>();
         static readonly DefaultDrawer s_defaultDrawer = new DefaultDrawer();
 
@@ -31,22 +32,32 @@ namespace MomomaAssets.GeneLit
             var oldDrawer = s_m_PropertyDrawerInfo.GetValue(handler);
             if (oldDrawer == null)
                 oldDrawer = s_defaultDrawer;
-            var oldDecorators = s_m_DecoratorDrawersInfo.GetValue(handler) as List<MaterialPropertyDrawer>;
-            var newDecorators = new List<MaterialPropertyDrawer>(oldDecorators.Count);
-            foreach (var i in oldDecorators)
+            var decorators = s_m_DecoratorDrawersInfo.GetValue(handler) as List<MaterialPropertyDrawer>;
+            var oldVersion = s_versionInfo.GetValue(decorators);
+            var nextIndex = decorators.IndexOf(drawer) + 1;
+            var remainingCount = decorators.Count - nextIndex;
+            if (0 < remainingCount)
             {
-                newDecorators.Add(i);
-                if (i == drawer)
-                    break;
+                var storeDecorators = new List<MaterialPropertyDrawer>(decorators);
+                decorators.RemoveRange(nextIndex, remainingCount);
+                s_versionInfo.SetValue(decorators, oldVersion);
+                s_m_PropertyDrawerInfo.SetValue(handler, emptyDrawer);
+                emptyDrawer.onEnded = () =>
+                {
+                    s_m_PropertyDrawerInfo.SetValue(handler, oldDrawer);
+                    s_m_DecoratorDrawersInfo.SetValue(handler, storeDecorators);
+                    emptyDrawer.onEnded = null;
+                };
             }
-            s_m_PropertyDrawerInfo.SetValue(handler, emptyDrawer);
-            s_m_DecoratorDrawersInfo.SetValue(handler, newDecorators);
-            emptyDrawer.onEnded = () =>
+            else
             {
-                s_m_PropertyDrawerInfo.SetValue(handler, oldDrawer);
-                s_m_DecoratorDrawersInfo.SetValue(handler, oldDecorators);
-                emptyDrawer.onEnded = null;
-            };
+                s_m_PropertyDrawerInfo.SetValue(handler, emptyDrawer);
+                emptyDrawer.onEnded = () =>
+                {
+                    s_m_PropertyDrawerInfo.SetValue(handler, oldDrawer);
+                    emptyDrawer.onEnded = null;
+                };
+            }
         }
 
         public static void ReplacePostDecorator(this MaterialProperty prop, MaterialPropertyDrawer postDecorator)
