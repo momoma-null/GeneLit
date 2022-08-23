@@ -22,6 +22,9 @@
         UNITY_DECLARE_TEX2D_NOSAMPLER(_ParallaxMap);
     #endif
     UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissionMap);
+    #if defined(_ANISOTROPY)
+        UNITY_DECLARE_TEX2D_NOSAMPLER(_TangentMap);
+    #endif
     #if defined(_DETAIL_MULX2)
         UNITY_DECLARE_TEX2D(_DetailAlbedoMap);
         UNITY_DECLARE_TEX2D_NOSAMPLER(_DetailNormalMap);
@@ -41,7 +44,7 @@
     UNITY_DEFINE_INSTANCED_PROP(half, _BumpScale)
     UNITY_DEFINE_INSTANCED_PROP(half, _Parallax)
     UNITY_DEFINE_INSTANCED_PROP(half4, _EmissionColor)
-    UNITY_DEFINE_INSTANCED_PROP(half4, _Anisotropy)
+    UNITY_DEFINE_INSTANCED_PROP(half, _Anisotropy)
     UNITY_DEFINE_INSTANCED_PROP(half, _SubsurfaceThickness)
     UNITY_DEFINE_INSTANCED_PROP(half, _SubsurfacePower)
     UNITY_DEFINE_INSTANCED_PROP(half4, _SubsurfaceColor)
@@ -219,9 +222,13 @@
         #endif
 
         #if defined(_ANISOTROPY)
-            float4 anisotropy = UNITY_ACCESS_INSTANCED_PROP(Props, _Anisotropy);
-            material.anisotropy = anisotropy.w;
-            material.anisotropyDirection = anisotropy.xyz;
+            material.anisotropy = UNITY_ACCESS_INSTANCED_PROP(Props, _Anisotropy);
+            #if defined(_TILEMODE_NO_TILE)
+                SAMPLE_TEX2DTILE_SAMPLER_WIEGHT(_TangentMap, _MainTex, tangentMap)
+            #else
+                float4 tangentMap = UNITY_SAMPLE_TEX2D_SAMPLER(_TangentMap, _MainTex, uv);
+            #endif
+            material.anisotropyDirection = UnpackNormal(tangentMap);
         #endif
 
         #if defined(SHADING_MODEL_SUBSURFACE)
