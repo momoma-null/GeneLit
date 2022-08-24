@@ -13,9 +13,9 @@
         [IfDef(_ALPHATEST_ON)]_Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
         [SingleLine(, _MASKMAP)] _MaskMap ("Mask Map", 2D) = "white" {}
         [IfNDef(SHADING_MODEL_CLOTH)] _Metallic ("Metallic", Range(0,1)) = 0.0
-        [IfNDef(SHADING_MODEL_CLOTH)] _Reflectance ("Reflectance", Range(0.35, 1.0)) = 0.5
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _OcclusionStrength ("Occlusion", Range(0,1)) = 1.0
+        [IfNDef(SHADING_MODEL_CLOTH)] _Reflectance ("Reflectance", Range(0.35, 1.0)) = 0.5
         [IfDef(_NORMALMAP)][SingleLine] _BumpScale ("Normal Scale", Float) = 1.0
         [SingleLine(_BumpScale, _NORMALMAP)][Normal] _BumpMap ("Normal Map", 2D) = "bump" {}
         [IfDef(_PARALLAXMAP)][SingleLine] _Parallax ("Height Scale", Range (0.005, 0.08)) = 0.02
