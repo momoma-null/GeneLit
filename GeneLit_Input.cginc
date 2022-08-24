@@ -25,7 +25,7 @@
     #if defined(_ANISOTROPY)
         UNITY_DECLARE_TEX2D_NOSAMPLER(_TangentMap);
     #endif
-    #if defined(_DETAIL_MULX2)
+    #if defined(_DETAIL_MAP)
         UNITY_DECLARE_TEX2D(_DetailMap);
         float4 _DetailMap_ST;
     #endif
@@ -187,7 +187,7 @@
             material.bentNormal = float3(0.0, 0.0, 1.0);
         #endif
 
-        #if defined(_DETAIL_MULX2)
+        #if defined(_DETAIL_MAP)
             float detailMask = mods.b;
             float2 detailUV = shadingData.uv.zw;
             float4 detailMap = UNITY_SAMPLE_TEX2D(_DetailMap, detailUV);

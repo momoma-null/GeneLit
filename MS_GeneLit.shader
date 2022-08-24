@@ -9,7 +9,7 @@
         [IfDef(_TILEMODE_NO_TILE)] _NoiseHeight ("Noise Height", Range(5.0, 20.0)) = 12.0
         [Enum(None,0,Multiply,1,Add,2,Screen,3)] _VertexColorMode ("Vertex Color Mode", Float) = 0.0
         [SingleLine] _Color ("Color", Color) = (1,1,1,1)
-        [ScaleOffset][SingleLine(_Color)] _MainTex ("Albedo", 2D) = "white" {}
+        [SingleLineScaleOffset(_Color)] _MainTex ("Albedo", 2D) = "white" {}
         [IfDef(_ALPHATEST_ON)]_Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
         [SingleLine(, _MASKMAP)] _MaskMap ("Mask Map", 2D) = "white" {}
         [IfNDef(SHADING_MODEL_CLOTH)] _Metallic ("Metallic", Range(0,1)) = 0.0
@@ -31,12 +31,11 @@
         [IfDef(_ANISOTROPY)][SingleLine] _Anisotropy ("Anisotropy", Range(-1, 1)) = 0.5
         [SingleLine(_Anisotropy, _ANISOTROPY)][Normal] _TangentMap ("Anisotropy Tangent Map", 2D) = "bump" {}
 
-        [ToggleHeader(Detail Map, _DETAIL_MULX2)]
-        [IfDef(_DETAIL_MULX2)][Enum(UV0,0,UV1,1,UV2,2,UV3,3)] _UVSec ("UV Set", Float) = 0
-        [ScaleOffset][IfDef(_DETAIL_MULX2)][SingleLine] _DetailMap ("Albedo", 2D) = "grey" {}
-        [IfDef(_DETAIL_MULX2)] _DetailAlbedoScale ("Albedo Scale", Range(0, 2)) = 1.0
-        [IfDef(_DETAIL_MULX2)] _DetailNormalScale ("Normal Scale", Range(0, 2)) = 1.0
-        [IfDef(_DETAIL_MULX2)] _DetailSmoothnessScale ("Smoothness Scale", Range(0, 2)) = 1.0
+        [SingleLineScaleOffset(,_DETAIL_MAP)] _DetailMap ("Detail Map", 2D) = "grey" {}
+        [IfDef(_DETAIL_MAP)][Enum(UV0,0,UV1,1,UV2,2,UV3,3)] _UVSec ("UV Set", Float) = 0
+        [IfDef(_DETAIL_MAP)] _DetailAlbedoScale ("Albedo Scale", Range(0, 2)) = 1.0
+        [IfDef(_DETAIL_MAP)] _DetailNormalScale ("Normal Scale", Range(0, 2)) = 1.0
+        [IfDef(_DETAIL_MAP)] _DetailSmoothnessScale ("Smoothness Scale", Range(0, 2)) = 1.0
 
         [IfNDef(SHADING_MODEL_CLOTH)][IfNDef(SHADING_MODEL_SUBSURFACE)]
         [ToggleHeader(Sheen, _SHEEN)]
@@ -111,7 +110,7 @@
             #pragma shader_feature_local _MASKMAP
             #pragma shader_feature_local _NORMALMAP
             #pragma shader_feature_local _PARALLAXMAP
-            #pragma shader_feature_local _DETAIL_MULX2
+            #pragma shader_feature_local _DETAIL_MAP
             #pragma shader_feature_local CAPSULE_AO
             #pragma shader_feature_local REFRACTION_TYPE_SOLID REFRACTION_TYPE_THIN
             #pragma shader_feature_local REFLECTION_SPACE_CUBE REFLECTION_SPACE_CYLINDER
@@ -146,7 +145,7 @@
             #pragma shader_feature_local _MASKMAP
             #pragma shader_feature_local _NORMALMAP
             #pragma shader_feature_local _PARALLAXMAP
-            #pragma shader_feature_local _DETAIL_MULX2
+            #pragma shader_feature_local _DETAIL_MAP
 
             #include "GeneLit_Core.cginc"
             ENDCG
@@ -181,7 +180,6 @@
             CGPROGRAM
             #pragma vertex vert_meta
             #pragma fragment frag_meta
-            #pragma shader_feature_local _DETAIL_MULX2
             #pragma shader_feature _EMISSION
             #pragma shader_feature EDITOR_VISUALIZATION
 

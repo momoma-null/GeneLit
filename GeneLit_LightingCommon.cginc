@@ -85,7 +85,7 @@
         float2 normalizedViewportCoord;
         half3 ambient;
         half4 lightmapUV;
-        #if defined(_DETAIL_MULX2)
+        #if defined(_DETAIL_MAP)
             float4 uv;
         #else
             float2 uv;

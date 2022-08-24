@@ -11,7 +11,7 @@
     struct v2f
     {
         UNITY_POSITION(pos);
-        #if defined(_DETAIL_MULX2)
+        #if defined(_DETAIL_MAP)
             float4 uv : TEXCOORD0;
         #else
             float2 uv : TEXCOORD0;
@@ -144,7 +144,7 @@
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
         o.pos = UnityObjectToClipPos(v.vertex);
         o.uv.xy = TRANSFORM_TEX(v.texcoord, _MainTex);
-        #if defined(_DETAIL_MULX2)
+        #if defined(_DETAIL_MAP)
             UNITY_BRANCH
             switch(GENELIT_ACCESS_PROP(_UVSec))
             {
