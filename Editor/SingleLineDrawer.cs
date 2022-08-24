@@ -1,9 +1,9 @@
-﻿using UnityEngine;
-using UnityEditor;
+﻿using UnityEditor;
+using UnityEngine;
 
 namespace MomomaAssets.GeneLit
 {
-    sealed class SingleLineDrawer : MaterialPropertyDrawer
+    class SingleLineDrawer : MaterialPropertyDrawer
     {
         static bool s_drawing;
 
@@ -77,6 +77,7 @@ namespace MomomaAssets.GeneLit
                             }
                         }
                     }
+                    OnAfterSingleLine(prop, editor);
                 }
                 finally
                 {
@@ -84,6 +85,21 @@ namespace MomomaAssets.GeneLit
                     EditorGUIUtility.labelWidth = oldLabelWidth;
                 }
             }
+        }
+
+        protected virtual void OnAfterSingleLine(MaterialProperty prop, MaterialEditor editor) { }
+    }
+
+    sealed class SingleLineScaleOffsetDrawer : SingleLineDrawer
+    {
+        public SingleLineScaleOffsetDrawer() : base() { }
+        public SingleLineScaleOffsetDrawer(string extraPropName) : base(extraPropName) { }
+        public SingleLineScaleOffsetDrawer(string extraPropName, string keyword) : base(extraPropName, keyword) { }
+
+        protected override void OnAfterSingleLine(MaterialProperty prop, MaterialEditor editor)
+        {
+            if (prop.textureValue != null)
+                editor.TextureScaleOffsetProperty(prop);
         }
     }
 }
