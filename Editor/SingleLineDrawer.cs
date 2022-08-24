@@ -99,7 +99,12 @@ namespace MomomaAssets.GeneLit
         protected override void OnAfterSingleLine(MaterialProperty prop, MaterialEditor editor)
         {
             if (prop.textureValue != null || string.IsNullOrEmpty(_keyword))
-                editor.TextureScaleOffsetProperty(prop);
+            {
+                using (new EditorGUI.IndentLevelScope(1))
+                {
+                    editor.TextureScaleOffsetProperty(prop);
+                }
+            }
         }
     }
 }
