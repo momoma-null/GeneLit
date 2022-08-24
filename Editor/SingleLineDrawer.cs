@@ -7,8 +7,8 @@ namespace MomomaAssets.GeneLit
     {
         static bool s_drawing;
 
-        readonly string _extraPropName;
-        readonly string _keyword;
+        protected readonly string _extraPropName;
+        protected readonly string _keyword;
 
         public SingleLineDrawer() : this(default, default) { }
 
@@ -98,7 +98,7 @@ namespace MomomaAssets.GeneLit
 
         protected override void OnAfterSingleLine(MaterialProperty prop, MaterialEditor editor)
         {
-            if (prop.textureValue != null)
+            if (prop.textureValue != null || string.IsNullOrEmpty(_keyword))
                 editor.TextureScaleOffsetProperty(prop);
         }
     }
