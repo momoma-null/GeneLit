@@ -91,7 +91,7 @@
         #endif
 
         #if !defined(SHADING_MODEL_CLOTH) && !defined(SHADING_MODEL_SUBSURFACE)
-            #if defined(_REFRACTION)
+            #if !defined(REFRACTION_TYPE_NONE)
                 // Air's Index of refraction is 1.000277 at STP but everybody uses 1.0
                 const float airIor = 1.0;
                 // [common case] ior is not set in the material, deduce it from F0

@@ -111,7 +111,7 @@
         #endif
 
         float3 Fd = diffuseLobe(pixel, NoV, NoL, LoH);
-        #if defined(_REFRACTION)
+        #if !defined(REFRACTION_TYPE_NONE)
             Fd *= (1.0 - pixel.transmission);
         #endif
 

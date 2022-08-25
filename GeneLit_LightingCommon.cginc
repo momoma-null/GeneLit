@@ -52,7 +52,7 @@
             float3 subsurfaceColor;
         #endif
 
-        #if defined(_REFRACTION)
+        #if !defined(REFRACTION_TYPE_NONE)
             float thickness;
             float  etaRI;
             float  etaIR;

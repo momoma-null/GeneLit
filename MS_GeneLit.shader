@@ -52,16 +52,15 @@
         [IfDef(_CLEAR_COAT)] _ClearCoatRoughness ("Clear Coat Roughness", Range(0,1)) = 0.0
 
         [IfNDef(SHADING_MODEL_CLOTH)][IfNDef(SHADING_MODEL_SUBSURFACE)]
-        [ToggleHeader(Refraction, _REFRACTION)]
-        [IfDef(_REFRACTION)][KeywordEnum(Solid, Thin)] Refraction_Type ("Refraction Type", Float) = 0.0
+        [EnumHeader(None, Solid, Thin)] Refraction_Type ("Refraction", Float) = 0.0
         [IfNDef(SHADING_MODEL_CLOTH)][IfNDef(SHADING_MODEL_SUBSURFACE)]
-        [IfDef(_REFRACTION)] _Thickness ("Thickness", Float) = 0.5
+        [IfNDef(REFRACTION_TYPE_NONE)] _Thickness ("Thickness", Float) = 0.5
         [IfNDef(SHADING_MODEL_CLOTH)][IfNDef(SHADING_MODEL_SUBSURFACE)]
-        [IfDef(_REFRACTION)][IfDef(REFRACTION_TYPE_THIN)] _MicroThickness ("MicroThickness", Float) = 0.01
+        [IfDef(REFRACTION_TYPE_THIN)] _MicroThickness ("MicroThickness", Float) = 0.01
         [IfNDef(SHADING_MODEL_CLOTH)][IfNDef(SHADING_MODEL_SUBSURFACE)]
-        [IfDef(_REFRACTION)] _TransmittanceColor ("Transmittance Color", Color) = (0, 0, 0, 1)
+        [IfNDef(REFRACTION_TYPE_NONE)] _TransmittanceColor ("Transmittance Color", Color) = (0, 0, 0, 1)
         [IfNDef(SHADING_MODEL_CLOTH)][IfNDef(SHADING_MODEL_SUBSURFACE)]
-        [IfDef(_REFRACTION)] _Transmission ("Transmission", Range(0,1)) = 0.0
+        [IfNDef(REFRACTION_TYPE_NONE)] _Transmission ("Transmission", Range(0,1)) = 0.0
 
         [Header(Experimental)]
         [Toggle(CAPSULE_AO)] _Capsule_AO ("Capsule AO", float) = 0
@@ -109,14 +108,13 @@
             #pragma shader_feature_local _ANISOTROPY
             #pragma shader_feature_local _CLEAR_COAT
             #pragma shader_feature_local _SHEEN
-            #pragma shader_feature_local _REFRACTION
             #pragma shader_feature_local _MASKMAP
             #pragma shader_feature_local _NORMALMAP
             #pragma shader_feature_local _BENTNORMALMAP
             #pragma shader_feature_local _PARALLAXMAP
             #pragma shader_feature_local _DETAIL_MAP
             #pragma shader_feature_local CAPSULE_AO
-            #pragma shader_feature_local REFRACTION_TYPE_SOLID REFRACTION_TYPE_THIN
+            #pragma shader_feature_local REFRACTION_TYPE_NONE REFRACTION_TYPE_SOLID REFRACTION_TYPE_THIN
             #pragma shader_feature_local REFLECTION_SPACE_CUBE REFLECTION_SPACE_CYLINDER
 
             #include "GeneLit_Core.cginc"
@@ -145,12 +143,12 @@
             #pragma shader_feature_local _ANISOTROPY
             #pragma shader_feature_local _CLEAR_COAT
             #pragma shader_feature_local _SHEEN
-            #pragma shader_feature_local _REFRACTION
             #pragma shader_feature_local _MASKMAP
             #pragma shader_feature_local _NORMALMAP
             #pragma shader_feature_local _BENTNORMALMAP
             #pragma shader_feature_local _PARALLAXMAP
             #pragma shader_feature_local _DETAIL_MAP
+            #pragma shader_feature_local REFRACTION_TYPE_NONE
 
             #include "GeneLit_Core.cginc"
             ENDCG

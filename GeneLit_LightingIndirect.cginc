@@ -258,7 +258,7 @@
         #endif
     }
 
-    #if defined(_REFRACTION)
+    #if !defined(REFRACTION_TYPE_NONE)
 
         struct Refraction
         {
@@ -416,7 +416,7 @@
         evaluateClearCoatIBL(pixel, shadingData, diffuseAO, Fd, Fr);
 
         // Note: iblLuminance is already premultiplied by the exposure
-        #if defined(_REFRACTION)
+        #if !defined(REFRACTION_TYPE_NONE)
             applyRefraction(pixel, shadingData.position, shadingData.view, shadingData.normal, E, Fd, Fr, color);
         #else
             color.rgb += (Fd + Fr);

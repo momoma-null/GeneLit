@@ -123,7 +123,7 @@
         #endif
 
         #if !defined(SHADING_MODEL_CLOTH) && !defined(SHADING_MODEL_SUBSURFACE)
-            #if defined(_REFRACTION)
+            #if !defined(REFRACTION_TYPE_NONE)
                 float thickness;
                 float3 absorption;
                 float transmission;
@@ -267,7 +267,7 @@
         #endif
 
         #if !defined(SHADING_MODEL_CLOTH) && !defined(SHADING_MODEL_SUBSURFACE)
-            #if defined(_REFRACTION)
+            #if !defined(REFRACTION_TYPE_NONE)
                 material.thickness = GENELIT_ACCESS_PROP(_Thickness);
                 material.absorption = -log(GENELIT_ACCESS_PROP(_TransmittanceColor).rgb) / max(material.thickness, 1e-5);
                 material.transmission = GENELIT_ACCESS_PROP(_Transmission);
