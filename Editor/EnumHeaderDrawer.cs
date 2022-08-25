@@ -28,6 +28,8 @@ namespace MomomaAssets.GeneLit
         public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
         {
             position.height -= s_lineHeight - EditorGUIUtility.singleLineHeight;
+            var oldLabelWidth = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = 0f;
             try
             {
                 var value = (int)prop.floatValue;
@@ -55,6 +57,7 @@ namespace MomomaAssets.GeneLit
             finally
             {
                 EditorGUI.showMixedValue = false;
+                EditorGUIUtility.labelWidth = oldLabelWidth;
             }
         }
 
