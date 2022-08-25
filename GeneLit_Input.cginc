@@ -53,6 +53,7 @@
     UNITY_DEFINE_INSTANCED_PROP(half, _SubsurfaceThickness)
     UNITY_DEFINE_INSTANCED_PROP(half, _SubsurfacePower)
     UNITY_DEFINE_INSTANCED_PROP(half4, _SubsurfaceColor)
+    UNITY_DEFINE_INSTANCED_PROP(half4, _ClothSubsurfaceColor)
     UNITY_DEFINE_INSTANCED_PROP(half, _ClearCoat)
     UNITY_DEFINE_INSTANCED_PROP(half, _ClearCoatRoughness)
     UNITY_DEFINE_INSTANCED_PROP(half, _Thickness)
@@ -106,9 +107,7 @@
 
         #if defined(SHADING_MODEL_CLOTH)
             float3 sheenColor;
-            #if defined(MATERIAL_HAS_SUBSURFACE_COLOR)
-                float3 subsurfaceColor;
-            #endif
+            float3 subsurfaceColor;
         #endif
 
         float3  normal;
@@ -256,9 +255,7 @@
 
         #if defined(SHADING_MODEL_CLOTH)
             material.sheenColor = sqrt(material.baseColor.rgb);
-            #if defined(MATERIAL_HAS_SUBSURFACE_COLOR)
-                material.subsurfaceColor = GENELIT_ACCESS_PROP(_SubsurfaceColor);
-            #endif
+            material.subsurfaceColor = GENELIT_ACCESS_PROP(_ClothSubsurfaceColor).rgb;
         #endif
 
         #if defined(_CLEAR_COAT)

@@ -48,7 +48,7 @@
             float  subsurfacePower;
         #endif
 
-        #if defined(SHADING_MODEL_CLOTH) && defined(MATERIAL_HAS_SUBSURFACE_COLOR)
+        #if defined(SHADING_MODEL_CLOTH)
             float3 subsurfaceColor;
         #endif
 

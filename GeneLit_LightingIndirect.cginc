@@ -204,7 +204,7 @@
 
     void evaluateClothIndirectDiffuseBRDF(const PixelParams pixel, const ShadingData shadingData, inout float diffuse)
     {
-        #if defined(SHADING_MODEL_CLOTH) && defined(MATERIAL_HAS_SUBSURFACE_COLOR)
+        #if defined(SHADING_MODEL_CLOTH)
             // Simulate subsurface scattering with a wrap diffuse term
             diffuse *= Fd_Wrap(shadingData.NoV, 0.5);
         #endif
@@ -253,7 +253,7 @@
             float3 viewDependent = prefilteredRadiance(-shadingData.view, pixel.roughness, 1.0 + pixel.subsurfaceThickness, shadingData.position);
             float attenuation = (1.0 - pixel.subsurfaceThickness) / (2.0 * PI);
             Fd += pixel.subsurfaceColor * (diffuseIrradiance + viewDependent) * attenuation;
-        #elif defined(SHADING_MODEL_CLOTH) && defined(MATERIAL_HAS_SUBSURFACE_COLOR)
+        #elif defined(SHADING_MODEL_CLOTH)
             Fd *= saturate(pixel.subsurfaceColor + shadingData.NoV);
         #endif
     }

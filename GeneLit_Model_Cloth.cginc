@@ -31,27 +31,20 @@
 
         // diffuse BRDF
         float diff = diffuse(pixel.roughness, shadingData.NoV, NoL, LoH);
-        #if defined(MATERIAL_HAS_SUBSURFACE_COLOR)
-            // Energy conservative wrap diffuse to simulate subsurface scattering
-            diff *= Fd_Wrap(dot(shadingData.normal, light.l), 0.5);
-        #endif
+        // Energy conservative wrap diffuse to simulate subsurface scattering
+        diff *= Fd_Wrap(dot(shadingData.normal, light.l), 0.5);
 
         // We do not multiply the diffuse term by the Fresnel term as discussed in
         // Neubelt and Pettineo 2013, "Crafting a Next-gen Material Pipeline for The Order: 1886"
         // The effect is fairly subtle and not deemed worth the cost for mobile
         float3 Fd = diff * pixel.diffuseColor;
 
-        #if defined(MATERIAL_HAS_SUBSURFACE_COLOR)
-            // Cheap subsurface scatter
-            Fd *= saturate(pixel.subsurfaceColor + NoL);
-            // We need to apply NoL separately to the specular lobe since we already took
-            // it into account in the diffuse lobe
-            float3 color = Fd + Fr * NoL;
-            color *= light.colorIntensity.rgb * (light.colorIntensity.w * light.attenuation * occlusion);
-        #else
-            float3 color = Fd + Fr;
-            color *= light.colorIntensity.rgb * (light.colorIntensity.w * light.attenuation * NoL * occlusion);
-        #endif
+        // Cheap subsurface scatter
+        Fd *= saturate(pixel.subsurfaceColor + NoL);
+        // We need to apply NoL separately to the specular lobe since we already took
+        // it into account in the diffuse lobe
+        float3 color = Fd + Fr * NoL;
+        color *= light.colorIntensity.rgb * (light.colorIntensity.w * light.attenuation * occlusion);
 
         return color;
     }

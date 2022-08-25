@@ -87,9 +87,7 @@
         #else
             pixel.diffuseColor = baseColor.rgb;
             pixel.f0 = material.sheenColor;
-            #if defined(MATERIAL_HAS_SUBSURFACE_COLOR)
-                pixel.subsurfaceColor = material.subsurfaceColor;
-            #endif
+            pixel.subsurfaceColor = material.subsurfaceColor;
         #endif
 
         #if !defined(SHADING_MODEL_CLOTH) && !defined(SHADING_MODEL_SUBSURFACE)
