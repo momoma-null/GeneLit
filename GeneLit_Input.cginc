@@ -233,7 +233,7 @@
 
         #if !defined(SHADING_MODEL_CLOTH) && !defined(SHADING_MODEL_SUBSURFACE)
             #if defined(_SHEEN)
-                material.sheenColor = GENELIT_ACCESS_PROP(_SheenColor);
+                material.sheenColor = GENELIT_ACCESS_PROP(_SheenColor).rgb;
                 material.sheenRoughness = GENELIT_ACCESS_PROP(_SheenRoughness);
             #endif
         #endif
@@ -251,7 +251,7 @@
         #if defined(SHADING_MODEL_SUBSURFACE)
             material.subsurfaceThickness = GENELIT_ACCESS_PROP(_SubsurfaceThickness);
             material.subsurfacePower = GENELIT_ACCESS_PROP(_SubsurfacePower);
-            material.subsurfaceColor = GENELIT_ACCESS_PROP(_SubsurfaceColor);
+            material.subsurfaceColor = GENELIT_ACCESS_PROP(_SubsurfaceColor).rgb;
         #endif
 
         #if defined(SHADING_MODEL_CLOTH)
