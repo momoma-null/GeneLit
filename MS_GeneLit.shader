@@ -18,6 +18,7 @@
         [IfNDef(SHADING_MODEL_CLOTH)] _Reflectance ("Reflectance", Range(0.35, 1.0)) = 0.5
         [IfDef(_NORMALMAP)][SingleLine] _BumpScale ("Normal Scale", Float) = 1.0
         [SingleLine(_BumpScale, _NORMALMAP)][Normal] _BumpMap ("Normal Map", 2D) = "bump" {}
+        [SingleLine(, _BENTNORMALMAP)][Normal] _BentNormalMap ("Bent Normal Map", 2D) = "bump" {}
         [IfDef(_PARALLAXMAP)][SingleLine] _Parallax ("Height Scale", Range (0.005, 0.08)) = 0.02
         [IfNDef(_TILEMODE_NO_TILE)][SingleLine(_Parallax, _PARALLAXMAP)] _ParallaxMap ("Height Map", 2D) = "white" {}
         [SingleLine][HDR] _EmissionColor ("Emission Color", Color) = (0,0,0,1)
@@ -109,6 +110,7 @@
             #pragma shader_feature_local _REFRACTION
             #pragma shader_feature_local _MASKMAP
             #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local _BENTNORMALMAP
             #pragma shader_feature_local _PARALLAXMAP
             #pragma shader_feature_local _DETAIL_MAP
             #pragma shader_feature_local CAPSULE_AO
@@ -144,6 +146,7 @@
             #pragma shader_feature_local _REFRACTION
             #pragma shader_feature_local _MASKMAP
             #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local _BENTNORMALMAP
             #pragma shader_feature_local _PARALLAXMAP
             #pragma shader_feature_local _DETAIL_MAP
 

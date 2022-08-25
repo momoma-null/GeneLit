@@ -74,7 +74,7 @@
         float3   reflected;        // reflection of view about normal
         float    NoV;              // dot(normal, view), always strictly >= MIN_N_DOT_V
 
-        #if defined(MATERIAL_HAS_BENT_NORMAL)
+        #if defined(_BENTNORMALMAP)
             float3 bentNormal;       // normalized transformed normal, in world space
         #endif
 

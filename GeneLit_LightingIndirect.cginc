@@ -381,7 +381,7 @@
 
         float diffuseAO = occlusion;
 
-        #if defined(MATERIAL_HAS_BENT_NORMAL)
+        #if defined(_BENTNORMALMAP)
             float specAO = specularAO(shadingData.NoV, diffuseAO, pixel.roughness, shadingData.bentNormal, shadingData.reflected);
         #else
             float specAO = specularAO(shadingData.NoV, diffuseAO, pixel.roughness, shadingData.normal, shadingData.reflected);
@@ -393,7 +393,7 @@
         float diffuseBRDF = singleBounceAO(diffuseAO); // Fd_Lambert() is baked in the SH below
         evaluateClothIndirectDiffuseBRDF(pixel, shadingData, diffuseBRDF);
 
-        #if defined(MATERIAL_HAS_BENT_NORMAL)
+        #if defined(_BENTNORMALMAP)
             float3 diffuseNormal = shadingData.bentNormal;
         #else
             float3 diffuseNormal = shadingData.normal;

@@ -9,6 +9,10 @@
     #define FILAMENT_QUALITY_NORMAL 1
     #define FILAMENT_QUALITY_HIGH   2
 
+    #if defined(_TILEMODE_NO_TILE) && defined(_BENTNORMALMAP)
+        #undef _BENTNORMALMAP
+    #endif
+
     UNITY_DECLARE_TEX2D(_MainTex);
     float4 _MainTex_ST;
     float4 _MainTex_TexelSize;
@@ -17,6 +21,9 @@
     #endif
     #if defined(_NORMALMAP)
         UNITY_DECLARE_TEX2D_NOSAMPLER(_BumpMap);
+    #endif
+    #if defined(_BENTNORMALMAP)
+        UNITY_DECLARE_TEX2D_NOSAMPLER(_BentNormalMap);
     #endif
     #if defined(_PARALLAXMAP)
         UNITY_DECLARE_TEX2D_NOSAMPLER(_ParallaxMap);
@@ -105,7 +112,7 @@
         #endif
 
         float3  normal;
-        #if defined(MATERIAL_HAS_BENT_NORMAL)
+        #if defined(_BENTNORMALMAP)
             float3 bentNormal;
         #endif
         #if defined(_CLEAR_COAT)
@@ -183,8 +190,9 @@
         #else
             material.normal = float3(0.0, 0.0, 1.0);
         #endif
-        #if defined(MATERIAL_HAS_BENT_NORMAL)
-            material.bentNormal = float3(0.0, 0.0, 1.0);
+
+        #if defined(_BENTNORMALMAP)
+            material.bentNormal = UnpackNormal(UNITY_SAMPLE_TEX2D_SAMPLER(_BentNormalMap, _MainTex, uv));
         #endif
 
         #if defined(_DETAIL_MAP)

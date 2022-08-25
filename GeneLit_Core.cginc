@@ -118,7 +118,7 @@
         shadingData.NoV = clampNoV(dot(shadingData.normal, shadingData.view));
         shadingData.reflected = reflect(-shadingData.view, shadingData.normal);
 
-        #if defined(MATERIAL_HAS_BENT_NORMAL)
+        #if defined(_BENTNORMALMAP)
             shadingData.bentNormal = normalize(mul(shadingData.tangentToWorld, material.bentNormal));
         #endif
 
