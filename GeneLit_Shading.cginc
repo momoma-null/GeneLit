@@ -24,11 +24,6 @@
     // Lighting
     //------------------------------------------------------------------------------
 
-    void unpremultiply(inout float4 color)
-    {
-        color.rgb /= max(color.a, FLT_EPS);
-    }
-
     #if defined(_ALPHATEST_ON)
         float applyAlphaMask(float alpha, float threshold)
         {
@@ -78,6 +73,10 @@
     void getCommonPixelParams(const MaterialInputs material, inout PixelParams pixel)
     {
         float4 baseColor = material.baseColor;
+
+        #if defined(_ALPHAPREMULTIPLY_ON)
+            baseColor.rgb *= baseColor.a;
+        #endif
 
         #if !defined(SHADING_MODEL_CLOTH)
             pixel.diffuseColor = computeDiffuseColor(baseColor, material.metallic);
