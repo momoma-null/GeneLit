@@ -29,21 +29,22 @@
         color.rgb /= max(color.a, FLT_EPS);
     }
 
-    float computeDiffuseAlpha(float a)
-    {
-        #if defined(_ALPHABLEND_ON) || defined(_ALPHAPREMULTIPLY_ON) || defined(_ALPHATEST_ON)
-            return a;
-        #else
-            return 1.0;
-        #endif
-    }
+    #if defined(_ALPHATEST_ON)
+        float applyAlphaMask(float alpha, float threshold)
+        {
+            // Use derivatives to smooth alpha tested edges
+            return saturate((alpha - threshold) / max(fwidth(alpha), 1e-3) + 0.5);
+        }
+    #endif
 
-    void applyAlphaMask(const MaterialInputs material, inout float4 baseColor)
+    float computeDiffuseAlpha(const MaterialInputs material)
     {
         #if defined(_ALPHATEST_ON)
-            // Use derivatives to smooth alpha tested edges
-            float alpha = baseColor.a;
-            baseColor.a = saturate((alpha - material.maskThreshold) / max(fwidth(alpha), 1e-3) + 0.5);
+            return applyAlphaMask(material.baseColor.a, material.maskThreshold);
+        #elif defined(_ALPHABLEND_ON) || defined(_ALPHAPREMULTIPLY_ON)
+            return material.baseColor.a;
+        #else
+            return 1.0;
         #endif
     }
 
@@ -77,7 +78,6 @@
     void getCommonPixelParams(const MaterialInputs material, inout PixelParams pixel)
     {
         float4 baseColor = material.baseColor;
-        applyAlphaMask(material, baseColor);
 
         #if !defined(SHADING_MODEL_CLOTH)
             pixel.diffuseColor = computeDiffuseColor(baseColor, material.metallic);
@@ -268,7 +268,7 @@
         #endif
         color.rgb += surfaceShading(pixel, light, shadingData, visibility);
 
-        return float4(color, computeDiffuseAlpha(material.baseColor.a));
+        return float4(color, computeDiffuseAlpha(material));
     }
 
     void addEmissive(const MaterialInputs material, inout float4 color)
