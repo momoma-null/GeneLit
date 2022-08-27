@@ -1,5 +1,5 @@
-#ifndef FILAMENT_UTILS_INCLUDED
-    #define FILAMENT_UTILS_INCLUDED
+#ifndef GENELIT_UTILS_INCLUDED
+    #define GENELIT_UTILS_INCLUDED
 
     //------------------------------------------------------------------------------
     // Common math

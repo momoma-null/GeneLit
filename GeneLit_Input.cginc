@@ -1,5 +1,5 @@
-#ifndef FILAMENT_INPUT_INCLUDED
-    #define FILAMENT_INPUT_INCLUDED
+#ifndef GENELIT_INPUT_INCLUDED
+    #define GENELIT_INPUT_INCLUDED
 
     #include "UnityCG.cginc"
     #include "UnityStandardUtils.cginc"

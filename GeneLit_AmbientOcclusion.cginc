@@ -1,5 +1,5 @@
-#ifndef FILAMENT_AO_INCLUDED
-    #define FILAMENT_AO_INCLUDED
+#ifndef GENELIT_AO_INCLUDED
+    #define GENELIT_AO_INCLUDED
 
     //------------------------------------------------------------------------------
     // Ambient occlusion configuration
