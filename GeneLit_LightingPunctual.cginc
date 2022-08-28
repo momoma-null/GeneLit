@@ -20,9 +20,5 @@ FilamentLight getPunctualLights(const ShadingData shadingData)
     light.l = normalize(posToLight + float3(0, 1e-8, 0));
     light.attenuation = 1;
     light.NoL = saturate(dot(shadingData.normal, light.l));
-    #ifdef SPOT
-        unityShadowCoord4 lightCoord = mul(unity_WorldToLight, unityShadowCoord4(shadingData.position, 1));
-        light.attenuation *= UnitySpotCookie(lightCoord) * UnitySpotAttenuate(lightCoord.xyz);
-    #endif
     return light;
 }
