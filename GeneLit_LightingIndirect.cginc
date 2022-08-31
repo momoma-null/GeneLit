@@ -144,7 +144,7 @@
         // The mapping below is a quadratic fit for log2(perceptualRoughness)+iblRoughnessOneLevel when
         // iblRoughnessOneLevel is 4. We found empirically that this mapping works very well for
         // a 256 cubemap with 5 levels used. But also scales well for other iblRoughnessOneLevel values.
-        return UNITY_SPECCUBE_LOD_STEPS * perceptualRoughness * (2.0 - perceptualRoughness);
+        return UNITY_SPECCUBE_LOD_STEPS * perceptualRoughness * (1.7 - 0.7 * perceptualRoughness);
     }
 
     inline half3 prefilteredRadiance(const float3 r, float perceptualRoughness, float3 worldPos)
