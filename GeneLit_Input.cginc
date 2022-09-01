@@ -66,6 +66,7 @@
     UNITY_DEFINE_INSTANCED_PROP(half, _DetailAlbedoScale)
     UNITY_DEFINE_INSTANCED_PROP(half, _DetailNormalScale)
     UNITY_DEFINE_INSTANCED_PROP(half, _DetailSmoothnessScale)
+    UNITY_DEFINE_INSTANCED_PROP(fixed, _SkyboxFog)
     UNITY_INSTANCING_BUFFER_END(Props)
 
     #include "GeneLit_NoTile.cginc"
@@ -132,6 +133,8 @@
                 #endif
             #endif
         #endif
+
+        uint skyboxFog;
     };
 
     void initMaterial(ShadingData shadingData, inout MaterialInputs material)
@@ -276,5 +279,7 @@
                 #endif
             #endif
         #endif
+
+        material.skyboxFog = GENELIT_ACCESS_PROP(_SkyboxFog);
     }
 #endif

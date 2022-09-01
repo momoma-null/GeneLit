@@ -63,8 +63,9 @@
         [IfNDef(REFRACTION_TYPE_NONE)] _Transmission ("Transmission", Range(0,1)) = 0.0
 
         [Header(Experimental)]
-        [Toggle(CAPSULE_AO)] _Capsule_AO ("Capsule AO", float) = 0
+        [Toggle(CAPSULE_AO)] _Capsule_AO ("Capsule AO", float) = 0.0
         [KeywordEnum(Cube, Cylinder)] Reflection_Space ("Reflection Space", Float) = 0.0
+        [IntRange] _SkyboxFog ("Skybox Fog", Range(0, 7)) = 0.0
 
         [HideInInspector][NonModifiableTextureData] _DFG ("_DFG", 2D) = "black" {}
 

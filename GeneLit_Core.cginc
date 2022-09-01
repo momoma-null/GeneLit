@@ -196,7 +196,13 @@
             #ifdef UNITY_PASS_FORWARDADD
                 UNITY_FOG_LERP_COLOR(fragColor, fixed4(0,0,0,0), unityFogFactor);
             #else
-                UNITY_FOG_LERP_COLOR(fragColor, unity_FogColor, unityFogFactor);
+                float4 fogColor = unity_FogColor;
+                UNITY_BRANCH
+                if (inputs.skyboxFog > 0)
+                {
+                    fogColor = UNITY_SAMPLE_TEXCUBE_SAMPLER_LOD(unity_SpecCube1, unity_SpecCube0, -shadingData.view, inputs.skyboxFog);
+                }
+                UNITY_FOG_LERP_COLOR(fragColor, fogColor, unityFogFactor);
             #endif
         #endif
     }
