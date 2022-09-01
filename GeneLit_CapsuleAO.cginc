@@ -5,8 +5,8 @@
 
     #define CAPSULE_COUNT 16
 
-    float4 _topAndRadius[CAPSULE_COUNT];
-    float4 _bottom[CAPSULE_COUNT];
+    float4 _UdonTopAndRadius[CAPSULE_COUNT];
+    float4 _UdonBottom[CAPSULE_COUNT];
 
     // The MIT License
     // Copyright © 2018 Inigo Quilez
@@ -57,9 +57,10 @@
         UNITY_UNROLL
         for (uint i = 0; i < CAPSULE_COUNT; ++i)
         {
-            float4 t = _topAndRadius[i];
-            ao *= capOcclusion(p, n, t.xyz, _bottom[i].xyz, t.w) * 0.8 + 0.2;
-            shadow = min(capShadow(p, l, t.xyz, _bottom[i].xyz, t.w, 4.0) * 0.5 + 0.5, shadow);
+            float4 t = _UdonTopAndRadius[i];
+            float3 b = _UdonBottom[i].xyz;
+            ao *= capOcclusion(p, n, t.xyz, b, t.w) * 0.8 + 0.2;
+            shadow = min(capShadow(p, l, t.xyz, b, t.w, 4.0) * 0.5 + 0.5, shadow);
         }
         return ao;
     }
