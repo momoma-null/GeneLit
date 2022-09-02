@@ -75,7 +75,7 @@
 
     struct MaterialInputs
     {
-        float4  baseColor;
+        float4 baseColor;
         float roughness;
         #if !defined(SHADING_MODEL_CLOTH)
             float metallic;
@@ -136,6 +136,23 @@
 
         uint skyboxFog;
     };
+
+    UVCoord TexCoords(appdata_full v)
+    {
+        UVCoord uv = 0;
+        uv.xy = TRANSFORM_TEX(v.texcoord, _MainTex);
+        #if defined(_DETAIL_MAP)
+            UNITY_BRANCH
+            switch(GENELIT_ACCESS_PROP(_UVSec))
+            {
+                case 0: uv.zw = TRANSFORM_TEX(v.texcoord, _DetailMap); break;
+                case 1: uv.zw = TRANSFORM_TEX(v.texcoord1, _DetailMap); break;
+                case 2: uv.zw = TRANSFORM_TEX(v.texcoord2, _DetailMap); break;
+                case 3: uv.zw = TRANSFORM_TEX(v.texcoord3, _DetailMap); break;
+            }
+        #endif
+        return uv;
+    }
 
     void initMaterial(ShadingData shadingData, inout MaterialInputs material)
     {

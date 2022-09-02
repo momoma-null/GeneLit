@@ -1,6 +1,12 @@
 #ifndef GENELIT_LIGHTING_COMMON_INCLUDED
     #define GENELIT_LIGHTING_COMMON_INCLUDED
 
+    #if defined(_DETAIL_MAP)
+        #define UVCoord float4
+    #else
+        #define UVCoord float2
+    #endif
+
     struct FilamentLight
     {
         float4 colorIntensity;  // rgb, pre-exposed intensity
@@ -85,11 +91,7 @@
         float2 normalizedViewportCoord;
         half3 ambient;
         half4 lightmapUV;
-        #if defined(_DETAIL_MAP)
-            float4 uv;
-        #else
-            float2 uv;
-        #endif
+        UVCoord uv;
     };
 
     float computeMicroShadowing(float NoL, float visibility)

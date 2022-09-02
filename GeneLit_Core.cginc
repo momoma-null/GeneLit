@@ -11,11 +11,7 @@
     struct v2f
     {
         UNITY_POSITION(pos);
-        #if defined(_DETAIL_MAP)
-            float4 uv : TEXCOORD0;
-        #else
-            float2 uv : TEXCOORD0;
-        #endif
+        UVCoord uv : TEXCOORD0;
         float4 tSpace0 : TEXCOORD1;
         float4 tSpace1 : TEXCOORD2;
         float4 tSpace2 : TEXCOORD3;
@@ -143,17 +139,7 @@
         UNITY_TRANSFER_INSTANCE_ID(v, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
         o.pos = UnityObjectToClipPos(v.vertex);
-        o.uv.xy = TRANSFORM_TEX(v.texcoord, _MainTex);
-        #if defined(_DETAIL_MAP)
-            UNITY_BRANCH
-            switch(GENELIT_ACCESS_PROP(_UVSec))
-            {
-                case 0: o.uv.zw = TRANSFORM_TEX(v.texcoord, _DetailMap); break;
-                case 1: o.uv.zw = TRANSFORM_TEX(v.texcoord1, _DetailMap); break;
-                case 2: o.uv.zw = TRANSFORM_TEX(v.texcoord2, _DetailMap); break;
-                case 3: o.uv.zw = TRANSFORM_TEX(v.texcoord3, _DetailMap); break;
-            }
-        #endif
+        o.uv = TexCoords(v);
         float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
         float3 worldNormal = UnityObjectToWorldNormal(v.normal);
         fixed3 worldTangent = UnityObjectToWorldDir(v.tangent.xyz);
