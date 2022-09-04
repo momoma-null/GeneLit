@@ -36,6 +36,9 @@
         UNITY_DECLARE_TEX2D(_DetailMap);
         float4 _DetailMap_ST;
     #endif
+    #if defined(SHADING_MODEL_SUBSURFACE)
+        UNITY_DECLARE_TEX2D_NOSAMPLER(_SubsurfaceThicknessMap);
+    #endif
 
     UNITY_INSTANCING_BUFFER_START(Props)
     UNITY_DEFINE_INSTANCED_PROP(half, _NoiseHeight)
@@ -275,7 +278,12 @@
         #endif
 
         #if defined(SHADING_MODEL_SUBSURFACE)
-            material.subsurfaceThickness = GENELIT_ACCESS_PROP(_SubsurfaceThickness);
+            #if defined(_TILEMODE_NO_TILE)
+                SAMPLE_TEX2DTILE_SAMPLER_WIEGHT(_SubsurfaceThicknessMap, _MainTex, subsurfaceThickness)
+            #else
+                float4 subsurfaceThickness = UNITY_SAMPLE_TEX2D_SAMPLER(_SubsurfaceThicknessMap, _MainTex, uv);
+            #endif
+            material.subsurfaceThickness = subsurfaceThickness * GENELIT_ACCESS_PROP(_SubsurfaceThickness);
             material.subsurfacePower = GENELIT_ACCESS_PROP(_SubsurfacePower);
             material.subsurfaceColor = GENELIT_ACCESS_PROP(_SubsurfaceColor).rgb;
         #endif

@@ -10,7 +10,7 @@
         [Enum(None,0,Multiply,1,Add,2,Screen,3)] _VertexColorMode ("Vertex Color Mode", Float) = 0.0
         [SingleLine] _Color ("Color", Color) = (1,1,1,1)
         [SingleLineScaleOffset(_Color)] _MainTex ("Albedo", 2D) = "white" {}
-        [IfDef(_ALPHATEST_ON)]_Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
+        [IfDef(_ALPHATEST_ON)] _Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
         [SingleLine(, _MASKMAP)] _MaskMap ("Mask Map", 2D) = "white" {}
         [IfNDef(SHADING_MODEL_CLOTH)] _Metallic ("Metallic", Range(0,1)) = 0.0
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
@@ -25,7 +25,8 @@
         [Emission]
         [SingleLine(_EmissionColor)] _EmissionMap ("Emission", 2D) = "white" {}
 
-        [IfDef(SHADING_MODEL_SUBSURFACE)] _SubsurfaceThickness ("Thickness", Range(0,1)) = 0.5
+        [IfDef(SHADING_MODEL_SUBSURFACE)][SingleLine] _SubsurfaceThickness ("Thickness", Range(0,1)) = 0.5
+        [IfDef(SHADING_MODEL_SUBSURFACE)][SingleLine(_SubsurfaceThickness)] _SubsurfaceThicknessMap ("Thickness Map", 2D) = "white" {}
         [IfDef(SHADING_MODEL_SUBSURFACE)] _SubsurfacePower ("Subsurface Power", Float) = 12.234
         [IfDef(SHADING_MODEL_SUBSURFACE)] _SubsurfaceColor ("Subsurface Color", Color) = (1,1,1,1)
 
