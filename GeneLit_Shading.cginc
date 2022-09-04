@@ -181,7 +181,7 @@
     {
         #if defined(SHADING_MODEL_SUBSURFACE)
             pixel.subsurfacePower = material.subsurfacePower;
-            pixel.subsurfaceColor = material.subsurfaceColor + material.emissive;
+            pixel.subsurfaceColor = material.subsurfaceColor;
             pixel.subsurfaceThickness = saturate(material.subsurfaceThickness);
         #endif
     }
@@ -270,6 +270,12 @@
         return float4(color, computeDiffuseAlpha(material));
     }
 
+    void addEmissive(const MaterialInputs material, inout float4 color)
+    {
+        float4 emissive = material.emissive;
+        color.rgb += emissive.rgb * color.a;
+    }
+
     /**
     * Evaluate lit materials. The actual shading model used to do so is defined
     * by the function surfaceShading() found in shading_model_*.fs.
@@ -279,8 +285,8 @@
     float4 evaluateMaterial(const MaterialInputs material, const ShadingData shadingData, float atten)
     {
         float4 color = evaluateLights(material, shadingData, atten);
-        #if UNITY_PASS_FORWARDBASE && !defined(SHADING_MODEL_SUBSURFACE)
-            color.rgb += material.emissive;
+        #if UNITY_PASS_FORWARDBASE
+            addEmissive(material, color);
         #endif
         return color;
     }

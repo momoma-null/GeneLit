@@ -59,7 +59,7 @@ namespace MomomaAssets.GeneLit
                     {
                         var extraProp = MaterialEditor.GetMaterialProperty(prop.targets, _extraPropName);
                         if (extraProp.type == MaterialProperty.PropType.Color && (extraProp.flags & MaterialProperty.PropFlags.HDR) > 0)
-                            editor.TexturePropertyWithHDRColor(label, prop, extraProp, true);
+                            editor.TexturePropertyWithHDRColor(label, prop, extraProp, false);
                         else
                             editor.TexturePropertySingleLine(label, prop, extraProp);
                     }

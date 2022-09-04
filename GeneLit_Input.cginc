@@ -85,7 +85,7 @@
             float reflectance;
         #endif
         float ambientOcclusion;
-        float3 emissive;
+        float4 emissive;
 
         #if defined(_ALPHATEST_ON)
             float maskThreshold;
@@ -241,19 +241,12 @@
             material.normal = lerp(material.normal, BlendNormals(material.normal, detailNormal), detailMask);
         #endif
 
-        float4 emissiveColor = GENELIT_ACCESS_PROP(_EmissionColor);
-        material.emissive = emissiveColor.rgb;
+        material.emissive = GENELIT_ACCESS_PROP(_EmissionColor);
         #if defined(_TILEMODE_NO_TILE)
             SAMPLE_TEX2DTILE_SAMPLER_WIEGHT(_EmissionMap, _MainTex, emissive)
-            material.emissive *= emissive.rgb;
+            material.emissive *= emissive;
         #else
-            float2 emissionUV = uv;
-            #if defined(SHADING_MODEL_SUBSURFACE)
-                float emissionHeight = emissiveColor.a * UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionMap, _MainTex, emissionUV).a;
-                float3 oViewDir = normalize(mul(shadingData.view, shadingData.tangentToWorld));
-                emissionUV -= oViewDir.xy / (oViewDir.z + 0.42) * emissionHeight;
-            #endif
-            material.emissive *= UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionMap, _MainTex, emissionUV).rgb;
+            material.emissive *= UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionMap, _MainTex, uv);
         #endif
 
         #if defined(_ALPHATEST_ON)
