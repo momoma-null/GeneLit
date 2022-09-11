@@ -38,7 +38,7 @@ FilamentLight getDirectionalLight(const ShadingData shadingData)
     }
     else
     {
-        #if UNITY_SHOULD_SAMPLE_SH
+        #if UNITY_SHOULD_SAMPLE_SH && !defined(_DIRECTIONALLIGHTESTIMATION_OFF)
             light.l = normalize(unity_SHAr.rgb * unity_ColorSpaceLuminance.r + unity_SHAg.rgb * unity_ColorSpaceLuminance.g + unity_SHAb.rgb * unity_ColorSpaceLuminance.b + float3(0, 1e-8, 0));
             light.colorIntensity = float4(saturate(SHEvalLinearL0L1(half4(light.l, 1))), 1);
         #elif defined(LIGHTMAP_ON) && defined(DIRLIGHTMAP_COMBINED)

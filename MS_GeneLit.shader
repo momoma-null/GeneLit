@@ -67,6 +67,7 @@
         [Toggle(CAPSULE_AO)] _Capsule_AO ("Capsule AO", float) = 0.0
         [KeywordEnum(Cube, Cylinder)] Reflection_Space ("Reflection Space", Float) = 0.0
         [IntRange] _SkyboxFog ("Skybox Fog", Range(0, 7)) = 0.0
+        [ToggleOff] _DirectionalLightEstimation ("Directional Light Estimation", Float) = 1.0
 
         [HideInInspector][NonModifiableTextureData] _DFG ("_DFG", 2D) = "black" {}
 
@@ -107,6 +108,7 @@
             #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
             #pragma shader_feature_local SHADING_MODEL_STANDARD SHADING_MODEL_SUBSURFACE SHADING_MODEL_CLOTH
             #pragma shader_feature_local _TILEMODE_NORMAL_TILE _TILEMODE_NO_TILE
+            #pragma shader_feature_local _DIRECTIONALLIGHTESTIMATION_OFF
             #pragma shader_feature_local _ANISOTROPY
             #pragma shader_feature_local _CLEAR_COAT
             #pragma shader_feature_local _SHEEN
