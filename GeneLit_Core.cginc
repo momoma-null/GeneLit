@@ -156,7 +156,7 @@
 
     void fragForward(out float4 fragColor : SV_Target, in v2f IN, in fixed facing : VFACE)
     {
-        UNITY_APPLY_DITHER_CROSSFADE(i.pos.xy);
+        UNITY_APPLY_DITHER_CROSSFADE(IN.pos.xy);
 
         UNITY_SETUP_INSTANCE_ID(IN);
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(IN);
