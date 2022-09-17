@@ -157,6 +157,21 @@
         return uv;
     }
 
+    #if defined(_PARALLAXMAP)
+        float2 ParallaxOffset2Step(float2 uv, half3 oViewDir)
+        {
+            float2 uvShift = oViewDir.xy / (oViewDir.z + 0.42) * GENELIT_ACCESS_PROP(_Parallax);
+            float h1 = 1.0 - UNITY_SAMPLE_TEX2D_SAMPLER(_ParallaxMap, _MainTex, uv).g;
+            float shift1 = h1 * 0.5;
+            float2 huv = uv - shift1 * uvShift;
+            float h2 = 1.0 - UNITY_SAMPLE_TEX2D_SAMPLER(_ParallaxMap, _MainTex, huv).g;
+            float a = (oViewDir.z + 0.42) * shift1 + 1e-4;
+            float b = h2 - h1;
+            float height = shift1 * (b + sqrt(max(0.0, b * b + 4 * a * h1))) / (2.0 * a);
+            return uv - uvShift * height;
+        }
+    #endif
+
     void initMaterial(ShadingData shadingData, inout MaterialInputs material)
     {
         float4 color = GENELIT_ACCESS_PROP(_Color);
@@ -173,16 +188,8 @@
         #else
             float2 uv = shadingData.uv.xy;
             #if defined(_PARALLAXMAP)
-                float3 oViewDir = normalize(mul(shadingData.view, shadingData.tangentToWorld));
-                float2 uvShift = oViewDir.xy / (oViewDir.z + 0.42) * GENELIT_ACCESS_PROP(_Parallax);
-                float h1 = 1.0 - UNITY_SAMPLE_TEX2D_SAMPLER(_ParallaxMap, _MainTex, uv).g;
-                float shift1 = h1 * 0.5;
-                float2 huv = uv - shift1 * uvShift;
-                float h2 = 1.0 - UNITY_SAMPLE_TEX2D_SAMPLER(_ParallaxMap, _MainTex, huv).g;
-                float a = (oViewDir.z + 0.42) * shift1 + 1e-4;
-                float b = h2 - h1;
-                float height = shift1 * (b + sqrt(max(0.0, b * b + 4 * a * h1))) / (2.0 * a);
-                uv -= uvShift * height;
+                half3 oViewDir = normalize(mul(shadingData.view, shadingData.tangentToWorld));
+                uv = ParallaxOffset2Step(uv, oViewDir);
             #endif
             material.baseColor *= UNITY_SAMPLE_TEX2D(_MainTex, uv);
         #endif

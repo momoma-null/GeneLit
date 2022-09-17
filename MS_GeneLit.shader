@@ -173,7 +173,7 @@
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
 
-            #include "UnityStandardShadow.cginc"
+            #include "GeneLit_Shadow.cginc"
             ENDCG
         }
 
