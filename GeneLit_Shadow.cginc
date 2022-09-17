@@ -74,11 +74,6 @@
         return o;
     }
 
-    inline float4 shadowCasterFragment(v2f_shadow i)
-    {
-        SHADOW_CASTER_FRAGMENT(i)
-    }
-
     half4 fragShadowCaster(v2f_shadow i) : SV_Target
     {
         half alpha = 1;
@@ -89,7 +84,7 @@
             #endif
             alpha = UNITY_SAMPLE_TEX2D(_MainTex, i.tex.xy).a * _Color.a;
             #if defined(_ALPHATEST_ON)
-                alpha = applyAlphaMask(alpha, GENELIT_ACCESS_PROP(_Cutoff));
+                clip(alpha - GENELIT_ACCESS_PROP(_Cutoff));
             #endif
             #if defined(_ALPHABLEND_ON) || defined(_ALPHAPREMULTIPLY_ON)
                 #if defined(_ALPHAPREMULTIPLY_ON)
@@ -117,6 +112,6 @@
             #endif
         #endif
 
-        return half4(shadowCasterFragment(i).rgb, alpha);
+        SHADOW_CASTER_FRAGMENT(i)
     }
 #endif
