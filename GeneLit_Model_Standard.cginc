@@ -1,11 +1,19 @@
 #ifndef GENELIT_MODEL_STANDARD_INCLUDED
     #define GENELIT_MODEL_STANDARD_INCLUDED
 
+    #if defined(_SHEEN)
+        #define USE_SHEEN
+    #endif
+
+    #if defined(REFRACTION_TYPE_SOLID) || defined(REFRACTION_TYPE_THIN)
+        #define USE_REFRACTION
+    #endif
+
     #include "GeneLit_Utils.cginc"
     #include "GeneLit_LightingCommon.cginc"
     #include "GeneLit_Brdf.cginc"
 
-    #if defined(_SHEEN)
+    #if defined(USE_SHEEN)
         float3 sheenLobe(const PixelParams pixel, float NoV, float NoL, float NoH)
         {
             float D = distributionCloth(pixel.sheenRoughness, NoH);
@@ -111,7 +119,7 @@
         #endif
 
         float3 Fd = diffuseLobe(pixel, NoV, NoL, LoH);
-        #if !defined(REFRACTION_TYPE_NONE)
+        #if defined(USE_REFRACTION)
             Fd *= (1.0 - pixel.transmission);
         #endif
 
@@ -121,7 +129,7 @@
         // at high roughness
         float3 color = Fd + Fr * pixel.energyCompensation;
 
-        #if defined(_SHEEN)
+        #if defined(USE_SHEEN)
             color *= pixel.sheenScaling;
             color += sheenLobe(pixel, NoV, NoL, NoH);
         #endif

@@ -1,6 +1,28 @@
 #ifndef GENELIT_MODEL_CLOTH_INCLUDED
     #define GENELIT_MODEL_CLOTH_INCLUDED
 
+    #define GENELIT_CUSTOM_INSTANCED_PROP \
+    UNITY_DEFINE_INSTANCED_PROP(half4, _ClothSubsurfaceColor)
+
+    #define GENELIT_CUSTOM_MATERIAL_INPUTS \
+    float3 sheenColor;\
+    float3 subsurfaceColor;
+
+    #define GENELIT_CUSTOM_INIT_MATERIAL(material) \
+    material.sheenColor = sqrt(material.baseColor.rgb);\
+    material.subsurfaceColor = GENELIT_ACCESS_PROP(_ClothSubsurfaceColor).rgb;
+
+    #define GENELIT_CUSTOM_PIXEL_PARAMS \
+    float3 subsurfaceColor;
+
+    #define GENELIT_IGNORE_ENERGY_COMPENSATION
+
+    #define GENELIT_GET_COMMON_COLOR_PARAMS \
+    pixel.diffuseColor = baseColor.rgb;\
+    pixel.f0 = material.sheenColor;\
+    pixel.subsurfaceColor = material.subsurfaceColor;
+
+    #include "GeneLit_Input.cginc"
     #include "GeneLit_LightingCommon.cginc"
     #include "GeneLit_Brdf.cginc"
 

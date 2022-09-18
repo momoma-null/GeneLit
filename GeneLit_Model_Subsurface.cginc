@@ -1,8 +1,41 @@
 #ifndef GENELIT_MODEL_SUBSURFACE_INCLUDED
     #define GENELIT_MODEL_SUBSURFACE_INCLUDED
 
+    UNITY_DECLARE_TEX2D_NOSAMPLER(_SubsurfaceThicknessMap);
+
+    #define GENELIT_CUSTOM_INSTANCED_PROP \
+    UNITY_DEFINE_INSTANCED_PROP(half, _SubsurfaceThickness)\
+    UNITY_DEFINE_INSTANCED_PROP(half, _SubsurfacePower)\
+    UNITY_DEFINE_INSTANCED_PROP(half4, _SubsurfaceColor)
+
+    #define GENELIT_CUSTOM_MATERIAL_INPUTS \
+    float subsurfaceThickness;\
+    float subsurfacePower;\
+    float3 subsurfaceColor;
+
+    #define GENELIT_CUSTOM_INIT_MATERIAL(material) \
+    GENELIT_SAMPLE_TEX2D_SAMPLER(_SubsurfaceThicknessMap, _MainTex, uv, subsurfaceThickness) \
+    material.subsurfaceThickness = subsurfaceThickness * GENELIT_ACCESS_PROP(_SubsurfaceThickness); \
+    material.subsurfacePower = GENELIT_ACCESS_PROP(_SubsurfacePower); \
+    material.subsurfaceColor = GENELIT_ACCESS_PROP(_SubsurfaceColor).rgb;
+
+    #define GENELIT_CUSTOM_PIXEL_PARAMS \
+    float subsurfaceThickness;\
+    float  subsurfacePower;\
+    float3 subsurfaceColor;
+
+    #define GENELIT_GET_CUSTOM_PIXEL_PARAMS(material, shadingData, pixel) getSubsurfacePixelParams(material, pixel);
+
+    #include "GeneLit_Input.cginc"
     #include "GeneLit_LightingCommon.cginc"
     #include "GeneLit_Brdf.cginc"
+
+    void getSubsurfacePixelParams(const MaterialInputs material, inout PixelParams pixel)
+    {
+        pixel.subsurfaceThickness = saturate(material.subsurfaceThickness);
+        pixel.subsurfacePower = material.subsurfacePower;
+        pixel.subsurfaceColor = material.subsurfaceColor;
+    }
 
     /**
     * Evalutes lit materials with the subsurface shading model. This model is a

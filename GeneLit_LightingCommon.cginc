@@ -32,14 +32,12 @@
             float clearCoatRoughness;
         #endif
 
-        #if defined(_SHEEN)
+        #if defined(USE_SHEEN)
             float3 sheenColor;
-            #if !defined(SHADING_MODEL_CLOTH)
-                float sheenRoughness;
-                float sheenPerceptualRoughness;
-                float sheenScaling;
-                float sheenDFG;
-            #endif
+            float sheenRoughness;
+            float sheenPerceptualRoughness;
+            float sheenScaling;
+            float sheenDFG;
         #endif
 
         #if defined(_ANISOTROPY)
@@ -48,23 +46,17 @@
             float  anisotropy;
         #endif
 
-        #if defined(SHADING_MODEL_SUBSURFACE)
-            float subsurfaceThickness;
-            float3 subsurfaceColor;
-            float  subsurfacePower;
-        #endif
-
-        #if defined(SHADING_MODEL_CLOTH)
-            float3 subsurfaceColor;
-        #endif
-
-        #if !defined(REFRACTION_TYPE_NONE)
+        #if defined(USE_REFRACTION)
             float thickness;
             float  etaRI;
             float  etaIR;
             float  transmission;
             float  uThickness;
             float3 absorption;
+        #endif
+
+        #ifdef GENELIT_CUSTOM_PIXEL_PARAMS
+            GENELIT_CUSTOM_PIXEL_PARAMS
         #endif
     };
 

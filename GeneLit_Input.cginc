@@ -36,51 +36,71 @@
         UNITY_DECLARE_TEX2D(_DetailMap);
         float4 _DetailMap_ST;
     #endif
-    #if defined(SHADING_MODEL_SUBSURFACE)
-        UNITY_DECLARE_TEX2D_NOSAMPLER(_SubsurfaceThicknessMap);
-    #endif
 
     UNITY_INSTANCING_BUFFER_START(Props)
     UNITY_DEFINE_INSTANCED_PROP(half, _NoiseHeight)
     UNITY_DEFINE_INSTANCED_PROP(half, _VertexColorMode)
+    #if defined(_PARALLAXMAP)
+        UNITY_DEFINE_INSTANCED_PROP(half, _Parallax)
+    #endif
     UNITY_DEFINE_INSTANCED_PROP(half4, _Color)
-    UNITY_DEFINE_INSTANCED_PROP(half, _Cutoff)
-    UNITY_DEFINE_INSTANCED_PROP(half, _Metallic)
     UNITY_DEFINE_INSTANCED_PROP(half, _Glossiness)
+    #if !defined(GENELIT_GET_COMMON_COLOR_PARAMS)
+        UNITY_DEFINE_INSTANCED_PROP(half, _Metallic)
+        UNITY_DEFINE_INSTANCED_PROP(half, _Reflectance)
+    #endif
     UNITY_DEFINE_INSTANCED_PROP(half, _OcclusionStrength)
-    UNITY_DEFINE_INSTANCED_PROP(half, _Reflectance)
-    UNITY_DEFINE_INSTANCED_PROP(half, _BumpScale)
-    UNITY_DEFINE_INSTANCED_PROP(half, _Parallax)
     UNITY_DEFINE_INSTANCED_PROP(half4, _EmissionColor)
-    UNITY_DEFINE_INSTANCED_PROP(half, _Anisotropy)
-    UNITY_DEFINE_INSTANCED_PROP(half, _SubsurfaceThickness)
-    UNITY_DEFINE_INSTANCED_PROP(half, _SubsurfacePower)
-    UNITY_DEFINE_INSTANCED_PROP(half4, _SubsurfaceColor)
-    UNITY_DEFINE_INSTANCED_PROP(half4, _ClothSubsurfaceColor)
-    UNITY_DEFINE_INSTANCED_PROP(half, _ClearCoat)
-    UNITY_DEFINE_INSTANCED_PROP(half, _ClearCoatRoughness)
-    UNITY_DEFINE_INSTANCED_PROP(half, _Thickness)
-    UNITY_DEFINE_INSTANCED_PROP(half, _MicroThickness)
-    UNITY_DEFINE_INSTANCED_PROP(half4, _TransmittanceColor)
-    UNITY_DEFINE_INSTANCED_PROP(half, _Transmission)
-    UNITY_DEFINE_INSTANCED_PROP(half4, _SheenColor)
-    UNITY_DEFINE_INSTANCED_PROP(half, _SheenRoughness)
-    UNITY_DEFINE_INSTANCED_PROP(half, _UVSec)
-    UNITY_DEFINE_INSTANCED_PROP(half, _DetailAlbedoScale)
-    UNITY_DEFINE_INSTANCED_PROP(half, _DetailNormalScale)
-    UNITY_DEFINE_INSTANCED_PROP(half, _DetailSmoothnessScale)
+    #if defined(_ALPHATEST_ON)
+        UNITY_DEFINE_INSTANCED_PROP(half, _Cutoff)
+    #endif
+    #if defined(USE_SHEEN)
+        UNITY_DEFINE_INSTANCED_PROP(half4, _SheenColor)
+        UNITY_DEFINE_INSTANCED_PROP(half, _SheenRoughness)
+    #endif
+    #if defined(_ANISOTROPY)
+        UNITY_DEFINE_INSTANCED_PROP(half, _Anisotropy)
+    #endif
+    UNITY_DEFINE_INSTANCED_PROP(half, _BumpScale)
+    #if defined(_CLEAR_COAT)
+        UNITY_DEFINE_INSTANCED_PROP(half, _ClearCoat)
+        UNITY_DEFINE_INSTANCED_PROP(half, _ClearCoatRoughness)
+    #endif
+    #if defined(USE_REFRACTION)
+        UNITY_DEFINE_INSTANCED_PROP(half, _Thickness)
+        UNITY_DEFINE_INSTANCED_PROP(half4, _TransmittanceColor)
+        UNITY_DEFINE_INSTANCED_PROP(half, _Transmission)
+        #if defined(REFRACTION_TYPE_THIN)
+            UNITY_DEFINE_INSTANCED_PROP(half, _MicroThickness)
+        #endif
+    #endif
+    #if defined(_DETAIL_MAP)
+        UNITY_DEFINE_INSTANCED_PROP(half, _UVSec)
+        UNITY_DEFINE_INSTANCED_PROP(half, _DetailAlbedoScale)
+        UNITY_DEFINE_INSTANCED_PROP(half, _DetailNormalScale)
+        UNITY_DEFINE_INSTANCED_PROP(half, _DetailSmoothnessScale)
+    #endif
     UNITY_DEFINE_INSTANCED_PROP(fixed, _SkyboxFog)
+    #ifdef GENELIT_CUSTOM_INSTANCED_PROP
+        GENELIT_CUSTOM_INSTANCED_PROP
+    #endif
     UNITY_INSTANCING_BUFFER_END(Props)
 
     #include "GeneLit_NoTile.cginc"
 
     #define GENELIT_ACCESS_PROP(var) UNITY_ACCESS_INSTANCED_PROP(Props, var)
 
+    #if defined(_TILEMODE_NO_TILE)
+        #define GENELIT_SAMPLE_TEX2D_SAMPLER(tex, samplertex, uv, col) SAMPLE_TEX2DTILE_SAMPLER_WIEGHT(tex, samplertex, col)
+    #else
+        #define GENELIT_SAMPLE_TEX2D_SAMPLER(tex, samplertex, uv, col) float4 col = UNITY_SAMPLE_TEX2D_SAMPLER(tex, samplertex, uv);
+    #endif
+
     struct MaterialInputs
     {
         float4 baseColor;
         float roughness;
-        #if !defined(SHADING_MODEL_CLOTH)
+        #if !defined(GENELIT_GET_COMMON_COLOR_PARAMS)
             float metallic;
             float reflectance;
         #endif
@@ -91,17 +111,9 @@
             float maskThreshold;
         #endif
 
-        #if !defined(SHADING_MODEL_CLOTH) && !defined(SHADING_MODEL_SUBSURFACE)
-            #if defined(_SHEEN)
-                float3 sheenColor;
-                float sheenRoughness;
-            #endif
-        #endif
-
-        #if defined(SHADING_MODEL_SUBSURFACE)
-            float subsurfaceThickness;
-            float subsurfacePower;
-            float3 subsurfaceColor;
+        #if defined(USE_SHEEN)
+            float3 sheenColor;
+            float sheenRoughness;
         #endif
 
         #if defined(_ANISOTROPY)
@@ -109,15 +121,11 @@
             float3 anisotropyDirection;
         #endif
 
-        #if defined(SHADING_MODEL_CLOTH)
-            float3 sheenColor;
-            float3 subsurfaceColor;
-        #endif
-
         float3  normal;
         #if defined(_BENTNORMALMAP)
             float3 bentNormal;
         #endif
+
         #if defined(_CLEAR_COAT)
             float clearCoat;
             float clearCoatRoughness;
@@ -126,18 +134,20 @@
             #endif
         #endif
 
-        #if !defined(SHADING_MODEL_CLOTH) && !defined(SHADING_MODEL_SUBSURFACE)
-            #if !defined(REFRACTION_TYPE_NONE)
-                float thickness;
-                float3 absorption;
-                float transmission;
-                #if defined(REFRACTION_TYPE_THIN)
-                    float microThickness;
-                #endif
+        #if defined(USE_REFRACTION)
+            float thickness;
+            float3 absorption;
+            float transmission;
+            #if defined(REFRACTION_TYPE_THIN)
+                float microThickness;
             #endif
         #endif
 
         uint skyboxFog;
+
+        #ifdef GENELIT_CUSTOM_MATERIAL_INPUTS
+            GENELIT_CUSTOM_MATERIAL_INPUTS
+        #endif
     };
 
     UVCoord TexCoords(appdata_full v)
@@ -194,27 +204,19 @@
             material.baseColor *= UNITY_SAMPLE_TEX2D(_MainTex, uv);
         #endif
         #if defined(_MASKMAP)
-            #if defined(_TILEMODE_NO_TILE)
-                SAMPLE_TEX2DTILE_SAMPLER_WIEGHT(_MaskMap, _MainTex, mods)
-            #else
-                float4 mods = UNITY_SAMPLE_TEX2D_SAMPLER(_MaskMap, _MainTex, uv);
-            #endif
+            GENELIT_SAMPLE_TEX2D_SAMPLER(_MaskMap, _MainTex, uv, mods)
         #else
             float4 mods = 1;
         #endif
         material.roughness = 1.0 - GENELIT_ACCESS_PROP(_Glossiness) * mods.a;
-        #if !defined(SHADING_MODEL_CLOTH)
+        #if !defined(GENELIT_GET_COMMON_COLOR_PARAMS)
             material.metallic = GENELIT_ACCESS_PROP(_Metallic) * mods.r;
             material.reflectance = GENELIT_ACCESS_PROP(_Reflectance);
         #endif
         material.ambientOcclusion = GENELIT_ACCESS_PROP(_OcclusionStrength) * mods.g;
 
         #if defined(_NORMALMAP)
-            #if defined(_TILEMODE_NO_TILE)
-                SAMPLE_TEX2DTILE_SAMPLER_WIEGHT(_BumpMap, _MainTex, normalMap)
-            #else
-                float4 normalMap = UNITY_SAMPLE_TEX2D_SAMPLER(_BumpMap, _MainTex, uv);
-            #endif
+            GENELIT_SAMPLE_TEX2D_SAMPLER(_BumpMap, _MainTex, uv, normalMap)
             material.normal = UnpackScaleNormal(normalMap, GENELIT_ACCESS_PROP(_BumpScale));
         #else
             material.normal = float3(0.0, 0.0, 1.0);
@@ -249,48 +251,22 @@
         #endif
 
         material.emissive = GENELIT_ACCESS_PROP(_EmissionColor);
-        #if defined(_TILEMODE_NO_TILE)
-            SAMPLE_TEX2DTILE_SAMPLER_WIEGHT(_EmissionMap, _MainTex, emissive)
-            material.emissive *= emissive;
-        #else
-            material.emissive *= UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionMap, _MainTex, uv);
-        #endif
+        GENELIT_SAMPLE_TEX2D_SAMPLER(_EmissionMap, _MainTex, uv, emissive)
+        material.emissive *= emissive;
 
         #if defined(_ALPHATEST_ON)
             material.maskThreshold = GENELIT_ACCESS_PROP(_Cutoff);
         #endif
 
-        #if !defined(SHADING_MODEL_CLOTH) && !defined(SHADING_MODEL_SUBSURFACE)
-            #if defined(_SHEEN)
-                material.sheenColor = GENELIT_ACCESS_PROP(_SheenColor).rgb;
-                material.sheenRoughness = GENELIT_ACCESS_PROP(_SheenRoughness);
-            #endif
+        #if defined(USE_SHEEN)
+            material.sheenColor = GENELIT_ACCESS_PROP(_SheenColor).rgb;
+            material.sheenRoughness = GENELIT_ACCESS_PROP(_SheenRoughness);
         #endif
 
         #if defined(_ANISOTROPY)
             material.anisotropy = GENELIT_ACCESS_PROP(_Anisotropy);
-            #if defined(_TILEMODE_NO_TILE)
-                SAMPLE_TEX2DTILE_SAMPLER_WIEGHT(_TangentMap, _MainTex, tangentMap)
-            #else
-                float4 tangentMap = UNITY_SAMPLE_TEX2D_SAMPLER(_TangentMap, _MainTex, uv);
-            #endif
+            GENELIT_SAMPLE_TEX2D_SAMPLER(_TangentMap, _MainTex, uv, tangentMap)
             material.anisotropyDirection = UnpackNormal(tangentMap);
-        #endif
-
-        #if defined(SHADING_MODEL_SUBSURFACE)
-            #if defined(_TILEMODE_NO_TILE)
-                SAMPLE_TEX2DTILE_SAMPLER_WIEGHT(_SubsurfaceThicknessMap, _MainTex, subsurfaceThickness)
-            #else
-                float4 subsurfaceThickness = UNITY_SAMPLE_TEX2D_SAMPLER(_SubsurfaceThicknessMap, _MainTex, uv);
-            #endif
-            material.subsurfaceThickness = subsurfaceThickness * GENELIT_ACCESS_PROP(_SubsurfaceThickness);
-            material.subsurfacePower = GENELIT_ACCESS_PROP(_SubsurfacePower);
-            material.subsurfaceColor = GENELIT_ACCESS_PROP(_SubsurfaceColor).rgb;
-        #endif
-
-        #if defined(SHADING_MODEL_CLOTH)
-            material.sheenColor = sqrt(material.baseColor.rgb);
-            material.subsurfaceColor = GENELIT_ACCESS_PROP(_ClothSubsurfaceColor).rgb;
         #endif
 
         #if defined(_CLEAR_COAT)
@@ -301,17 +277,19 @@
             #endif
         #endif
 
-        #if !defined(SHADING_MODEL_CLOTH) && !defined(SHADING_MODEL_SUBSURFACE)
-            #if !defined(REFRACTION_TYPE_NONE)
-                material.thickness = GENELIT_ACCESS_PROP(_Thickness);
-                material.absorption = -log(GENELIT_ACCESS_PROP(_TransmittanceColor).rgb) / max(material.thickness, 1e-5);
-                material.transmission = GENELIT_ACCESS_PROP(_Transmission);
-                #if defined(REFRACTION_TYPE_THIN)
-                    material.microThickness = GENELIT_ACCESS_PROP(_MicroThickness);
-                #endif
+        #if defined(USE_REFRACTION)
+            material.thickness = GENELIT_ACCESS_PROP(_Thickness);
+            material.absorption = -log(GENELIT_ACCESS_PROP(_TransmittanceColor).rgb) / max(material.thickness, 1e-5);
+            material.transmission = GENELIT_ACCESS_PROP(_Transmission);
+            #if defined(REFRACTION_TYPE_THIN)
+                material.microThickness = GENELIT_ACCESS_PROP(_MicroThickness);
             #endif
         #endif
 
         material.skyboxFog = GENELIT_ACCESS_PROP(_SkyboxFog);
+
+        #ifdef GENELIT_CUSTOM_INIT_MATERIAL
+            GENELIT_CUSTOM_INIT_MATERIAL(material)
+        #endif
     }
 #endif

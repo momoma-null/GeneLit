@@ -12,14 +12,6 @@
         #include "GeneLit_CapsuleAO.cginc"
     #endif
 
-    #if defined(SHADING_MODEL_SUBSURFACE)
-        #include "GeneLit_Model_Subsurface.cginc"
-    #elif defined(SHADING_MODEL_CLOTH)
-        #include "GeneLit_Model_Cloth.cginc"
-    #else
-        #include "GeneLit_Model_Standard.cginc"
-    #endif
-
     //------------------------------------------------------------------------------
     // Lighting
     //------------------------------------------------------------------------------
@@ -78,40 +70,36 @@
             baseColor.rgb *= baseColor.a;
         #endif
 
-        #if !defined(SHADING_MODEL_CLOTH)
+        #if !defined(GENELIT_GET_COMMON_COLOR_PARAMS)
             pixel.diffuseColor = computeDiffuseColor(baseColor, material.metallic);
             // Assumes an interface from air to an IOR of 1.5 for dielectrics
             float reflectance = computeDielectricF0(material.reflectance);
             pixel.f0 = computeF0(baseColor, material.metallic, reflectance);
         #else
-            pixel.diffuseColor = baseColor.rgb;
-            pixel.f0 = material.sheenColor;
-            pixel.subsurfaceColor = material.subsurfaceColor;
+            GENELIT_GET_COMMON_COLOR_PARAMS
         #endif
 
-        #if !defined(SHADING_MODEL_CLOTH) && !defined(SHADING_MODEL_SUBSURFACE)
-            #if !defined(REFRACTION_TYPE_NONE)
-                // Air's Index of refraction is 1.000277 at STP but everybody uses 1.0
-                const float airIor = 1.0;
-                // [common case] ior is not set in the material, deduce it from F0
-                float materialor = f0ToIor(pixel.f0.g);
-                pixel.etaIR = airIor / materialor;  // air -> material
-                pixel.etaRI = materialor / airIor;  // material -> air
-                pixel.transmission = saturate(material.transmission);
-                pixel.absorption = max(0, material.absorption);
-                pixel.thickness = max(0.0, material.thickness);
-                #if defined(REFRACTION_TYPE_THIN)
-                    pixel.uThickness = max(0.0, material.microThickness);
-                #else
-                    pixel.uThickness = 0.0;
-                #endif
+        #if defined(USE_REFRACTION)
+            // Air's Index of refraction is 1.000277 at STP but everybody uses 1.0
+            const float airIor = 1.0;
+            // [common case] ior is not set in the material, deduce it from F0
+            float materialor = f0ToIor(pixel.f0.g);
+            pixel.etaIR = airIor / materialor;  // air -> material
+            pixel.etaRI = materialor / airIor;  // material -> air
+            pixel.transmission = saturate(material.transmission);
+            pixel.absorption = max(0, material.absorption);
+            pixel.thickness = max(0.0, material.thickness);
+            #if defined(REFRACTION_TYPE_THIN)
+                pixel.uThickness = max(0.0, material.microThickness);
+            #else
+                pixel.uThickness = 0.0;
             #endif
         #endif
     }
 
     void getSheenPixelParams(const MaterialInputs material, const ShadingData shadingData, inout PixelParams pixel)
     {
-        #if defined(_SHEEN) && !defined(SHADING_MODEL_CLOTH) && !defined(SHADING_MODEL_SUBSURFACE)
+        #if defined(USE_SHEEN)
             pixel.sheenColor = material.sheenColor;
 
             float sheenPerceptualRoughness = material.sheenRoughness;
@@ -177,15 +165,6 @@
         pixel.roughness = perceptualRoughnessToRoughness(pixel.perceptualRoughness);
     }
 
-    void getSubsurfacePixelParams(const MaterialInputs material, inout PixelParams pixel)
-    {
-        #if defined(SHADING_MODEL_SUBSURFACE)
-            pixel.subsurfacePower = material.subsurfacePower;
-            pixel.subsurfaceColor = material.subsurfaceColor;
-            pixel.subsurfaceThickness = saturate(material.subsurfaceThickness);
-        #endif
-    }
-
     void getAnisotropyPixelParams(const MaterialInputs material, const ShadingData shadingData, inout PixelParams pixel)
     {
         #if defined(_ANISOTROPY)
@@ -202,7 +181,7 @@
         // Pre-filtered DFG term used for image-based lighting
         pixel.dfg = prefilteredDFG(pixel.perceptualRoughness, shadingData.NoV);
 
-        #if !defined(SHADING_MODEL_CLOTH)
+        #if !defined(GENELIT_IGNORE_ENERGY_COMPENSATION)
             // Energy compensation for multiple scattering in a microfacet model
             // See "Multiple-Scattering Microfacet BSDFs with the Smith Model"
             pixel.energyCompensation = 1.0 + pixel.f0 * (1.0 / pixel.dfg.y - 1.0);
@@ -210,7 +189,7 @@
             pixel.energyCompensation = 1.0;
         #endif
 
-        #if !defined(SHADING_MODEL_CLOTH) && defined(_SHEEN)
+        #if defined(USE_SHEEN)
             pixel.sheenDFG = prefilteredDFG(pixel.sheenPerceptualRoughness, shadingData.NoV).z;
             pixel.sheenScaling = 1.0 - max3(pixel.sheenColor) * pixel.sheenDFG;
         #endif
@@ -235,9 +214,11 @@
         getSheenPixelParams(material, shadingData, pixel);
         getClearCoatPixelParams(material, shadingData, pixel);
         getRoughnessPixelParams(material, shadingData, pixel);
-        getSubsurfacePixelParams(material, pixel);
         getAnisotropyPixelParams(material, shadingData, pixel);
         getEnergyCompensationPixelParams(shadingData, pixel);
+        #ifdef GENELIT_GET_CUSTOM_PIXEL_PARAMS
+            GENELIT_GET_CUSTOM_PIXEL_PARAMS(material, shadingData, pixel)
+        #endif
 
         // Ideally we would keep the diffuse and specular components separate
         // until the very end but it costs more ALUs on mobile. The gains are

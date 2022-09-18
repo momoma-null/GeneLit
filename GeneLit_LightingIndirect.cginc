@@ -212,7 +212,7 @@
 
     void evaluateSheenIBL(const PixelParams pixel, const ShadingData shadingData, float diffuseAO, inout float3 Fd, inout float3 Fr)
     {
-        #if !defined(SHADING_MODEL_CLOTH) && !defined(SHADING_MODEL_SUBSURFACE) && defined(_SHEEN)
+        #if defined(USE_SHEEN)
             // Albedo scaling of the base layer before we layer sheen on top
             Fd *= pixel.sheenScaling;
             Fr *= pixel.sheenScaling;
@@ -258,7 +258,7 @@
         #endif
     }
 
-    #if !defined(REFRACTION_TYPE_NONE)
+    #if defined(USE_REFRACTION)
 
         struct Refraction
         {
@@ -416,7 +416,7 @@
         evaluateClearCoatIBL(pixel, shadingData, diffuseAO, Fd, Fr);
 
         // Note: iblLuminance is already premultiplied by the exposure
-        #if !defined(REFRACTION_TYPE_NONE)
+        #if defined(USE_REFRACTION)
             applyRefraction(pixel, shadingData.position, shadingData.view, shadingData.normal, E, Fd, Fr, color);
         #else
             color.rgb += (Fd + Fr);

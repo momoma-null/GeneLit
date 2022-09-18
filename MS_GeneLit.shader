@@ -82,8 +82,14 @@
 
         AlphaToMask [_AlphaToMask]
 
-        CGINCLUDE
-        #define UNITY_SETUP_BRDF_INPUT MetallicSetup
+        CGINCLUDE        
+        #if defined(SHADING_MODEL_SUBSURFACE)
+            #include "GeneLit_Model_Subsurface.cginc"
+        #elif defined(SHADING_MODEL_CLOTH)
+            #include "GeneLit_Model_Cloth.cginc"
+        #else
+            #include "GeneLit_Model_Standard.cginc"
+        #endif
 
         #define FILAMENT_QUALITY FILAMENT_QUALITY_HIGH
         #define GEOMETRIC_SPECULAR_AA
