@@ -1,4 +1,4 @@
-﻿Shader "MomomaShader/General/GeneLit"
+﻿Shader "MomomaShader/General/GeneLit_Cloth"
 {
     Properties
     {
@@ -11,10 +11,8 @@
         [SingleLineScaleOffset(_Color)] _MainTex ("Albedo", 2D) = "white" {}
         [IfDef(_ALPHATEST_ON)] _Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
         [SingleLine(, _MASKMAP)] _MaskMap ("Mask Map", 2D) = "white" {}
-        _Metallic ("Metallic", Range(0,1)) = 0.0
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _OcclusionStrength ("Occlusion", Range(0,1)) = 1.0
-        _Reflectance ("Reflectance", Range(0.35, 1.0)) = 0.5
         [IfDef(_NORMALMAP)][SingleLine] _BumpScale ("Normal Scale", Float) = 1.0
         [SingleLine(_BumpScale, _NORMALMAP)][Normal] _BumpMap ("Normal Map", 2D) = "bump" {}
         [SingleLine(, _BENTNORMALMAP)][Normal] _BentNormalMap ("Bent Normal Map", 2D) = "bump" {}
@@ -23,6 +21,8 @@
         [SingleLine][HDR] _EmissionColor ("Emission Color", Color) = (0,0,0,1)
         [Emission]
         [SingleLine(_EmissionColor)] _EmissionMap ("Emission", 2D) = "white" {}
+
+        _ClothSubsurfaceColor ("Subsurface Color", Color) = (0.5,0.5,0.5,1)
 
         [IfDef(_ANISOTROPY)][SingleLine] _Anisotropy ("Anisotropy", Range(-1, 1)) = 0.5
         [SingleLine(_Anisotropy, _ANISOTROPY)][Normal] _TangentMap ("Anisotropy", 2D) = "bump" {}
@@ -33,19 +33,9 @@
         [IfDef(_DETAIL_MAP)] _DetailNormalScale ("Normal Scale", Range(0, 2)) = 1.0
         [IfDef(_DETAIL_MAP)] _DetailSmoothnessScale ("Smoothness Scale", Range(0, 2)) = 1.0
 
-        [ToggleHeader(Sheen, _SHEEN)]
-        [IfDef(_SHEEN)] _SheenColor ("Sheen Color", Color) = (0,0,0,1)
-        [IfDef(_SHEEN)] _SheenRoughness ("Sheen Roughness", Range(0,1)) = 0.0
-
         [ToggleHeader(ClearCoat, _CLEAR_COAT)]
         [IfDef(_CLEAR_COAT)] _ClearCoat ("Clear Coat", Range(0,1)) = 1.0
         [IfDef(_CLEAR_COAT)] _ClearCoatRoughness ("Clear Coat Roughness", Range(0,1)) = 0.0
-
-        [EnumHeader(None, Solid, Thin)] Refraction_Type ("Refraction", Float) = 0.0
-        [IfNDef(REFRACTION_TYPE_NONE)] _Thickness ("Thickness", Float) = 0.5
-        [IfDef(REFRACTION_TYPE_THIN)] _MicroThickness ("MicroThickness", Float) = 0.01
-        [IfNDef(REFRACTION_TYPE_NONE)] _TransmittanceColor ("Transmittance Color", Color) = (0, 0, 0, 1)
-        [IfNDef(REFRACTION_TYPE_NONE)] _Transmission ("Transmission", Range(0,1)) = 0.0
 
         [Header(Experimental)]
         [Toggle(CAPSULE_AO)] _Capsule_AO ("Capsule AO", float) = 0.0
@@ -67,7 +57,7 @@
         AlphaToMask [_AlphaToMask]
 
         CGINCLUDE
-        #include "Include/GeneLit_Model_Standard.cginc"
+        #include "Include/GeneLit_Model_Cloth.cginc"
 
         #define FILAMENT_QUALITY FILAMENT_QUALITY_HIGH
         #define GEOMETRIC_SPECULAR_AA
@@ -94,14 +84,12 @@
             #pragma shader_feature_local _DIRECTIONALLIGHTESTIMATION_OFF
             #pragma shader_feature_local _ANISOTROPY
             #pragma shader_feature_local _CLEAR_COAT
-            #pragma shader_feature_local _SHEEN
             #pragma shader_feature_local _MASKMAP
             #pragma shader_feature_local _NORMALMAP
             #pragma shader_feature_local _BENTNORMALMAP
             #pragma shader_feature_local _PARALLAXMAP
             #pragma shader_feature_local _DETAIL_MAP
             #pragma shader_feature_local CAPSULE_AO
-            #pragma shader_feature_local REFRACTION_TYPE_NONE REFRACTION_TYPE_SOLID REFRACTION_TYPE_THIN
             #pragma shader_feature_local REFLECTION_SPACE_CUBE REFLECTION_SPACE_CYLINDER
 
             #include "Include/GeneLit_Core.cginc"
@@ -128,13 +116,11 @@
             #pragma shader_feature_local _TILEMODE_NORMAL_TILE _TILEMODE_NO_TILE
             #pragma shader_feature_local _ANISOTROPY
             #pragma shader_feature_local _CLEAR_COAT
-            #pragma shader_feature_local _SHEEN
             #pragma shader_feature_local _MASKMAP
             #pragma shader_feature_local _NORMALMAP
             #pragma shader_feature_local _BENTNORMALMAP
             #pragma shader_feature_local _PARALLAXMAP
             #pragma shader_feature_local _DETAIL_MAP
-            #pragma shader_feature_local REFRACTION_TYPE_NONE
 
             #include "Include/GeneLit_Core.cginc"
             ENDCG
