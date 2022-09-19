@@ -95,8 +95,6 @@
         return pixel.diffuseColor * diffuse(pixel.roughness, NoV, NoL, LoH);
     }
 
-    void initCustomMaterial(const float2 uv, inout MaterialInputs material) { }
-
     void getCustomPixelParams(const MaterialInputs material, const ShadingData shadingData, inout PixelParams pixel) { }
 
     /**
