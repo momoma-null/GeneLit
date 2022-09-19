@@ -174,6 +174,7 @@
             #pragma shader_feature _EMISSION
             #pragma shader_feature EDITOR_VISUALIZATION
             #pragma shader_feature_local _TILEMODE_NORMAL_TILE _TILEMODE_NO_TILE
+            #pragma shader_feature_local _MASKMAP
             #pragma shader_feature_local _DETAIL_MAP
 
             #include "Include/GeneLit_Meta.cginc"
