@@ -99,7 +99,7 @@
         shadingData.uv = IN.uv;
     }
 
-    void initMaterial(ShadingData shadingData, inout MaterialInputs material)
+    void initMaterial(const ShadingData shadingData, inout MaterialInputs material)
     {
         float4 color = GENELIT_ACCESS_PROP(_Color);
         switch(GENELIT_ACCESS_PROP(_VertexColorMode))
