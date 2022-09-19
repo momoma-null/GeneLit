@@ -15,30 +15,35 @@
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _OcclusionStrength ("Occlusion", Range(0,1)) = 1.0
         _Reflectance ("Reflectance", Range(0.35, 1.0)) = 0.5
+
         [IfDef(_NORMALMAP)][SingleLine] _BumpScale ("Normal Scale", Float) = 1.0
         [SingleLine(_BumpScale, _NORMALMAP)][Normal] _BumpMap ("Normal Map", 2D) = "bump" {}
         [SingleLine(, _BENTNORMALMAP)][Normal] _BentNormalMap ("Bent Normal Map", 2D) = "bump" {}
+
         [IfDef(_PARALLAXMAP)][SingleLine] _Parallax ("Height Scale", Range (0.005, 0.08)) = 0.02
         [IfNDef(_TILEMODE_NO_TILE)][SingleLine(_Parallax, _PARALLAXMAP)] _ParallaxMap ("Height Map", 2D) = "white" {}
+
         [SingleLine][HDR] _EmissionColor ("Emission Color", Color) = (0,0,0,1)
         [Emission]
         [SingleLine(_EmissionColor)] _EmissionMap ("Emission", 2D) = "white" {}
 
-        [SingleLine] _SubsurfaceThickness ("Thickness", Range(0,1)) = 0.5
-        [SingleLine(_SubsurfaceThickness)] _SubsurfaceThicknessMap ("Thickness Map", 2D) = "white" {}
-        _SubsurfacePower ("Subsurface Power", Float) = 12.234
-        _SubsurfaceColor ("Subsurface Color", Color) = (1,1,1,1)
-
         [IfDef(_ANISOTROPY)][SingleLine] _Anisotropy ("Anisotropy", Range(-1, 1)) = 0.5
         [SingleLine(_Anisotropy, _ANISOTROPY)][Normal] _TangentMap ("Anisotropy", 2D) = "bump" {}
 
+        [ShurikenHeader(Subsurface Inputs)]
+        [SingleLine(_SubsurfaceThickness)] _SubsurfaceThicknessMap ("Thickness Map", 2D) = "white" {}
+        [SingleLine] _SubsurfaceThickness ("Thickness", Range(0,1)) = 0.5
+        _SubsurfacePower ("Subsurface Power", Float) = 12.234
+        _SubsurfaceColor ("Subsurface Color", Color) = (1,1,1,1)
+
+        [ShurikenHeader(Detail Inputs)]
         [SingleLineScaleOffset(,_DETAIL_MAP)] _DetailMap ("Detail Map", 2D) = "grey" {}
         [IfDef(_DETAIL_MAP)][Enum(UV0,0,UV1,1,UV2,2,UV3,3)] _UVSec ("UV Set", Float) = 0
         [IfDef(_DETAIL_MAP)] _DetailAlbedoScale ("Albedo Scale", Range(0, 2)) = 1.0
         [IfDef(_DETAIL_MAP)] _DetailNormalScale ("Normal Scale", Range(0, 2)) = 1.0
         [IfDef(_DETAIL_MAP)] _DetailSmoothnessScale ("Smoothness Scale", Range(0, 2)) = 1.0
 
-        [ToggleHeader(ClearCoat, _CLEAR_COAT)]
+        [ToggleHeader(Clear Coat, _CLEAR_COAT)]
         [IfDef(_CLEAR_COAT)] _ClearCoat ("Clear Coat", Range(0,1)) = 1.0
         [IfDef(_CLEAR_COAT)] _ClearCoatRoughness ("Clear Coat Roughness", Range(0,1)) = 0.0
 
