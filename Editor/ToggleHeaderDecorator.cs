@@ -1,12 +1,23 @@
 ﻿using System;
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 namespace MomomaAssets.GeneLit
 {
     sealed class ToggleHeaderDecorator : MaterialPropertyDrawer
     {
-        readonly static float s_lineHeight = EditorStyles.toolbar.CalcHeight(GUIContent.none, 0) + EditorGUIUtility.standardVerticalSpacing;
+        public static class Styles
+        {
+            public static readonly GUIStyle HeaderStyle = new GUIStyle("ShurikenModuleTitle")
+            {
+                font = new GUIStyle(EditorStyles.boldLabel).font,
+                border = new RectOffset(15, 7, 4, 4),
+                fixedHeight = 22f,
+                contentOffset = new Vector2(20f, -2f)
+            };
+        }
+
+        readonly static float s_lineHeight = Styles.HeaderStyle.CalcHeight(GUIContent.none, 0) + EditorGUIUtility.standardVerticalSpacing;
 
         readonly GUIContent _title;
         readonly string _keyword;
@@ -34,12 +45,15 @@ namespace MomomaAssets.GeneLit
                     break;
                 }
             }
+            var oldLabelWidth = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = 0f;
             try
             {
                 EditorGUI.showMixedValue = mixed;
                 EditorGUI.BeginChangeCheck();
-                GUI.Box(position, GUIContent.none, EditorStyles.toolbar);
-                enabled = EditorGUI.ToggleLeft(position, _title, enabled);
+                GUI.Box(position, GUIContent.none, Styles.HeaderStyle);
+                position.xMin += 4f;
+                enabled = EditorGUI.Toggle(position, _title, enabled);
                 if (EditorGUI.EndChangeCheck())
                 {
                     editor.RegisterPropertyChangeUndo("Material Keyword");
@@ -55,6 +69,7 @@ namespace MomomaAssets.GeneLit
             finally
             {
                 EditorGUI.showMixedValue = false;
+                EditorGUIUtility.labelWidth = oldLabelWidth;
             }
         }
     }

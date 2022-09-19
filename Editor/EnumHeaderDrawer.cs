@@ -35,7 +35,8 @@ namespace MomomaAssets.GeneLit
                 var value = (int)prop.floatValue;
                 EditorGUI.showMixedValue = prop.hasMixedValue;
                 EditorGUI.BeginChangeCheck();
-                GUI.Box(position, GUIContent.none, EditorStyles.toolbar);
+                GUI.Box(position, GUIContent.none, ToggleHeaderDecorator.Styles.HeaderStyle);
+                position.xMin += 4f;
                 value = EditorGUI.Popup(position, label, value, _keywords);
                 if (EditorGUI.EndChangeCheck())
                 {
