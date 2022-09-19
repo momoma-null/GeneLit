@@ -1,6 +1,8 @@
 #ifndef GENELIT_MODEL_STANDARD_INCLUDED
     #define GENELIT_MODEL_STANDARD_INCLUDED
 
+    #define USE_METALLIC
+
     #if defined(_SHEEN)
         #define USE_SHEEN
     #endif
@@ -14,7 +16,6 @@
     #define GENELIT_CUSTOM_PIXEL_PARAMS
 
     #define GENELIT_INIT_CUSTOM_MATERIAL(material)
-    #define GENELIT_GET_COMMON_PIXEL_PARAMS getCommonPixelParams
     #define GENELIT_EVALUATE_CUSTOM_INDIRECT(pixel, shadingData, irradiance, Fd, Fr)
 
     #include "GeneLit_Utils.cginc"

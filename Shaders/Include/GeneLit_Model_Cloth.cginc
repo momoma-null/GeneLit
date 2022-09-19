@@ -17,8 +17,6 @@
     material.sheenColor = sqrt(material.baseColor.rgb);\
     material.subsurfaceColor = GENELIT_ACCESS_PROP(_ClothSubsurfaceColor).rgb;
 
-    #define GENELIT_GET_COMMON_PIXEL_PARAMS getClothCommonPixelParams
-
     #define GENELIT_EVALUATE_CUSTOM_INDIRECT(pixel, shadingData, irradiance, Fd, Fr) \
     Fd *= Fd_Wrap(shadingData.NoV, 0.5) * saturate(pixel.subsurfaceColor + shadingData.NoV);
 
@@ -26,7 +24,7 @@
     #include "GeneLit_LightingCommon.cginc"
     #include "GeneLit_Brdf.cginc"
 
-    void getClothCommonPixelParams(const MaterialInputs material, inout PixelParams pixel)
+    void getCommonPixelParams(const MaterialInputs material, inout PixelParams pixel)
     {
         float4 baseColor = material.baseColor;
 

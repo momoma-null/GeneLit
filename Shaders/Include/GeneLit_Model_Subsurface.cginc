@@ -1,6 +1,8 @@
 #ifndef GENELIT_MODEL_SUBSURFACE_INCLUDED
     #define GENELIT_MODEL_SUBSURFACE_INCLUDED
 
+    #define USE_METALLIC
+
     UNITY_DECLARE_TEX2D_NOSAMPLER(_SubsurfaceThicknessMap);
 
     #define GENELIT_CUSTOM_INSTANCED_PROP \
@@ -23,8 +25,6 @@
     material.subsurfaceThickness = subsurfaceThickness.g * GENELIT_ACCESS_PROP(_SubsurfaceThickness);\
     material.subsurfacePower = GENELIT_ACCESS_PROP(_SubsurfacePower);\
     material.subsurfaceColor = GENELIT_ACCESS_PROP(_SubsurfaceColor).rgb;
-
-    #define GENELIT_GET_COMMON_PIXEL_PARAMS getCommonPixelParams
 
     #define GENELIT_EVALUATE_CUSTOM_INDIRECT(pixel, shadingData, irradiance, Fd, Fr) \
     float3 viewDependent = prefilteredRadiance(-shadingData.view, pixel.roughness, 1.0 + pixel.subsurfaceThickness, shadingData.position);\

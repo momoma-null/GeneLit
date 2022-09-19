@@ -126,7 +126,7 @@
             float4 mods = 1;
         #endif
         material.roughness = 1.0 - GENELIT_ACCESS_PROP(_Glossiness) * mods.a;
-        #if !defined(GENELIT_GET_COMMON_COLOR_PARAMS)
+        #if defined(USE_METALLIC)
             material.metallic = GENELIT_ACCESS_PROP(_Metallic) * mods.r;
             material.reflectance = GENELIT_ACCESS_PROP(_Reflectance);
         #endif

@@ -176,6 +176,8 @@
             #pragma vertex vertShadowCaster
             #pragma fragment fragShadowCaster
             #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
+            #pragma shader_feature_local _MASKMAP
+            #pragma shader_feature_local _PARALLAXMAP
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
 

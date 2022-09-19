@@ -62,40 +62,38 @@
         }
     #endif
 
-    void getCommonPixelParams(const MaterialInputs material, inout PixelParams pixel)
-    {
-        float4 baseColor = material.baseColor;
+    #if defined(USE_METALLIC)
+        void getCommonPixelParams(const MaterialInputs material, inout PixelParams pixel)
+        {
+            float4 baseColor = material.baseColor;
 
-        #if defined(_ALPHAPREMULTIPLY_ON)
-            baseColor.rgb *= baseColor.a;
-        #endif
+            #if defined(_ALPHAPREMULTIPLY_ON)
+                baseColor.rgb *= baseColor.a;
+            #endif
 
-        #if !defined(GENELIT_GET_COMMON_COLOR_PARAMS)
             pixel.diffuseColor = computeDiffuseColor(baseColor, material.metallic);
             // Assumes an interface from air to an IOR of 1.5 for dielectrics
             float reflectance = computeDielectricF0(material.reflectance);
             pixel.f0 = computeF0(baseColor, material.metallic, reflectance);
-        #else
-            GENELIT_GET_COMMON_COLOR_PARAMS
-        #endif
 
-        #if defined(USE_REFRACTION)
-            // Air's Index of refraction is 1.000277 at STP but everybody uses 1.0
-            const float airIor = 1.0;
-            // [common case] ior is not set in the material, deduce it from F0
-            float materialor = f0ToIor(pixel.f0.g);
-            pixel.etaIR = airIor / materialor;  // air -> material
-            pixel.etaRI = materialor / airIor;  // material -> air
-            pixel.transmission = saturate(material.transmission);
-            pixel.absorption = max(0, material.absorption);
-            pixel.thickness = max(0.0, material.thickness);
-            #if defined(REFRACTION_TYPE_THIN)
-                pixel.uThickness = max(0.0, material.microThickness);
-            #else
-                pixel.uThickness = 0.0;
+            #if defined(USE_REFRACTION)
+                // Air's Index of refraction is 1.000277 at STP but everybody uses 1.0
+                const float airIor = 1.0;
+                // [common case] ior is not set in the material, deduce it from F0
+                float materialor = f0ToIor(pixel.f0.g);
+                pixel.etaIR = airIor / materialor;  // air -> material
+                pixel.etaRI = materialor / airIor;  // material -> air
+                pixel.transmission = saturate(material.transmission);
+                pixel.absorption = max(0, material.absorption);
+                pixel.thickness = max(0.0, material.thickness);
+                #if defined(REFRACTION_TYPE_THIN)
+                    pixel.uThickness = max(0.0, material.microThickness);
+                #else
+                    pixel.uThickness = 0.0;
+                #endif
             #endif
-        #endif
-    }
+        }
+    #endif
 
     void getSheenPixelParams(const MaterialInputs material, const ShadingData shadingData, inout PixelParams pixel)
     {
@@ -210,7 +208,7 @@
         PixelParams pixel;
         UNITY_INITIALIZE_OUTPUT(PixelParams, pixel);
         pixel.attenuation = atten;
-        GENELIT_GET_COMMON_PIXEL_PARAMS(material, pixel);
+        getCommonPixelParams(material, pixel);
         getSheenPixelParams(material, shadingData, pixel);
         getClearCoatPixelParams(material, shadingData, pixel);
         getRoughnessPixelParams(material, shadingData, pixel);

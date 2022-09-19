@@ -20,7 +20,7 @@
 
     half ShadowGetOneMinusReflectivity(half2 uv)
     {
-        #if !defined(SHADING_MODEL_CLOTH)
+        #if defined(USE_METALLIC)
             half metallicity = GENELIT_ACCESS_PROP(_Metallic);
             #if defined(_MASKMAP)
                 metallicity = UNITY_SAMPLE_TEX2D_SAMPLER(_MaskMap, _MainTex, uv).r;

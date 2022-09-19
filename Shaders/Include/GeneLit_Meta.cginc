@@ -86,7 +86,7 @@
 
         PixelParams pixel;
         UNITY_INITIALIZE_OUTPUT(PixelParams, pixel);
-        GENELIT_GET_COMMON_PIXEL_PARAMS(material, pixel);
+        getCommonPixelParams(material, pixel);
 
         UnityMetaInput o;
         UNITY_INITIALIZE_OUTPUT(UnityMetaInput, o);

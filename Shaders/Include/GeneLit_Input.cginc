@@ -45,7 +45,7 @@
     #endif
     UNITY_DEFINE_INSTANCED_PROP(half4, _Color)
     UNITY_DEFINE_INSTANCED_PROP(half, _Glossiness)
-    #if !defined(GENELIT_GET_COMMON_COLOR_PARAMS)
+    #if defined(USE_METALLIC)
         UNITY_DEFINE_INSTANCED_PROP(half, _Metallic)
         UNITY_DEFINE_INSTANCED_PROP(half, _Reflectance)
     #endif
