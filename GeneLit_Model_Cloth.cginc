@@ -1,6 +1,8 @@
 #ifndef GENELIT_MODEL_CLOTH_INCLUDED
     #define GENELIT_MODEL_CLOTH_INCLUDED
 
+    #define DFG_TYPE_CLOTH
+
     #define GENELIT_CUSTOM_INSTANCED_PROP \
     UNITY_DEFINE_INSTANCED_PROP(half4, _ClothSubsurfaceColor)
 
@@ -8,23 +10,36 @@
     float3 sheenColor;\
     float3 subsurfaceColor;
 
-    #define GENELIT_CUSTOM_INIT_MATERIAL(material) \
-    material.sheenColor = sqrt(material.baseColor.rgb);\
-    material.subsurfaceColor = GENELIT_ACCESS_PROP(_ClothSubsurfaceColor).rgb;
-
     #define GENELIT_CUSTOM_PIXEL_PARAMS \
     float3 subsurfaceColor;
 
-    #define GENELIT_IGNORE_ENERGY_COMPENSATION
+    #define GENELIT_INIT_CUSTOM_MATERIAL(material) \
+    material.sheenColor = sqrt(material.baseColor.rgb);\
+    material.subsurfaceColor = GENELIT_ACCESS_PROP(_ClothSubsurfaceColor).rgb;
 
-    #define GENELIT_GET_COMMON_COLOR_PARAMS \
-    pixel.diffuseColor = baseColor.rgb;\
-    pixel.f0 = material.sheenColor;\
-    pixel.subsurfaceColor = material.subsurfaceColor;
+    #define GENELIT_GET_COMMON_PIXEL_PARAMS getClothCommonPixelParams
+
+    #define GENELIT_EVALUATE_CUSTOM_INDIRECT(pixel, shadingData, irradiance, Fd, Fr) \
+    Fd *= Fd_Wrap(shadingData.NoV, 0.5) * saturate(pixel.subsurfaceColor + shadingData.NoV);
 
     #include "GeneLit_Input.cginc"
     #include "GeneLit_LightingCommon.cginc"
     #include "GeneLit_Brdf.cginc"
+
+    void getClothCommonPixelParams(const MaterialInputs material, inout PixelParams pixel)
+    {
+        float4 baseColor = material.baseColor;
+
+        #if defined(_ALPHAPREMULTIPLY_ON)
+            baseColor.rgb *= baseColor.a;
+        #endif
+
+        pixel.diffuseColor = baseColor.rgb;
+        pixel.f0 = material.sheenColor;
+        pixel.subsurfaceColor = material.subsurfaceColor;
+    }
+
+    void getCustomPixelParams(const MaterialInputs material, const ShadingData shadingData, inout PixelParams pixel) { }
 
     /**
     * Evaluates lit materials with the cloth shading model. Similar to the standard

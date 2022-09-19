@@ -181,7 +181,7 @@
         // Pre-filtered DFG term used for image-based lighting
         pixel.dfg = prefilteredDFG(pixel.perceptualRoughness, shadingData.NoV);
 
-        #if !defined(GENELIT_IGNORE_ENERGY_COMPENSATION)
+        #if !defined(DFG_TYPE_CLOTH)
             // Energy compensation for multiple scattering in a microfacet model
             // See "Multiple-Scattering Microfacet BSDFs with the Smith Model"
             pixel.energyCompensation = 1.0 + pixel.f0 * (1.0 / pixel.dfg.y - 1.0);
@@ -210,15 +210,13 @@
         PixelParams pixel;
         UNITY_INITIALIZE_OUTPUT(PixelParams, pixel);
         pixel.attenuation = atten;
-        getCommonPixelParams(material, pixel);
+        GENELIT_GET_COMMON_PIXEL_PARAMS(material, pixel);
         getSheenPixelParams(material, shadingData, pixel);
         getClearCoatPixelParams(material, shadingData, pixel);
         getRoughnessPixelParams(material, shadingData, pixel);
         getAnisotropyPixelParams(material, shadingData, pixel);
         getEnergyCompensationPixelParams(shadingData, pixel);
-        #ifdef GENELIT_GET_CUSTOM_PIXEL_PARAMS
-            GENELIT_GET_CUSTOM_PIXEL_PARAMS(material, shadingData, pixel)
-        #endif
+        getCustomPixelParams(material, shadingData, pixel);
 
         // Ideally we would keep the diffuse and specular components separate
         // until the very end but it costs more ALUs on mobile. The gains are

@@ -166,7 +166,7 @@
 
     inline float3 specularDFG(const PixelParams pixel)
     {
-        #if defined(SHADING_MODEL_CLOTH)
+        #if defined(DFG_TYPE_CLOTH)
             return pixel.f0 * pixel.dfg.z;
         #else
             return lerp(pixel.dfg.xxx, pixel.dfg.yyy, pixel.f0);
@@ -202,14 +202,6 @@
     // IBL evaluation
     //------------------------------------------------------------------------------
 
-    void evaluateClothIndirectDiffuseBRDF(const PixelParams pixel, const ShadingData shadingData, inout float diffuse)
-    {
-        #if defined(SHADING_MODEL_CLOTH)
-            // Simulate subsurface scattering with a wrap diffuse term
-            diffuse *= Fd_Wrap(shadingData.NoV, 0.5);
-        #endif
-    }
-
     void evaluateSheenIBL(const PixelParams pixel, const ShadingData shadingData, float diffuseAO, inout float3 Fd, inout float3 Fr)
     {
         #if defined(USE_SHEEN)
@@ -244,17 +236,6 @@
             // TODO: Should we apply specularAO to the attenuation as well?
             float specAO = specularAO(clearCoatNoV, diffuseAO, pixel.clearCoatRoughness, shadingData.normal, shadingData.reflected);
             Fr += prefilteredRadiance(clearCoatR, pixel.clearCoatPerceptualRoughness, shadingData.position) * (specAO * Fc);
-        #endif
-    }
-
-    void evaluateSubsurfaceIBL(const PixelParams pixel, const ShadingData shadingData, const float3 diffuseIrradiance, inout float3 Fd, inout float3 Fr)
-    {
-        #if defined(SHADING_MODEL_SUBSURFACE)
-            float3 viewDependent = prefilteredRadiance(-shadingData.view, pixel.roughness, 1.0 + pixel.subsurfaceThickness, shadingData.position);
-            float attenuation = (1.0 - pixel.subsurfaceThickness) / (2.0 * PI);
-            Fd += pixel.subsurfaceColor * (diffuseIrradiance + viewDependent) * attenuation;
-        #elif defined(SHADING_MODEL_CLOTH)
-            Fd *= saturate(pixel.subsurfaceColor + shadingData.NoV);
         #endif
     }
 
@@ -391,7 +372,6 @@
 
         // diffuse layer
         float diffuseBRDF = singleBounceAO(diffuseAO); // Fd_Lambert() is baked in the SH below
-        evaluateClothIndirectDiffuseBRDF(pixel, shadingData, diffuseBRDF);
 
         #if defined(_BENTNORMALMAP)
             float3 diffuseNormal = shadingData.bentNormal;
@@ -402,8 +382,7 @@
         float3 irradiance = diffuseIrradiance(diffuseNormal, shadingData) * pixel.attenuation;
         float3 Fd = pixel.diffuseColor * irradiance * saturate(1.0 - E) * diffuseBRDF;
 
-        // subsurface layer
-        evaluateSubsurfaceIBL(pixel, shadingData, irradiance, Fd, Fr);
+        GENELIT_EVALUATE_CUSTOM_INDIRECT(pixel, shadingData, irradiance, Fd, Fr)
 
         // extra ambient occlusion term for the base and subsurface layers
         multiBounceAO(diffuseAO, pixel.diffuseColor, Fd);

@@ -13,24 +13,29 @@
     float subsurfacePower;\
     float3 subsurfaceColor;
 
-    #define GENELIT_CUSTOM_INIT_MATERIAL(material) \
-    GENELIT_SAMPLE_TEX2D_SAMPLER(_SubsurfaceThicknessMap, _MainTex, uv, subsurfaceThickness) \
-    material.subsurfaceThickness = subsurfaceThickness * GENELIT_ACCESS_PROP(_SubsurfaceThickness); \
-    material.subsurfacePower = GENELIT_ACCESS_PROP(_SubsurfacePower); \
-    material.subsurfaceColor = GENELIT_ACCESS_PROP(_SubsurfaceColor).rgb;
-
     #define GENELIT_CUSTOM_PIXEL_PARAMS \
     float subsurfaceThickness;\
-    float  subsurfacePower;\
+    float subsurfacePower;\
     float3 subsurfaceColor;
 
-    #define GENELIT_GET_CUSTOM_PIXEL_PARAMS(material, shadingData, pixel) getSubsurfacePixelParams(material, pixel);
+    #define GENELIT_INIT_CUSTOM_MATERIAL(material) \
+    GENELIT_SAMPLE_TEX2D_SAMPLER(_SubsurfaceThicknessMap, _MainTex, uv, subsurfaceThickness)\
+    material.subsurfaceThickness = subsurfaceThickness.g * GENELIT_ACCESS_PROP(_SubsurfaceThickness);\
+    material.subsurfacePower = GENELIT_ACCESS_PROP(_SubsurfacePower);\
+    material.subsurfaceColor = GENELIT_ACCESS_PROP(_SubsurfaceColor).rgb;
+
+    #define GENELIT_GET_COMMON_PIXEL_PARAMS getCommonPixelParams
+
+    #define GENELIT_EVALUATE_CUSTOM_INDIRECT(pixel, shadingData, irradiance, Fd, Fr) \
+    float3 viewDependent = prefilteredRadiance(-shadingData.view, pixel.roughness, 1.0 + pixel.subsurfaceThickness, shadingData.position);\
+    float attenuation = (1.0 - pixel.subsurfaceThickness) / (2.0 * PI);\
+    Fd += pixel.subsurfaceColor * (irradiance + viewDependent) * attenuation;
 
     #include "GeneLit_Input.cginc"
     #include "GeneLit_LightingCommon.cginc"
     #include "GeneLit_Brdf.cginc"
 
-    void getSubsurfacePixelParams(const MaterialInputs material, inout PixelParams pixel)
+    void getCustomPixelParams(const MaterialInputs material, const ShadingData shadingData, inout PixelParams pixel)
     {
         pixel.subsurfaceThickness = saturate(material.subsurfaceThickness);
         pixel.subsurfacePower = material.subsurfacePower;

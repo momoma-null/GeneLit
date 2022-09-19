@@ -9,7 +9,16 @@
         #define USE_REFRACTION
     #endif
 
+    #define GENELIT_CUSTOM_INSTANCED_PROP
+    #define GENELIT_CUSTOM_MATERIAL_INPUTS
+    #define GENELIT_CUSTOM_PIXEL_PARAMS
+
+    #define GENELIT_INIT_CUSTOM_MATERIAL(material)
+    #define GENELIT_GET_COMMON_PIXEL_PARAMS getCommonPixelParams
+    #define GENELIT_EVALUATE_CUSTOM_INDIRECT(pixel, shadingData, irradiance, Fd, Fr)
+
     #include "GeneLit_Utils.cginc"
+    #include "GeneLit_Input.cginc"
     #include "GeneLit_LightingCommon.cginc"
     #include "GeneLit_Brdf.cginc"
 
@@ -85,6 +94,10 @@
     {
         return pixel.diffuseColor * diffuse(pixel.roughness, NoV, NoL, LoH);
     }
+
+    void initCustomMaterial(const float2 uv, inout MaterialInputs material) { }
+
+    void getCustomPixelParams(const MaterialInputs material, const ShadingData shadingData, inout PixelParams pixel) { }
 
     /**
     * Evaluates lit materials with the standard shading model. This model comprises

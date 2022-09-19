@@ -20,6 +20,35 @@
         float3 wNormal : TEXCOORD5;
     };
 
+    
+    void initMaterial_meta(const ShadingData shadingData, inout MaterialInputs material)
+    {
+        float4 color = GENELIT_ACCESS_PROP(_Color);
+        switch(GENELIT_ACCESS_PROP(_VertexColorMode))
+        {
+            case 1:material.baseColor *= color;break;
+            case 2:material.baseColor += color;break;
+            case 3:material.baseColor =  material.baseColor + color - material.baseColor * color;break;
+            default:material.baseColor = color;break;
+        }
+        #if defined(_TILEMODE_NO_TILE)
+            SAMPLE_TEX2DTILE_WIEGHT(_MainTex, baseColor, shadingData.position, shadingData.geometricNormal)
+            material.baseColor *= baseColor;
+        #else
+            float2 uv = shadingData.uv.xy;
+            material.baseColor *= UNITY_SAMPLE_TEX2D(_MainTex, uv);
+        #endif
+        #if defined(_MASKMAP)
+            GENELIT_SAMPLE_TEX2D_SAMPLER(_MaskMap, _MainTex, uv, mods)
+        #else
+            float4 mods = 1;
+        #endif
+        material.roughness = 1.0 - GENELIT_ACCESS_PROP(_Glossiness) * mods.a;
+        material.emissive = GENELIT_ACCESS_PROP(_EmissionColor);
+        GENELIT_SAMPLE_TEX2D_SAMPLER(_EmissionMap, _MainTex, uv, emissive)
+        material.emissive *= emissive;
+    }
+
     v2f_meta vert_meta (appdata_full v)
     {
         v2f_meta o;
@@ -53,11 +82,11 @@
         MaterialInputs material;
         UNITY_INITIALIZE_OUTPUT(MaterialInputs, material);
         material.baseColor = i.color;
-        initMaterial(shadingData, material);
+        initMaterial_meta(shadingData, material);
 
         PixelParams pixel;
         UNITY_INITIALIZE_OUTPUT(PixelParams, pixel);
-        getCommonPixelParams(material, pixel);
+        GENELIT_GET_COMMON_PIXEL_PARAMS(material, pixel);
 
         UnityMetaInput o;
         UNITY_INITIALIZE_OUTPUT(UnityMetaInput, o);
