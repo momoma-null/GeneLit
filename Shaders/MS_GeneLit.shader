@@ -84,11 +84,11 @@
 
         CGINCLUDE        
         #if defined(SHADING_MODEL_SUBSURFACE)
-            #include "GeneLit_Model_Subsurface.cginc"
+            #include "Include/GeneLit_Model_Subsurface.cginc"
         #elif defined(SHADING_MODEL_CLOTH)
-            #include "GeneLit_Model_Cloth.cginc"
+            #include "Include/GeneLit_Model_Cloth.cginc"
         #else
-            #include "GeneLit_Model_Standard.cginc"
+            #include "Include/GeneLit_Model_Standard.cginc"
         #endif
 
         #define FILAMENT_QUALITY FILAMENT_QUALITY_HIGH
@@ -127,7 +127,7 @@
             #pragma shader_feature_local REFRACTION_TYPE_NONE REFRACTION_TYPE_SOLID REFRACTION_TYPE_THIN
             #pragma shader_feature_local REFLECTION_SPACE_CUBE REFLECTION_SPACE_CYLINDER
 
-            #include "GeneLit_Core.cginc"
+            #include "Include/GeneLit_Core.cginc"
             ENDCG
         }
 
@@ -160,7 +160,7 @@
             #pragma shader_feature_local _DETAIL_MAP
             #pragma shader_feature_local REFRACTION_TYPE_NONE
 
-            #include "GeneLit_Core.cginc"
+            #include "Include/GeneLit_Core.cginc"
             ENDCG
         }
 
@@ -179,7 +179,7 @@
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
 
-            #include "GeneLit_Shadow.cginc"
+            #include "Include/GeneLit_Shadow.cginc"
             ENDCG
         }
 
@@ -198,7 +198,7 @@
             #pragma shader_feature_local _TILEMODE_NORMAL_TILE _TILEMODE_NO_TILE
             #pragma shader_feature_local _DETAIL_MAP
 
-            #include "GeneLit_Meta.cginc"
+            #include "Include/GeneLit_Meta.cginc"
             ENDCG
         }
     }
