@@ -17,12 +17,6 @@
     // Ambient occlusion helpers
     //------------------------------------------------------------------------------
 
-    float unpack(float2 depth)
-    {
-        // this is equivalent to (x8 * 256 + y8) / 65535, which gives a value between 0 and 1
-        return (depth.x * (256.0 / 257.0) + depth.y * (1.0 / 257.0));
-    }
-
     float SpecularAO_Lagarde(float NoV, float visibility, float roughness)
     {
         // Lagarde and de Rousiers 2014, "Moving Frostbite to PBR"
@@ -42,11 +36,8 @@
         // We also remove a multiplication by 2 * PI to simplify the computation
         // since we divide by 2 * PI in computeBentSpecularAO()
 
-        if (min(r1, r2) <= max(r1, r2) - d) {
-            return 1.0 - max(cosCap1, cosCap2);
-            } else if (r1 + r2 <= d) {
-            return 0.0;
-        }
+        if (min(r1, r2) <= max(r1, r2) - d) return 1.0 - max(cosCap1, cosCap2);
+        else if (r1 + r2 <= d) return 0.0;
 
         float delta = abs(r1 - r2);
         float x = 1.0 - saturate((d - delta) / max(r1 + r2 - delta, 1e-4));
@@ -73,15 +64,6 @@
         // Smoothly kill specular AO when entering the perceptual roughness range [0.1..0.3]
         // Without this, specular AO can remove all reflections, which looks bad on metals
         return lerp(1.0, ao, smoothstep(0.01, 0.09, roughness));
-    }
-
-    /**
-    * Computes a specular occlusion term from the ambient occlusion term.
-    */
-    float3 unpackBentNormal(float3 bn)
-    {
-        // this must match src/materials/ssao/ssaoUtils.fs
-        return bn * 2.0 - 1.0;
     }
 
     float specularAO(float NoV, float visibility, float roughness, float3 normal, float3 refl)

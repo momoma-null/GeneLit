@@ -9,24 +9,6 @@
 // Directional light evaluation
 //------------------------------------------------------------------------------
 
-#if FILAMENT_QUALITY < FILAMENT_QUALITY_HIGH
-    #define SUN_AS_AREA_LIGHT
-#endif
-
-float3 sampleSunAreaLight(const float3 lightDirection) {
-    #if defined(SUN_AS_AREA_LIGHT)
-        if (frameUniforms.sun.w >= 0.0) {
-            // simulate sun as disc area light
-            float LoR = dot(lightDirection, shading_reflected);
-            float d = frameUniforms.sun.x;
-            float3 s = shading_reflected - LoR * lightDirection;
-            return LoR < d ?
-            normalize(lightDirection * d + normalize(s) * frameUniforms.sun.y) : shading_reflected;
-        }
-    #endif
-    return lightDirection;
-}
-
 FilamentLight getDirectionalLight(const ShadingData shadingData)
 {
     FilamentLight light;
@@ -34,7 +16,7 @@ FilamentLight getDirectionalLight(const ShadingData shadingData)
     if(sum(_LightColor0.rgb) > 1e-6)
     {
         light.colorIntensity = float4(_LightColor0.rgb, 1);
-        light.l = sampleSunAreaLight(normalize(_WorldSpaceLightPos0.xyz + float3(0, 1e-8, 0)));
+        light.l = normalize(_WorldSpaceLightPos0.xyz + float3(0, 1e-8, 0));
     }
     else
     {
