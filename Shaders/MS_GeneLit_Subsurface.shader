@@ -2,14 +2,17 @@
 {
     Properties
     {
+        [ShurikenHeader(Surface Options)]
         [BlendMode] _Mode ("Blend Mode", Float) = 0.0
         [Enum(UnityEngine.Rendering.CullMode)] _CullMode ("Cull Mode", Float) = 2.0
+        [IfDef(_ALPHATEST_ON)] _Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
+
+        [ShurikenHeader(Surface Inputs)]
         [KeywordEnum(NORMAL_TILE, NO_TILE)] _TileMode ("Tile Mode", Float) = 0
         [IfDef(_TILEMODE_NO_TILE)] _NoiseHeight ("Noise Height", Range(5.0, 20.0)) = 12.0
         [Enum(None,0,Multiply,1,Add,2,Screen,3)] _VertexColorMode ("Vertex Color Mode", Float) = 0.0
         [SingleLine] _Color ("Color", Color) = (1,1,1,1)
         [SingleLineScaleOffset(_Color)] _MainTex ("Albedo", 2D) = "white" {}
-        [IfDef(_ALPHATEST_ON)] _Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
         [SingleLine(, _MASKMAP)] _MaskMap ("Mask Map", 2D) = "white" {}
         _Metallic ("Metallic", Range(0,1)) = 0.0
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
