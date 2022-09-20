@@ -170,6 +170,11 @@
         material.emissive = GENELIT_ACCESS_PROP(_EmissionColor);
         GENELIT_SAMPLE_TEX2D_SAMPLER(_EmissionMap, _MainTex, uv, emissive)
         material.emissive *= emissive;
+        UNITY_BRANCH
+        if(GENELIT_ACCESS_PROP(_AlbedoAffectEmissive) > 0)
+        {
+            material.emissive *= material.baseColor;
+        }
 
         #if defined(_ALPHATEST_ON)
             material.maskThreshold = GENELIT_ACCESS_PROP(_Cutoff);

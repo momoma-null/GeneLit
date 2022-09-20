@@ -29,6 +29,7 @@
         [SingleLine][HDR] _EmissionColor ("Emission Color", Color) = (0,0,0,1)
         [Emission]
         [SingleLine(_EmissionColor)] _EmissionMap ("Emission", 2D) = "white" {}
+        [ToggleUI] _AlbedoAffectEmissive ("Albedo Affect Emissive", Float) = 0.0
 
         [IfDef(_ANISOTROPY)][SingleLine] _Anisotropy ("Anisotropy", Range(-1, 1)) = 0.5
         [SingleLine(_Anisotropy, _ANISOTROPY)][Normal] _TangentMap ("Anisotropy", 2D) = "bump" {}

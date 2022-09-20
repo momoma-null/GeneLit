@@ -51,6 +51,7 @@
     #endif
     UNITY_DEFINE_INSTANCED_PROP(half, _OcclusionStrength)
     UNITY_DEFINE_INSTANCED_PROP(half4, _EmissionColor)
+    UNITY_DEFINE_INSTANCED_PROP(fixed, _AlbedoAffectEmissive)
     #if defined(_ALPHATEST_ON)
         UNITY_DEFINE_INSTANCED_PROP(half, _Cutoff)
     #endif
