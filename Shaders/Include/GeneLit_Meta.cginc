@@ -71,7 +71,7 @@
         return o;
     }
 
-    float4 frag_meta (v2f_meta i, fixed facing : VFACE) : SV_Target
+    float4 frag_meta (v2f_meta i) : SV_Target
     {
         ShadingData shadingData;
         UNITY_INITIALIZE_OUTPUT(ShadingData, shadingData);
