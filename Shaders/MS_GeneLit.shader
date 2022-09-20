@@ -139,10 +139,9 @@
             #pragma shader_feature_local _SHEEN
             #pragma shader_feature_local _MASKMAP
             #pragma shader_feature_local _NORMALMAP
-            #pragma shader_feature_local _BENTNORMALMAP
             #pragma shader_feature_local _PARALLAXMAP
             #pragma shader_feature_local _DETAIL_MAP
-            #pragma shader_feature_local REFRACTION_TYPE_NONE
+            #pragma shader_feature_local REFRACTION_TYPE_NONE REFRACTION_TYPE_SOLID REFRACTION_TYPE_THIN
 
             #include "Include/GeneLit_Core.cginc"
             ENDCG

@@ -128,11 +128,8 @@
             #pragma multi_compile_fwdadd_fullshadows
             #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
             #pragma shader_feature_local _TILEMODE_NORMAL_TILE _TILEMODE_NO_TILE
-            #pragma shader_feature_local _ANISOTROPY
-            #pragma shader_feature_local _CLEAR_COAT
             #pragma shader_feature_local _MASKMAP
             #pragma shader_feature_local _NORMALMAP
-            #pragma shader_feature_local _BENTNORMALMAP
             #pragma shader_feature_local _PARALLAXMAP
             #pragma shader_feature_local _DETAIL_MAP
 
@@ -140,44 +137,7 @@
             ENDCG
         }
 
-        Pass
-        {
-            Name "ShadowCaster"
-            Tags { "LightMode" = "ShadowCaster" }
-
-            Cull [_CullMode]
-
-            CGPROGRAM
-            #pragma target 3.5
-            #pragma vertex vertShadowCaster
-            #pragma fragment fragShadowCaster
-            #pragma multi_compile_shadowcaster
-            #pragma multi_compile_instancing
-            #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
-            #pragma shader_feature_local _MASKMAP
-            #pragma shader_feature_local _PARALLAXMAP
-
-            #include "Include/GeneLit_Shadow.cginc"
-            ENDCG
-        }
-
-        Pass
-        {
-            Name "META"
-            Tags { "LightMode"="Meta" }
-
-            Cull Off
-
-            CGPROGRAM
-            #pragma vertex vert_meta
-            #pragma fragment frag_meta
-            #pragma shader_feature _EMISSION
-            #pragma shader_feature EDITOR_VISUALIZATION
-            #pragma shader_feature_local _TILEMODE_NORMAL_TILE _TILEMODE_NO_TILE
-            #pragma shader_feature_local _DETAIL_MAP
-
-            #include "Include/GeneLit_Meta.cginc"
-            ENDCG
-        }
+        UsePass "MomomaShader/General/GeneLit/ShadowCaster"
+        UsePass "MomomaShader/General/GeneLit/META"
     }
 }
