@@ -55,7 +55,7 @@
         [IfNDef(REFRACTION_TYPE_NONE)] _TransmittanceColor ("Transmittance Color", Color) = (0, 0, 0, 1)
         [IfNDef(REFRACTION_TYPE_NONE)] _Transmission ("Transmission", Range(0,1)) = 0.0
 
-        [Header(Experimental)]
+        [ShurikenHeader(Experimental)]
         [Toggle(CAPSULE_AO)] _Capsule_AO ("Capsule AO", float) = 0.0
         [KeywordEnum(Cube, Cylinder)] Reflection_Space ("Reflection Space", Float) = 0.0
         [IntRange] _SkyboxFog ("Skybox Fog", Range(0, 7)) = 0.0
