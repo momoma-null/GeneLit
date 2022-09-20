@@ -133,7 +133,7 @@
                 // of 1.5, but the clear coat layer forms an interface from IOR 1.5 to IOR
                 // 1.5. We recompute f0 by first computing its IOR, then reconverting to f0
                 // by using the correct interface
-                pixel.f0 = mix(pixel.f0, f0ClearCoatToSurface(pixel.f0), pixel.clearCoat);
+                pixel.f0 = lerp(pixel.f0, f0ClearCoatToSurface(pixel.f0), pixel.clearCoat);
             #endif
         #endif
     }

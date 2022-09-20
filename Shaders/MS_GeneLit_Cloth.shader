@@ -70,6 +70,7 @@
 
         #define FILAMENT_QUALITY FILAMENT_QUALITY_HIGH
         #define GEOMETRIC_SPECULAR_AA
+        #define CLEAR_COAT_IOR_CHANGE
         ENDCG
 
         Pass
