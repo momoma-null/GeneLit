@@ -82,7 +82,7 @@
                 half3 viewDirForParallax = normalize(i.viewDirForParallax);
                 i.tex.xy = ParallaxOffset2Step(i.tex.xy, viewDirForParallax);
             #endif
-            alpha = UNITY_SAMPLE_TEX2D(_MainTex, i.tex.xy).a * _Color.a;
+            alpha = UNITY_SAMPLE_TEX2D(_MainTex, i.tex.xy).a * GENELIT_ACCESS_PROP(_Color).a;
             #if defined(_ALPHATEST_ON)
                 clip(alpha - GENELIT_ACCESS_PROP(_Cutoff));
             #endif
