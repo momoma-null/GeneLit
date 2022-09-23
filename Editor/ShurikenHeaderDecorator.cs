@@ -128,23 +128,36 @@ namespace MomomaAssets.GeneLit
                 {
                     prop.floatValue = value;
                     editor.RegisterPropertyChangeUndo("Material Keyword");
-                    for (var i = 0; i < _keywords.Length; ++i)
-                    {
-                        var keyword = GetKeywordName(prop.name, _keywords[i].text);
-                        foreach (Material mat in prop.targets)
-                        {
-                            if (value == i)
-                                mat.EnableKeyword(keyword);
-                            else
-                                mat.DisableKeyword(keyword);
-                        }
-                    }
+                    SetKeyword(prop, value);
                 }
             }
             finally
             {
                 EditorGUI.showMixedValue = false;
                 EditorGUIUtility.labelWidth = oldLabelWidth;
+            }
+        }
+
+        public override void Apply(MaterialProperty prop)
+        {
+            base.Apply(prop);
+            if (prop.hasMixedValue)
+                return;
+            SetKeyword(prop, (int)prop.floatValue);
+        }
+
+        void SetKeyword(MaterialProperty prop, int index)
+        {
+            for (var i = 0; i < _keywords.Length; ++i)
+            {
+                var keyword = GetKeywordName(prop.name, _keywords[i].text);
+                foreach (Material mat in prop.targets)
+                {
+                    if (index == i)
+                        mat.EnableKeyword(keyword);
+                    else
+                        mat.DisableKeyword(keyword);
+                }
             }
         }
 
