@@ -66,11 +66,11 @@
         AlphaToMask [_AlphaToMask]
 
         CGINCLUDE
-        #include "Include/GeneLit_Model_Cloth.cginc"
-
         #define FILAMENT_QUALITY FILAMENT_QUALITY_HIGH
         #define GEOMETRIC_SPECULAR_AA
         #define CLEAR_COAT_IOR_CHANGE
+
+        #include "Include/GeneLit_Model_Cloth.cginc"
         ENDCG
 
         Pass
