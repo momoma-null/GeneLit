@@ -82,6 +82,7 @@
         UNITY_DEFINE_INSTANCED_PROP(half, _DetailSmoothnessScale)
     #endif
     UNITY_DEFINE_INSTANCED_PROP(fixed, _SkyboxFog)
+    UNITY_DEFINE_INSTANCED_PROP(fixed, _DirectionalLightEstimation)
     #ifdef GENELIT_CUSTOM_INSTANCED_PROP
         GENELIT_CUSTOM_INSTANCED_PROP
     #endif
@@ -145,6 +146,7 @@
         #endif
 
         uint skyboxFog;
+        bool directionalLightEstimation;
 
         #ifdef GENELIT_CUSTOM_MATERIAL_INPUTS
             GENELIT_CUSTOM_MATERIAL_INPUTS

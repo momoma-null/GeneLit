@@ -205,6 +205,7 @@
         #endif
 
         material.skyboxFog = GENELIT_ACCESS_PROP(_SkyboxFog);
+        material.directionalLightEstimation = GENELIT_ACCESS_PROP(_DirectionalLightEstimation);
 
         GENELIT_INIT_CUSTOM_MATERIAL(material)
     }
@@ -239,6 +240,8 @@
                 shadingData.ambient = SubtractMainLightWithRealtimeAttenuationFromLightmap(shadingData.ambient, shadingData.atten, 0, shadingData.normal);
             #endif
         #endif
+
+        shadingData.useDirectionalLightEstimation = material.directionalLightEstimation;
     }
 
     v2f vertForward(appdata_full v)

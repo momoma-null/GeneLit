@@ -84,6 +84,8 @@
         half3 ambient;
         half4 lightmapUV;
         UVCoord uv;
+
+        bool useDirectionalLightEstimation;
     };
 
     float computeMicroShadowing(float NoL, float visibility)
