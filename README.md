@@ -6,6 +6,9 @@
 Physically based rendering (PBR) shaders for Unity derived from [Filament shaders](https://github.com/google/filament).
 More beautiful and accurate rendering than Unity Standard shaders.
 
+![GeneLit0](https://user-images.githubusercontent.com/44657486/200121648-ff1bbcef-a948-4636-b02d-009d1f436997.png)
+![GeneLit1](https://user-images.githubusercontent.com/44657486/200121660-8919e730-f847-4ca7-8abb-f5d508b19a10.png)
+
 # Feature
 - [Basic Filament Features](https://google.github.io/filament/Materials.html) 
   - Albedo
@@ -66,6 +69,7 @@ More beautiful and accurate rendering than Unity Standard shaders.
     - A dedicated script is required.
   - Cylinder Projection of Reflection
     - Only if using box projection
+  - Skybox Fog
 
 # Map Channel
 Basically same as [Unity HDRP mapping](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@15.0/manual/Mask-Map-and-Detail-Map.html)
