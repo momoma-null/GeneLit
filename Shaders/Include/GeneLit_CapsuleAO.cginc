@@ -50,18 +50,17 @@
         return r > 0 && ocd < 0 ? s * s * (3.0 - 2.0 * s) : 1;
     }
 
-    float clculateAllCapOcclusion(float3 p, float3 n, float3 l, out float shadow)
+    void clculateAllCapOcclusion(float3 p, float3 n, float3 l, out float ao, out float shadow)
     {
-        float ao = 1;
+        ao = 1;
         shadow = 1;
         UNITY_UNROLL
         for (uint i = 0; i < CAPSULE_COUNT; ++i)
         {
             float4 t = _UdonTopAndRadius[i];
             float3 b = _UdonBottom[i].xyz;
-            ao *= capOcclusion(p, n, t.xyz, b, t.w) * 0.8 + 0.2;
-            shadow = min(capShadow(p, l, t.xyz, b, t.w, 4.0) * 0.5 + 0.5, shadow);
+            ao *= capOcclusion(p, n, t.xyz, b, t.w);
+            shadow = min(capShadow(p, l, t.xyz, b, t.w, 4.0), shadow);
         }
-        return ao;
     }
 #endif

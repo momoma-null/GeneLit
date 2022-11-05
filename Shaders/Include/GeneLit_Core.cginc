@@ -204,6 +204,11 @@
             #endif
         #endif
 
+        #if defined(CAPSULE_AO)
+            material.capsuleAOStrength = GENELIT_ACCESS_PROP(_Capsule_AOStrength);
+            material.capsuleShadowStrength = GENELIT_ACCESS_PROP(_Capsule_ShadowStrength);
+        #endif
+
         material.skyboxFog = GENELIT_ACCESS_PROP(_SkyboxFog);
         material.directionalLightEstimation = GENELIT_ACCESS_PROP(_DirectionalLightEstimation);
 

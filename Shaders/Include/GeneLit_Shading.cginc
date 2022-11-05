@@ -228,9 +228,10 @@
             float occlusion = material.ambientOcclusion;
 
             #if defined(CAPSULE_AO)
-                float capsuleShadow;
-                occlusion *= clculateAllCapOcclusion(shadingData.position, shadingData.normal, light.l, capsuleShadow);
-                pixel.attenuation *= lerp(1.0, capsuleShadow, max3(light.colorIntensity.rgb));
+                float capsuleAO, capsuleShadow;
+                clculateAllCapOcclusion(shadingData.position, shadingData.normal, light.l, /* out */ capsuleAO, /* out */ capsuleShadow);
+                occlusion *= lerp(1.0, capsuleAO, material.capsuleAOStrength);
+                pixel.attenuation *= lerp(1.0, capsuleShadow, material.capsuleShadowStrength * max3(light.colorIntensity.rgb));
             #endif
 
             // We always evaluate the IBL as not having one is going to be uncommon,

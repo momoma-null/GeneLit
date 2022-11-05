@@ -81,6 +81,10 @@
         UNITY_DEFINE_INSTANCED_PROP(half, _DetailNormalScale)
         UNITY_DEFINE_INSTANCED_PROP(half, _DetailSmoothnessScale)
     #endif
+    #if defined(CAPSULE_AO)
+        UNITY_DEFINE_INSTANCED_PROP(fixed, _Capsule_AOStrength)
+        UNITY_DEFINE_INSTANCED_PROP(fixed, _Capsule_ShadowStrength)
+    #endif
     UNITY_DEFINE_INSTANCED_PROP(fixed, _SkyboxFog)
     UNITY_DEFINE_INSTANCED_PROP(fixed, _DirectionalLightEstimation)
     #ifdef GENELIT_CUSTOM_INSTANCED_PROP
@@ -143,6 +147,11 @@
             #if defined(REFRACTION_TYPE_THIN)
                 float microThickness;
             #endif
+        #endif
+
+        #if defined(CAPSULE_AO)
+            float capsuleAOStrength;
+            float capsuleShadowStrength;
         #endif
 
         uint skyboxFog;
