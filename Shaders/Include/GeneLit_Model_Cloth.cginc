@@ -65,7 +65,7 @@
         float3 Fr = (D * V) * F;
 
         // diffuse BRDF
-        float diff = diffuse(pixel.roughness, shadingData.NoV, NoL, LoH);
+        float diff = diffuse(pixel.roughness, shadingData.NoV, NoL, LoH) * light.colorIntensity.w;
         // Energy conservative wrap diffuse to simulate subsurface scattering
         diff *= Fd_Wrap(dot(shadingData.normal, light.l), 0.5);
 
@@ -79,7 +79,7 @@
         // We need to apply NoL separately to the specular lobe since we already took
         // it into account in the diffuse lobe
         float3 color = Fd + Fr * NoL;
-        color *= light.colorIntensity.rgb * (light.colorIntensity.w * light.attenuation * occlusion);
+        color *= light.colorIntensity.rgb * (light.attenuation * occlusion);
 
         return color;
     }
