@@ -130,7 +130,7 @@
             material.metallic = GENELIT_ACCESS_PROP(_Metallic) * mods.r;
             material.reflectance = GENELIT_ACCESS_PROP(_Reflectance);
         #endif
-        material.ambientOcclusion = GENELIT_ACCESS_PROP(_OcclusionStrength) * mods.g;
+        material.ambientOcclusion = LerpOneTo(mods.g, GENELIT_ACCESS_PROP(_OcclusionStrength));
 
         #if defined(_NORMALMAP)
             GENELIT_SAMPLE_TEX2D_SAMPLER(_BumpMap, _MainTex, uv, normalMap)
