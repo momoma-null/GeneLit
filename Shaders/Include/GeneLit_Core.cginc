@@ -256,6 +256,9 @@
         UNITY_INITIALIZE_OUTPUT(v2f, o);
         UNITY_TRANSFER_INSTANCE_ID(v, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+        #if defined(GENELIT_CUSTOM_VERTEX)
+            GENELIT_CUSTOM_VERTEX(v)
+        #endif
         o.pos = UnityObjectToClipPos(v.vertex);
         o.uv = TexCoords(v);
         float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;

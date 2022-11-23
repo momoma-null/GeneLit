@@ -265,4 +265,11 @@
         p = p * k + k.yx;
         return frac(16.0 * k * frac(p.x * p.y * (p.x + p.y))) * 2.0 - 1.0;
     }
+
+    inline float3 rotateAroundAxis(float3 p, float3 v, float t)
+    {
+        float s, c;
+        sincos(t, s, c);
+        return c * p + v * dot(v, p) * (1 - c) + cross(v, p) * s;
+    }
 #endif

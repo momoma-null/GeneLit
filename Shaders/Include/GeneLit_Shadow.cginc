@@ -35,10 +35,9 @@
     {
         float4 vertex   : POSITION;
         float3 normal   : NORMAL;
-        float2 uv0      : TEXCOORD0;
-        #if defined(USE_SHADOW_UVS) && defined(_PARALLAXMAP)
-            half4 tangent   : TANGENT;
-        #endif
+        half4 tangent   : TANGENT;
+        float2 texcoord : TEXCOORD0;
+        float4 color    : COLOR;
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
@@ -63,9 +62,12 @@
         UNITY_INITIALIZE_OUTPUT(v2f_shadow, o)
         UNITY_TRANSFER_INSTANCE_ID(v, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+        #if defined(GENELIT_CUSTOM_VERTEX)
+            GENELIT_CUSTOM_VERTEX(v)
+        #endif
         TRANSFER_SHADOW_CASTER_NOPOS(o, o.pos)
         #if defined(USE_SHADOW_UVS)
-            o.tex = TRANSFORM_TEX(v.uv0, _MainTex);
+            o.tex = TRANSFORM_TEX(v.texcoord, _MainTex);
             #ifdef _PARALLAXMAP
                 TANGENT_SPACE_ROTATION;
                 o.viewDirForParallax = mul (rotation, ObjSpaceViewDir(v.vertex));
