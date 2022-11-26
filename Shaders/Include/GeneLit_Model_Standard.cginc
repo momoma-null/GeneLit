@@ -11,9 +11,15 @@
         #define USE_REFRACTION
     #endif
 
-    #define GENELIT_CUSTOM_INSTANCED_PROP
-    #define GENELIT_CUSTOM_MATERIAL_INPUTS
-    #define GENELIT_CUSTOM_PIXEL_PARAMS
+    #ifndef GENELIT_CUSTOM_INSTANCED_PROP
+        #define GENELIT_CUSTOM_INSTANCED_PROP
+    #endif
+    #ifndef GENELIT_CUSTOM_MATERIAL_INPUTS
+        #define GENELIT_CUSTOM_MATERIAL_INPUTS
+    #endif
+    #ifndef GENELIT_CUSTOM_PIXEL_PARAMS
+        #define GENELIT_CUSTOM_PIXEL_PARAMS
+    #endif
 
     #define GENELIT_INIT_CUSTOM_MATERIAL(material)
     #define GENELIT_EVALUATE_CUSTOM_INDIRECT(pixel, shadingData, irradiance, Fd, Fr)

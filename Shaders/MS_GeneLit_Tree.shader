@@ -34,6 +34,11 @@
         [IfDef(_ANISOTROPY)][SingleLine] _Anisotropy ("Anisotropy", Range(-1, 1)) = 0.5
         [SingleLine(_Anisotropy, _ANISOTROPY)][Normal] _TangentMap ("Anisotropy", 2D) = "bump" {}
 
+        [ShurikenHeader(Tree Inputs)]
+        _TreeWind ("Wind Vector(xyz) & Time Scale(w)", Vector) = (1, 0, 0, 0.2)
+        _TreeBranchScale ("Branch Scale", Float) = 0.02
+        _TreeLeafScale ("Leaf Scale", Float) = 0.1
+
         [ShurikenHeader(Detail Inputs)]
         [SingleLineScaleOffset(,_DETAIL_MAP)] _DetailMap ("Detail Map", 2D) = "grey" {}
         [IfDef(_DETAIL_MAP)][Enum(UV0,0,UV1,1,UV2,2,UV3,3)] _UVSec ("UV Set", Float) = 0
@@ -81,15 +86,20 @@
         #define GEOMETRIC_SPECULAR_AA
         #define CLEAR_COAT_IOR_CHANGE
 
+        #define GENELIT_CUSTOM_INSTANCED_PROP \
+            UNITY_DEFINE_INSTANCED_PROP(float4, _TreeWind)\
+            UNITY_DEFINE_INSTANCED_PROP(float, _TreeBranchScale)\
+            UNITY_DEFINE_INSTANCED_PROP(float, _TreeLeafScale)
+
         #include "Include/GeneLit_Model_Standard.cginc"
         #include "SpeedTreeWind.cginc"
 
         #define GENELIT_CUSTOM_VERTEX(v) \
-            float time = _Time.y * 0.2;\
-            float branchScale = 0.02;\
-            float leafScale = 0.1;\
-            float windNoise = _SinTime.y * 0.1;\
-            float3 wind = float3(1 - windNoise * windNoise, 0, windNoise);\
+            float4 windProp = GENELIT_ACCESS_PROP(_TreeWind);\
+            float time = _Time.y * windProp.w;\
+            float branchScale = GENELIT_ACCESS_PROP(_TreeBranchScale);\
+            float leafScale = GENELIT_ACCESS_PROP(_TreeLeafScale);\
+            float3 wind = windProp.xyz;\
             float4 amount = TrigApproximate(float4(time + v.color.g * 0.2, time * 0.689 + v.color.g, (time + v.color.g) * 0.5, 0.0));\
             float3 axis = cross(wind, normalize(v.vertex.xyz));\
             float rot = length(axis);\
