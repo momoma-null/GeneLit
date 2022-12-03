@@ -9,7 +9,7 @@
 
     struct FilamentLight
     {
-        float4 colorIntensity;  // rgb, pre-exposed intensity
+        float4 colorIntensity;  // rgb, diffuse strength
         float3 l;
         float  attenuation;
         float  NoL;

@@ -104,7 +104,7 @@
             sheenPerceptualRoughness = clamp(sheenPerceptualRoughness, MIN_PERCEPTUAL_ROUGHNESS, 1.0);
 
             #if defined(GEOMETRIC_SPECULAR_AA)
-                sheenPerceptualRoughness = normalFiltering(sheenPerceptualRoughness, shadingData.geometricNormal);
+                sheenPerceptualRoughness = normalFiltering(sheenPerceptualRoughness, shadingData.normal);
             #endif
 
             pixel.sheenPerceptualRoughness = sheenPerceptualRoughness;
@@ -122,7 +122,7 @@
             clearCoatPerceptualRoughness = clamp(clearCoatPerceptualRoughness, MIN_PERCEPTUAL_ROUGHNESS, 1.0);
 
             #if defined(GEOMETRIC_SPECULAR_AA)
-                clearCoatPerceptualRoughness = normalFiltering(clearCoatPerceptualRoughness, shadingData.geometricNormal);
+                clearCoatPerceptualRoughness = normalFiltering(clearCoatPerceptualRoughness, shadingData.normal);
             #endif
 
             pixel.clearCoatPerceptualRoughness = clearCoatPerceptualRoughness;
@@ -146,7 +146,7 @@
         pixel.perceptualRoughnessUnclamped = perceptualRoughness;
 
         #if defined(GEOMETRIC_SPECULAR_AA)
-            perceptualRoughness = normalFiltering(perceptualRoughness, shadingData.geometricNormal);
+            perceptualRoughness = normalFiltering(perceptualRoughness, shadingData.normal);
         #endif
 
         #if defined(_CLEAR_COAT)
@@ -231,7 +231,7 @@
                 float capsuleAO, capsuleShadow;
                 clculateAllCapOcclusion(shadingData.position, shadingData.normal, light.l, /* out */ capsuleAO, /* out */ capsuleShadow);
                 occlusion *= lerp(1.0, capsuleAO, material.capsuleAOStrength);
-                pixel.attenuation *= lerp(1.0, capsuleShadow, material.capsuleShadowStrength * max3(light.colorIntensity.rgb));
+                pixel.attenuation *= lerp(1.0, capsuleShadow, material.capsuleShadowStrength);
             #endif
 
             // We always evaluate the IBL as not having one is going to be uncommon,

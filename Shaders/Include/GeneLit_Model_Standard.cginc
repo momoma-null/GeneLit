@@ -11,9 +11,15 @@
         #define USE_REFRACTION
     #endif
 
-    #define GENELIT_CUSTOM_INSTANCED_PROP
-    #define GENELIT_CUSTOM_MATERIAL_INPUTS
-    #define GENELIT_CUSTOM_PIXEL_PARAMS
+    #ifndef GENELIT_CUSTOM_INSTANCED_PROP
+        #define GENELIT_CUSTOM_INSTANCED_PROP
+    #endif
+    #ifndef GENELIT_CUSTOM_MATERIAL_INPUTS
+        #define GENELIT_CUSTOM_MATERIAL_INPUTS
+    #endif
+    #ifndef GENELIT_CUSTOM_PIXEL_PARAMS
+        #define GENELIT_CUSTOM_PIXEL_PARAMS
+    #endif
 
     #define GENELIT_INIT_CUSTOM_MATERIAL(material)
     #define GENELIT_EVALUATE_CUSTOM_INDIRECT(pixel, shadingData, irradiance, Fd, Fr)
@@ -130,7 +136,7 @@
             float3 Fr = isotropicLobe(pixel, h, NoV, NoL, NoH, LoH);
         #endif
 
-        float3 Fd = diffuseLobe(pixel, NoV, NoL, LoH);
+        float3 Fd = diffuseLobe(pixel, NoV, NoL, LoH) * light.colorIntensity.w;
         #if defined(USE_REFRACTION)
             Fd *= (1.0 - pixel.transmission);
         #endif
@@ -160,13 +166,13 @@
                 color += clearCoat * clearCoatNoL;
 
                 // Early exit to avoid the extra multiplication by NoL
-                return (color * light.colorIntensity.rgb) * (light.colorIntensity.w * light.attenuation * occlusion);
+                return (color * light.colorIntensity.rgb) * (light.attenuation * occlusion);
             #else
                 color *= attenuation;
                 color += clearCoat;
             #endif
         #endif
 
-        return (color * light.colorIntensity.rgb) * (light.colorIntensity.w * light.attenuation * NoL * occlusion);
+        return (color * light.colorIntensity.rgb) * (light.attenuation * NoL * occlusion);
     }
 #endif

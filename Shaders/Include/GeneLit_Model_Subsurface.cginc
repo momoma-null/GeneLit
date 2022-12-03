@@ -67,7 +67,7 @@
         }
 
         // diffuse BRDF
-        float3 Fd = pixel.diffuseColor * diffuse(pixel.roughness, shadingData.NoV, NoL, LoH);
+        float3 Fd = pixel.diffuseColor * diffuse(pixel.roughness, shadingData.NoV, NoL, LoH) * light.colorIntensity.w;
 
         // NoL does not apply to transmitted light
         float3 color = (Fd + Fr) * (NoL * occlusion);
@@ -82,6 +82,6 @@
         color += pixel.subsurfaceColor * (subsurface * Fd_Lambert());
 
         // TODO: apply occlusion to the transmitted light
-        return (color * light.colorIntensity.rgb) * (light.colorIntensity.w * light.attenuation);
+        return (color * light.colorIntensity.rgb) * (light.attenuation);
     }
 #endif

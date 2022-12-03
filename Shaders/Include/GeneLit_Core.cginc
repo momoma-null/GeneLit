@@ -130,7 +130,7 @@
             material.metallic = GENELIT_ACCESS_PROP(_Metallic) * mods.r;
             material.reflectance = GENELIT_ACCESS_PROP(_Reflectance);
         #endif
-        material.ambientOcclusion = GENELIT_ACCESS_PROP(_OcclusionStrength) * mods.g;
+        material.ambientOcclusion = LerpOneTo(mods.g, GENELIT_ACCESS_PROP(_OcclusionStrength));
 
         #if defined(_NORMALMAP)
             GENELIT_SAMPLE_TEX2D_SAMPLER(_BumpMap, _MainTex, uv, normalMap)
@@ -256,6 +256,9 @@
         UNITY_INITIALIZE_OUTPUT(v2f, o);
         UNITY_TRANSFER_INSTANCE_ID(v, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+        #if defined(GENELIT_CUSTOM_VERTEX)
+            GENELIT_CUSTOM_VERTEX(v)
+        #endif
         o.pos = UnityObjectToClipPos(v.vertex);
         o.uv = TexCoords(v);
         float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
