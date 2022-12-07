@@ -88,6 +88,9 @@
             half4 bakedColorTex = UNITY_SAMPLE_TEX2D(unity_Lightmap, IN.ambientOrLightmapUV.xy);
             shadingData.ambient = DecodeLightmap(bakedColorTex);
             shadingData.lightmapUV = IN.ambientOrLightmapUV;
+            #if defined(DIRLIGHTMAP_COMBINED)
+                shadingData.bakedDir = UNITY_SAMPLE_TEX2D_SAMPLER(unity_LightmapInd, unity_Lightmap, IN.ambientOrLightmapUV.xy);
+            #endif
         #elif defined(DYNAMICLIGHTMAP_ON)
             shadingData.ambient = 0;
             shadingData.lightmapUV = IN.ambientOrLightmapUV;

@@ -85,6 +85,10 @@
         half4 lightmapUV;
         UVCoord uv;
 
+        #if defined(LIGHTMAP_ON) && defined(DIRLIGHTMAP_COMBINED)
+            fixed4 bakedDir;
+        #endif
+
         bool useDirectionalLightEstimation;
     };
 

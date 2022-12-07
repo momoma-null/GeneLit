@@ -46,6 +46,10 @@
             irradiance = ShadeSHPerPixel(normalWorld, irradiance, shadingData.position);
         #endif
 
+        #if defined(LIGHTMAP_ON) && defined(DIRLIGHTMAP_COMBINED)
+            irradiance = DecodeDirectionalLightmap(irradiance, shadingData.bakedDir, normalWorld);
+        #endif
+
         #ifdef DYNAMICLIGHTMAP_ON
             // Dynamic lightmaps
             fixed4 realtimeColorTex = UNITY_SAMPLE_TEX2D(unity_DynamicLightmap, shadingData.lightmapUV.zw);
