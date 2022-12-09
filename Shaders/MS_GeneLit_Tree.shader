@@ -109,8 +109,8 @@
 
         ENDCG
 
-        UsePass "MomomaShader/General/GeneLit/ForwardBase"
-        UsePass "MomomaShader/General/GeneLit/ForwardAdd"
+        UsePass "MomomaShader/General/GeneLit/FORWARD"
+        UsePass "MomomaShader/General/GeneLit/FORWARD_DELTA"
         UsePass "MomomaShader/General/GeneLit/ShadowCaster"
         UsePass "MomomaShader/General/GeneLit/META"
     }
