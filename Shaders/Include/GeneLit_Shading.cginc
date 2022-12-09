@@ -234,6 +234,8 @@
                 pixel.attenuation *= lerp(1.0, capsuleShadow, material.capsuleShadowStrength);
             #endif
 
+            pixel.attenuation *= computeHeightMapShadowing(shadingData, light);
+
             // We always evaluate the IBL as not having one is going to be uncommon,
             // it also saves 1 shader variant
             evaluateIBL(pixel, shadingData, occlusion, color);
@@ -241,7 +243,7 @@
             visibility = pixel.attenuation * computeMicroShadowing(light.NoL, occlusion);
         #elif UNITY_PASS_FORWARDADD
             light = getPunctualLights(shadingData);
-            visibility = pixel.attenuation;
+            visibility = pixel.attenuation * computeHeightMapShadowing(shadingData, light);
         #endif
         color.rgb += surfaceShading(pixel, light, shadingData, visibility);
 

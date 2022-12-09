@@ -180,9 +180,12 @@
     }
 
     #if defined(_PARALLAXMAP)
+        float2 parallaxCache;
+
         float2 ParallaxOffset2Step(float2 uv, half3 oViewDir)
         {
-            float2 uvShift = oViewDir.xy / (oViewDir.z + 0.42) * GENELIT_ACCESS_PROP(_Parallax);
+            float maxHeight = GENELIT_ACCESS_PROP(_Parallax);
+            float2 uvShift = oViewDir.xy / (oViewDir.z + 0.42) * maxHeight;
             float h1 = 1.0 - UNITY_SAMPLE_TEX2D_SAMPLER(_ParallaxMap, _MainTex, uv).g;
             float shift1 = h1 * 0.5;
             float2 huv = uv - shift1 * uvShift;
@@ -190,7 +193,21 @@
             float a = (oViewDir.z + 0.42) * shift1 + 1e-4;
             float b = h2 - h1;
             float height = shift1 * (b + sqrt(max(0.0, b * b + 4 * a * h1))) / (2.0 * a);
+            parallaxCache = float2(h1, maxHeight);
             return uv - uvShift * height;
         }
     #endif
+
+    float computeHeightMapShadowing(const ShadingData shadingData, const FilamentLight light)
+    {
+        #if defined(_PARALLAXMAP)
+            float h1 = parallaxCache.x;
+            float3 oLitDir = normalize(mul(light.l, shadingData.tangentToWorld));
+            float2 uvShift = oLitDir.xy / (oLitDir.z + 0.1) * parallaxCache.y * h1 * 0.9;
+            float h2 = 1.0 - UNITY_SAMPLE_TEX2D_SAMPLER(_ParallaxMap, _MainTex, shadingData.uv + uvShift).g;
+            return 1.0 - saturate(h1 * 0.9 - h2);
+        #else
+            return 1.0;
+        #endif
+    }
 #endif
