@@ -383,7 +383,7 @@
             float3 diffuseNormal = shadingData.normal;
         #endif
 
-        float3 irradiance = diffuseIrradiance(diffuseNormal, shadingData) * pixel.attenuation;
+        float3 irradiance = diffuseIrradiance(diffuseNormal, shadingData);
         float3 Fd = pixel.diffuseColor * irradiance * saturate(1.0 - E) * diffuseBRDF;
 
         GENELIT_EVALUATE_CUSTOM_INDIRECT(pixel, shadingData, irradiance, Fd, Fr)
