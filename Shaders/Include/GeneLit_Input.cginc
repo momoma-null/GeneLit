@@ -180,7 +180,7 @@
     }
 
     #if defined(_PARALLAXMAP)
-        float2 parallaxCache;
+        float4 parallaxCache;
 
         float2 ParallaxOffset2Step(float2 uv, half3 oViewDir)
         {
@@ -193,7 +193,7 @@
             float a = (oViewDir.z + 0.42) * shift1 + 1e-4;
             float b = h2 - h1;
             float height = shift1 * (b + sqrt(max(0.0, b * b + 4 * a * h1))) / (2.0 * a);
-            parallaxCache = float2(h1, maxHeight);
+            parallaxCache = float4(height, maxHeight, uvShift);
             return uv - uvShift * height;
         }
     #endif
@@ -203,9 +203,10 @@
         #if defined(_PARALLAXMAP)
             float h1 = parallaxCache.x;
             float3 oLitDir = normalize(mul(light.l, shadingData.tangentToWorld));
-            float2 uvShift = oLitDir.xy / (oLitDir.z + 0.1) * parallaxCache.y * h1 * 0.9;
+            float2 uvShift = oLitDir.xy / (oLitDir.z + 0.1) * parallaxCache.y * h1;
+            uvShift -= parallaxCache.zw * h1;
             float h2 = 1.0 - UNITY_SAMPLE_TEX2D_SAMPLER(_ParallaxMap, _MainTex, shadingData.uv + uvShift).g;
-            return 1.0 - saturate(h1 * 0.9 - h2);
+            return 1.0 - saturate((h1 - h2) * 10);
         #else
             return 1.0;
         #endif
