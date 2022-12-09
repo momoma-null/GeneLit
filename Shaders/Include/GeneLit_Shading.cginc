@@ -234,7 +234,7 @@
             #endif
 
             visibility *= computeHeightMapShadowing(shadingData, light);
-            occlusion *= lerp(visibility, 1.0, light.colorIntensity.w);
+            pixel.pseudoAmbient = lerp(visibility, 1.0, light.colorIntensity.w);
 
             // We always evaluate the IBL as not having one is going to be uncommon,
             // it also saves 1 shader variant

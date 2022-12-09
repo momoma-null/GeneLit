@@ -24,6 +24,7 @@
         float  roughness;
         float3 dfg;
         float3 energyCompensation;
+        float pseudoAmbient;
 
         #if defined(_CLEAR_COAT)
             float clearCoat;
