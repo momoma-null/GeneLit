@@ -289,6 +289,8 @@
         // Computes global variables we need to evaluate material and lighting
         ShadingData shadingData;
         computeShadingParams(IN, facing > 0, shadingData);
+        UNITY_LIGHT_ATTENUATION(atten, IN, shadingData.position);
+        shadingData.atten = atten;
 
         // Initialize the inputs to sensible default values, see material_inputs.fs
         MaterialInputs inputs;
@@ -296,9 +298,8 @@
         inputs.baseColor = IN.color;
         initMaterial(shadingData, inputs);
         prepareMaterial(inputs, shadingData);
-        UNITY_LIGHT_ATTENUATION(atten, IN, shadingData.position);
 
-        fragColor = evaluateMaterial(inputs, shadingData, atten);
+        fragColor = evaluateMaterial(inputs, shadingData);
 
         #if defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2)
             float l = distance(shadingData.position, _WorldSpaceCameraPos);

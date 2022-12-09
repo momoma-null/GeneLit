@@ -203,11 +203,11 @@
     *
     * Returns a pre-exposed HDR RGBA color in linear space.
     */
-    float4 evaluateLights(const MaterialInputs material, const ShadingData shadingData, float atten)
+    float4 evaluateLights(const MaterialInputs material, const ShadingData shadingData)
     {
         PixelParams pixel;
         UNITY_INITIALIZE_OUTPUT(PixelParams, pixel);
-        pixel.attenuation = atten;
+        pixel.attenuation = shadingData.atten;
         getCommonPixelParams(material, pixel);
         getSheenPixelParams(material, shadingData, pixel);
         getClearCoatPixelParams(material, shadingData, pixel);
@@ -260,9 +260,9 @@
     *
     * Returns a pre-exposed HDR RGBA color in linear space.
     */
-    float4 evaluateMaterial(const MaterialInputs material, const ShadingData shadingData, float atten)
+    float4 evaluateMaterial(const MaterialInputs material, const ShadingData shadingData)
     {
-        float4 color = evaluateLights(material, shadingData, atten);
+        float4 color = evaluateLights(material, shadingData);
         #if UNITY_PASS_FORWARDBASE
             addEmissive(material, color);
         #endif
