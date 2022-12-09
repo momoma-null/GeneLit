@@ -207,7 +207,6 @@
     {
         PixelParams pixel;
         UNITY_INITIALIZE_OUTPUT(PixelParams, pixel);
-        pixel.attenuation = shadingData.atten;
         getCommonPixelParams(material, pixel);
         getSheenPixelParams(material, shadingData, pixel);
         getClearCoatPixelParams(material, shadingData, pixel);
@@ -220,7 +219,7 @@
         // until the very end but it costs more ALUs on mobile. The gains are
         // currently not worth the extra operations
         float3 color = 0.0;
-        float visibility = 1.0;
+        float visibility = shadingData.atten;
         FilamentLight light;
         UNITY_INITIALIZE_OUTPUT(FilamentLight, light)
         #if UNITY_PASS_FORWARDBASE
@@ -231,19 +230,20 @@
                 float capsuleAO, capsuleShadow;
                 clculateAllCapOcclusion(shadingData.position, shadingData.normal, light.l, /* out */ capsuleAO, /* out */ capsuleShadow);
                 occlusion *= lerp(1.0, capsuleAO, material.capsuleAOStrength);
-                pixel.attenuation *= lerp(1.0, capsuleShadow, material.capsuleShadowStrength);
+                visibility *= lerp(1.0, capsuleShadow, material.capsuleShadowStrength);
             #endif
 
-            pixel.attenuation *= computeHeightMapShadowing(shadingData, light);
+            visibility *= computeHeightMapShadowing(shadingData, light);
+            occlusion *= lerp(visibility, 1.0, light.colorIntensity.w);
 
             // We always evaluate the IBL as not having one is going to be uncommon,
             // it also saves 1 shader variant
             evaluateIBL(pixel, shadingData, occlusion, color);
 
-            visibility = pixel.attenuation * computeMicroShadowing(light.NoL, occlusion);
+            visibility *= computeMicroShadowing(light.NoL, occlusion);
         #elif UNITY_PASS_FORWARDADD
             light = getPunctualLights(shadingData);
-            visibility = pixel.attenuation * computeHeightMapShadowing(shadingData, light);
+            visibility *= computeHeightMapShadowing(shadingData, light);
         #endif
         color.rgb += surfaceShading(pixel, light, shadingData, visibility);
 
