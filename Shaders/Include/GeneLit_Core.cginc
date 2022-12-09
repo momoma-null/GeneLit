@@ -76,7 +76,6 @@
         // We use unnormalized post-interpolation values, assuming mikktspace tangents
         shadingData.tangentToWorld = transpose(float3x3(t, b, n));
 
-        shadingData.normal = float3(0, 0, 1);
         shadingData.position = float3(IN.tSpace0.w, IN.tSpace1.w, IN.tSpace2.w);
         shadingData.view = normalize(_WorldSpaceCameraPos - shadingData.position);
 
@@ -118,7 +117,7 @@
             SAMPLE_TEX2DTILE_WIEGHT(_MainTex, baseColor, uv)
         #elif defined(_TILEMODE_TRIPLANAR)
             float3 oPos = mul(unity_WorldToObject, float4(shadingData.position, 1)).xyz;
-            float3 oNorm = UnityWorldToObjectDir(shadingData.normal);
+            float3 oNorm = UnityWorldToObjectDir(shadingData.geometricNormal);
             SAMPLE_TEX2D_TRIPLANAR(_MainTex, baseColor, oPos, oNorm)
         #else
             #if defined(_PARALLAXMAP)
