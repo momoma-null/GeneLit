@@ -8,7 +8,7 @@
         [IfDef(_ALPHATEST_ON)] _Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
 
         [ShurikenHeader(Surface Inputs)]
-        [KeywordEnum(NORMAL_TILE, NO_TILE)] _TileMode ("Tile Mode", Float) = 0
+        [KeywordEnum(Normal_Tile, No_Tile, TriPlanar)] _TileMode ("Tile Mode", Float) = 0
         [IfDef(_TILEMODE_NO_TILE)] _NoiseHeight ("Noise Height", Range(5.0, 20.0)) = 12.0
         [Enum(None,0,Multiply,1,Add,2,Screen,3)] _VertexColorMode ("Vertex Color Mode", Float) = 0.0
         [SingleLine] _Color ("Color", Color) = (1,1,1,1)
@@ -92,7 +92,7 @@
             #pragma multi_compile_fwdbase
             #pragma multi_compile_instancing
             #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
-            #pragma shader_feature_local _TILEMODE_NORMAL_TILE _TILEMODE_NO_TILE
+            #pragma shader_feature_local _TILEMODE_NORMAL_TILE _TILEMODE_NO_TILE _TILEMODE_TRIPLANAR
             #pragma shader_feature_local _ANISOTROPY
             #pragma shader_feature_local _CLEAR_COAT
             #pragma shader_feature_local _MASKMAP
@@ -124,7 +124,7 @@
             #pragma multi_compile_fog
             #pragma multi_compile_fwdadd_fullshadows
             #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
-            #pragma shader_feature_local _TILEMODE_NORMAL_TILE _TILEMODE_NO_TILE
+            #pragma shader_feature_local _TILEMODE_NORMAL_TILE _TILEMODE_NO_TILE _TILEMODE_TRIPLANAR
             #pragma shader_feature_local _MASKMAP
             #pragma shader_feature_local _NORMALMAP
             #pragma shader_feature_local _PARALLAXMAP

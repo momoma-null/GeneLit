@@ -93,11 +93,14 @@
     UNITY_INSTANCING_BUFFER_END(Props)
 
     #include "GeneLit_NoTile.cginc"
+    #include "GeneLit_TriPlanar.cginc"
 
     #define GENELIT_ACCESS_PROP(var) UNITY_ACCESS_INSTANCED_PROP(Props, var)
 
     #if defined(_TILEMODE_NO_TILE)
-        #define GENELIT_SAMPLE_TEX2D_SAMPLER(tex, samplertex, uv, col) SAMPLE_TEX2DTILE_SAMPLER_WIEGHT(tex, samplertex, col)
+        #define GENELIT_SAMPLE_TEX2D_SAMPLER(tex, samplertex, uv, col) SAMPLE_TEX2DTILE_SAMPLER_WIEGHT(tex, samplertex, col, uv)
+    #elif defined(_TILEMODE_TRIPLANAR)
+        #define GENELIT_SAMPLE_TEX2D_SAMPLER(tex, samplertex, uv, col) SAMPLE_TEX2D_TRIPLANAR_SAMPLER(tex, samplertex, col)
     #else
         #define GENELIT_SAMPLE_TEX2D_SAMPLER(tex, samplertex, uv, col) float4 col = UNITY_SAMPLE_TEX2D_SAMPLER(tex, samplertex, uv);
     #endif

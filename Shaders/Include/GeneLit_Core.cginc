@@ -56,7 +56,7 @@
     * Computes global shading parameters used to apply lighting, such as the view
     * vector in world space, the tangent frame at the shading point, etc.
     */
-    void computeShadingParams(v2f IN, bool facing, out ShadingData shadingData)
+    void computeShadingParams(const v2f IN, bool facing, out ShadingData shadingData)
     {
         UNITY_INITIALIZE_OUTPUT(ShadingData, shadingData);
 
@@ -76,6 +76,7 @@
         // We use unnormalized post-interpolation values, assuming mikktspace tangents
         shadingData.tangentToWorld = transpose(float3x3(t, b, n));
 
+        shadingData.normal = float3(0, 0, 1);
         shadingData.position = float3(IN.tSpace0.w, IN.tSpace1.w, IN.tSpace2.w);
         shadingData.view = normalize(_WorldSpaceCameraPos - shadingData.position);
 
@@ -112,17 +113,22 @@
             case 3:material.baseColor =  material.baseColor + color - material.baseColor * color;break;
             default:material.baseColor = color;break;
         }
+        float2 uv = shadingData.uv.xy;
         #if defined(_TILEMODE_NO_TILE)
-            SAMPLE_TEX2DTILE_WIEGHT(_MainTex, baseColor, shadingData.position, shadingData.geometricNormal)
-            material.baseColor *= baseColor;
+            SAMPLE_TEX2DTILE_WIEGHT(_MainTex, baseColor, uv)
+        #elif defined(_TILEMODE_TRIPLANAR)
+            float3 oPos = mul(unity_WorldToObject, float4(shadingData.position, 1)).xyz;
+            float3 oNorm = UnityWorldToObjectDir(shadingData.normal);
+            SAMPLE_TEX2D_TRIPLANAR(_MainTex, baseColor, oPos, oNorm)
         #else
-            float2 uv = shadingData.uv.xy;
             #if defined(_PARALLAXMAP)
                 half3 oViewDir = normalize(mul(shadingData.view, shadingData.tangentToWorld));
                 uv = ParallaxOffset2Step(uv, oViewDir);
             #endif
-            material.baseColor *= UNITY_SAMPLE_TEX2D(_MainTex, uv);
+            float4 baseColor = UNITY_SAMPLE_TEX2D(_MainTex, uv);
         #endif
+        material.baseColor *= baseColor;
+
         #if defined(_MASKMAP)
             GENELIT_SAMPLE_TEX2D_SAMPLER(_MaskMap, _MainTex, uv, mods)
         #else

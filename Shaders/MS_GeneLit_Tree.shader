@@ -8,7 +8,7 @@
         [IfDef(_ALPHATEST_ON)] _Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
 
         [ShurikenHeader(Surface Inputs)]
-        [KeywordEnum(NORMAL_TILE, NO_TILE)] _TileMode ("Tile Mode", Float) = 0
+        [KeywordEnum(Normal_Tile, No_Tile, TriPlanar)] _TileMode ("Tile Mode", Float) = 0
         [IfDef(_TILEMODE_NO_TILE)] _NoiseHeight ("Noise Height", Range(5.0, 20.0)) = 12.0
         [Enum(None,0,Multiply,1,Add,2,Screen,3)] _VertexColorMode ("Vertex Color Mode", Float) = 0.0
         [SingleLine] _Color ("Color", Color) = (1,1,1,1)
@@ -109,110 +109,9 @@
 
         ENDCG
 
-        Pass
-        {
-            Name "FORWARD"
-            Tags { "LightMode"="ForwardBase" }
-
-            Cull [_CullMode]
-            Blend [_SrcBlend] [_DstBlend]
-            ZWrite [_ZWrite]
-
-            CGPROGRAM
-            #pragma target 3.5
-            #pragma vertex vertForward
-            #pragma fragment fragForward
-            #pragma multi_compile_fog
-            #pragma multi_compile_fwdbase
-            #pragma multi_compile_instancing
-            #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
-            #pragma shader_feature_local _TILEMODE_NORMAL_TILE _TILEMODE_NO_TILE
-            #pragma shader_feature_local _ANISOTROPY
-            #pragma shader_feature_local _CLEAR_COAT
-            #pragma shader_feature_local _SHEEN
-            #pragma shader_feature_local _MASKMAP
-            #pragma shader_feature_local _NORMALMAP
-            #pragma shader_feature_local _BENTNORMALMAP
-            #pragma shader_feature_local _PARALLAXMAP
-            #pragma shader_feature_local _DETAIL_MAP
-            #pragma shader_feature_local CAPSULE_AO
-            #pragma shader_feature_local REFRACTION_TYPE_NONE REFRACTION_TYPE_SOLID REFRACTION_TYPE_THIN
-            #pragma shader_feature_local REFLECTION_SPACE_CUBE REFLECTION_SPACE_CYLINDER
-
-            #include "Include/GeneLit_Core.cginc"
-            ENDCG
-        }
-
-        Pass
-        {
-            Name "FORWARD_DELTA"
-            Tags { "LightMode"="ForwardAdd" }
-
-            Cull [_CullMode]
-            Blend [_SrcBlend] One
-            Fog { Color (0,0,0,0) }
-            ZWrite Off
-
-            CGPROGRAM
-            #pragma target 3.5
-            #pragma vertex vertForward
-            #pragma fragment fragForward
-            #pragma multi_compile_fog
-            #pragma multi_compile_fwdadd_fullshadows
-            #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
-            #pragma shader_feature_local _TILEMODE_NORMAL_TILE _TILEMODE_NO_TILE
-            #pragma shader_feature_local _ANISOTROPY
-            #pragma shader_feature_local _CLEAR_COAT
-            #pragma shader_feature_local _SHEEN
-            #pragma shader_feature_local _MASKMAP
-            #pragma shader_feature_local _NORMALMAP
-            #pragma shader_feature_local _PARALLAXMAP
-            #pragma shader_feature_local _DETAIL_MAP
-            #pragma shader_feature_local REFRACTION_TYPE_NONE REFRACTION_TYPE_SOLID REFRACTION_TYPE_THIN
-
-            #include "Include/GeneLit_Core.cginc"
-            ENDCG
-        }
-
-        Pass
-        {
-            Name "ShadowCaster"
-            Tags { "LightMode" = "ShadowCaster" }
-
-            Cull [_CullMode]
-
-            CGPROGRAM
-            #pragma target 3.5
-            #pragma vertex vertShadowCaster
-            #pragma fragment fragShadowCaster
-            #pragma multi_compile_shadowcaster
-            #pragma multi_compile_instancing
-            #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
-            #pragma shader_feature_local _MASKMAP
-            #pragma shader_feature_local _PARALLAXMAP
-
-            #include "Include/GeneLit_Shadow.cginc"
-            ENDCG
-        }
-
-        Pass
-        {
-            Name "META"
-            Tags { "LightMode"="Meta" }
-
-            Cull Off
-
-            CGPROGRAM
-            #pragma vertex vert_meta
-            #pragma fragment frag_meta
-            #pragma shader_feature _EMISSION
-            #pragma shader_feature EDITOR_VISUALIZATION
-            #pragma shader_feature_local _TILEMODE_NORMAL_TILE _TILEMODE_NO_TILE
-            #pragma shader_feature_local _MASKMAP
-            #pragma shader_feature_local _DETAIL_MAP
-
-            #include "Include/GeneLit_Meta.cginc"
-            ENDCG
-        }
+        UsePass "MomomaShader/General/GeneLit/ForwardBase"
+        UsePass "MomomaShader/General/GeneLit/ForwardAdd"
+        UsePass "MomomaShader/General/GeneLit/ShadowCaster"
+        UsePass "MomomaShader/General/GeneLit/META"
     }
 }
