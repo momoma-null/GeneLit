@@ -84,6 +84,9 @@
         //    shadingData.normalizedViewportCoord = p.xy * 0.5 / p.w + 0.5
         shadingData.normalizedViewportCoord = ComputeScreenPos(UnityWorldToClipPos(shadingData.position));
 
+        UNITY_LIGHT_ATTENUATION(atten, IN, shadingData.position);
+        shadingData.atten = atten;
+
         #if defined(LIGHTMAP_ON)
             half4 bakedColorTex = UNITY_SAMPLE_TEX2D(unity_Lightmap, IN.ambientOrLightmapUV.xy);
             shadingData.ambient = DecodeLightmap(bakedColorTex);
@@ -294,8 +297,6 @@
         // Computes global variables we need to evaluate material and lighting
         ShadingData shadingData;
         computeShadingParams(IN, facing > 0, shadingData);
-        UNITY_LIGHT_ATTENUATION(atten, IN, shadingData.position);
-        shadingData.atten = atten;
 
         // Initialize the inputs to sensible default values, see material_inputs.fs
         MaterialInputs inputs;
