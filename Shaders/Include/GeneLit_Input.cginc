@@ -93,11 +93,14 @@
     UNITY_INSTANCING_BUFFER_END(Props)
 
     #include "GeneLit_NoTile.cginc"
+    #include "GeneLit_TriPlanar.cginc"
 
     #define GENELIT_ACCESS_PROP(var) UNITY_ACCESS_INSTANCED_PROP(Props, var)
 
     #if defined(_TILEMODE_NO_TILE)
-        #define GENELIT_SAMPLE_TEX2D_SAMPLER(tex, samplertex, uv, col) SAMPLE_TEX2DTILE_SAMPLER_WIEGHT(tex, samplertex, col)
+        #define GENELIT_SAMPLE_TEX2D_SAMPLER(tex, samplertex, uv, col) SAMPLE_TEX2DTILE_SAMPLER_WIEGHT(tex, samplertex, col, uv)
+    #elif defined(_TILEMODE_TRIPLANAR)
+        #define GENELIT_SAMPLE_TEX2D_SAMPLER(tex, samplertex, uv, col) SAMPLE_TEX2D_TRIPLANAR_SAMPLER(tex, samplertex, col)
     #else
         #define GENELIT_SAMPLE_TEX2D_SAMPLER(tex, samplertex, uv, col) float4 col = UNITY_SAMPLE_TEX2D_SAMPLER(tex, samplertex, uv);
     #endif
@@ -180,9 +183,12 @@
     }
 
     #if defined(_PARALLAXMAP)
+        float4 parallaxCache;
+
         float2 ParallaxOffset2Step(float2 uv, half3 oViewDir)
         {
-            float2 uvShift = oViewDir.xy / (oViewDir.z + 0.42) * GENELIT_ACCESS_PROP(_Parallax);
+            float maxHeight = GENELIT_ACCESS_PROP(_Parallax);
+            float2 uvShift = oViewDir.xy / (oViewDir.z + 0.42) * maxHeight;
             float h1 = 1.0 - UNITY_SAMPLE_TEX2D_SAMPLER(_ParallaxMap, _MainTex, uv).g;
             float shift1 = h1 * 0.5;
             float2 huv = uv - shift1 * uvShift;
@@ -190,7 +196,22 @@
             float a = (oViewDir.z + 0.42) * shift1 + 1e-4;
             float b = h2 - h1;
             float height = shift1 * (b + sqrt(max(0.0, b * b + 4 * a * h1))) / (2.0 * a);
+            parallaxCache = float4(height, maxHeight, uvShift);
             return uv - uvShift * height;
         }
     #endif
+
+    float computeHeightMapShadowing(const ShadingData shadingData, const FilamentLight light)
+    {
+        #if defined(_PARALLAXMAP)
+            float h1 = parallaxCache.x;
+            float3 oLitDir = normalize(mul(light.l, shadingData.tangentToWorld));
+            float2 uvShift = oLitDir.xy / (oLitDir.z + 0.1) * parallaxCache.y * h1;
+            uvShift -= parallaxCache.zw * h1;
+            float h2 = 1.0 - UNITY_SAMPLE_TEX2D_SAMPLER(_ParallaxMap, _MainTex, shadingData.uv + uvShift).g;
+            return 1.0 - saturate((h1 - h2) * 10);
+        #else
+            return 1.0;
+        #endif
+    }
 #endif

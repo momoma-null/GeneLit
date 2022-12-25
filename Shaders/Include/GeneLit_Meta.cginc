@@ -31,13 +31,17 @@
             case 3:material.baseColor =  material.baseColor + color - material.baseColor * color;break;
             default:material.baseColor = color;break;
         }
+        float2 uv = shadingData.uv.xy;
         #if defined(_TILEMODE_NO_TILE)
-            SAMPLE_TEX2DTILE_WIEGHT(_MainTex, baseColor, shadingData.position, shadingData.geometricNormal)
-            material.baseColor *= baseColor;
+            SAMPLE_TEX2DTILE_WIEGHT(_MainTex, baseColor, uv)
+        #elif defined(_TILEMODE_TRIPLANAR)
+            float3 oPos = mul(unity_WorldToObject, float4(shadingData.position, 1)).xyz;
+            float3 oNorm = UnityWorldToObjectDir(shadingData.geometricNormal);
+            SAMPLE_TEX2D_TRIPLANAR(_MainTex, baseColor, oPos, oNorm)
         #else
-            float2 uv = shadingData.uv.xy;
-            material.baseColor *= UNITY_SAMPLE_TEX2D(_MainTex, uv);
+            float4 baseColor = UNITY_SAMPLE_TEX2D(_MainTex, uv);
         #endif
+        material.baseColor *= baseColor;
         #if defined(_MASKMAP)
             GENELIT_SAMPLE_TEX2D_SAMPLER(_MaskMap, _MainTex, uv, mods)
         #else

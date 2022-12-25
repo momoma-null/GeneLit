@@ -46,6 +46,10 @@
             irradiance = ShadeSHPerPixel(normalWorld, irradiance, shadingData.position);
         #endif
 
+        #if defined(LIGHTMAP_ON) && defined(DIRLIGHTMAP_COMBINED)
+            irradiance = DecodeDirectionalLightmap(irradiance, shadingData.bakedDir, normalWorld);
+        #endif
+
         #ifdef DYNAMICLIGHTMAP_ON
             // Dynamic lightmaps
             fixed4 realtimeColorTex = UNITY_SAMPLE_TEX2D(unity_DynamicLightmap, shadingData.lightmapUV.zw);
@@ -379,7 +383,8 @@
             float3 diffuseNormal = shadingData.normal;
         #endif
 
-        float3 irradiance = diffuseIrradiance(diffuseNormal, shadingData) * pixel.attenuation;
+        float3 irradiance = diffuseIrradiance(diffuseNormal, shadingData);
+        irradiance *= (pixel.pseudoAmbient * 0.5 + 0.5);
         float3 Fd = pixel.diffuseColor * irradiance * saturate(1.0 - E) * diffuseBRDF;
 
         GENELIT_EVALUATE_CUSTOM_INDIRECT(pixel, shadingData, irradiance, Fd, Fr)

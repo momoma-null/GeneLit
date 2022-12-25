@@ -272,4 +272,12 @@
         sincos(t, s, c);
         return c * p + v * dot(v, p) * (1 - c) + cross(v, p) * s;
     }
+
+    inline float ComputeTextureLOD(float2 uv, float2 texelSize)
+    {
+        float2 ddx_ = texelSize * ddx(uv);
+        float2 ddy_ = texelSize * ddy(uv);
+        float  d = max(dot(ddx_, ddx_), dot(ddy_, ddy_));
+        return max(0.5 * log2(d), 0.0);
+    }
 #endif

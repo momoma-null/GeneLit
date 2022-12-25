@@ -62,8 +62,10 @@ More beautiful and accurate rendering than Unity Standard shaders.
     - More accurate unique method by sampling twice.
   - Light Source Estimation from Spherical Harmonics
   - Accurate Fog
-  - Tri Planar Sampling + No Tiling Sampling
-    - Sampling 3 x 2 times.
+  - Tri Planar Sampling
+  - No Tiling Sampling
+  - Height Map Shadow
+  - Tree Shader for "Tree It"
 - Experimental Features
   - Capsule AO / Capsule Shadow
     - A dedicated script is required.

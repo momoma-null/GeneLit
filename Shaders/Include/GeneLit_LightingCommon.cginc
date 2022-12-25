@@ -24,7 +24,7 @@
         float  roughness;
         float3 dfg;
         float3 energyCompensation;
-        float attenuation;
+        float pseudoAmbient;
 
         #if defined(_CLEAR_COAT)
             float clearCoat;
@@ -81,9 +81,14 @@
         #endif
 
         float2 normalizedViewportCoord;
+        float atten;
         half3 ambient;
         half4 lightmapUV;
         UVCoord uv;
+
+        #if defined(LIGHTMAP_ON) && defined(DIRLIGHTMAP_COMBINED)
+            fixed4 bakedDir;
+        #endif
 
         bool useDirectionalLightEstimation;
     };

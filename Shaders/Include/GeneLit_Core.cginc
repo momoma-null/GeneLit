@@ -56,7 +56,7 @@
     * Computes global shading parameters used to apply lighting, such as the view
     * vector in world space, the tangent frame at the shading point, etc.
     */
-    void computeShadingParams(v2f IN, bool facing, out ShadingData shadingData)
+    void computeShadingParams(const v2f IN, bool facing, out ShadingData shadingData)
     {
         UNITY_INITIALIZE_OUTPUT(ShadingData, shadingData);
 
@@ -84,10 +84,16 @@
         //    shadingData.normalizedViewportCoord = p.xy * 0.5 / p.w + 0.5
         shadingData.normalizedViewportCoord = ComputeScreenPos(UnityWorldToClipPos(shadingData.position));
 
+        UNITY_LIGHT_ATTENUATION(atten, IN, shadingData.position);
+        shadingData.atten = atten;
+
         #if defined(LIGHTMAP_ON)
             half4 bakedColorTex = UNITY_SAMPLE_TEX2D(unity_Lightmap, IN.ambientOrLightmapUV.xy);
             shadingData.ambient = DecodeLightmap(bakedColorTex);
             shadingData.lightmapUV = IN.ambientOrLightmapUV;
+            #if defined(DIRLIGHTMAP_COMBINED)
+                shadingData.bakedDir = UNITY_SAMPLE_TEX2D_SAMPLER(unity_LightmapInd, unity_Lightmap, IN.ambientOrLightmapUV.xy);
+            #endif
         #elif defined(DYNAMICLIGHTMAP_ON)
             shadingData.ambient = 0;
             shadingData.lightmapUV = IN.ambientOrLightmapUV;
@@ -109,17 +115,22 @@
             case 3:material.baseColor =  material.baseColor + color - material.baseColor * color;break;
             default:material.baseColor = color;break;
         }
+        float2 uv = shadingData.uv.xy;
         #if defined(_TILEMODE_NO_TILE)
-            SAMPLE_TEX2DTILE_WIEGHT(_MainTex, baseColor, shadingData.position, shadingData.geometricNormal)
-            material.baseColor *= baseColor;
+            SAMPLE_TEX2DTILE_WIEGHT(_MainTex, baseColor, uv)
+        #elif defined(_TILEMODE_TRIPLANAR)
+            float3 oPos = mul(unity_WorldToObject, float4(shadingData.position, 1)).xyz;
+            float3 oNorm = UnityWorldToObjectDir(shadingData.geometricNormal);
+            SAMPLE_TEX2D_TRIPLANAR(_MainTex, baseColor, oPos, oNorm)
         #else
-            float2 uv = shadingData.uv.xy;
             #if defined(_PARALLAXMAP)
                 half3 oViewDir = normalize(mul(shadingData.view, shadingData.tangentToWorld));
                 uv = ParallaxOffset2Step(uv, oViewDir);
             #endif
-            material.baseColor *= UNITY_SAMPLE_TEX2D(_MainTex, uv);
+            float4 baseColor = UNITY_SAMPLE_TEX2D(_MainTex, uv);
         #endif
+        material.baseColor *= baseColor;
+
         #if defined(_MASKMAP)
             GENELIT_SAMPLE_TEX2D_SAMPLER(_MaskMap, _MainTex, uv, mods)
         #else
@@ -293,9 +304,8 @@
         inputs.baseColor = IN.color;
         initMaterial(shadingData, inputs);
         prepareMaterial(inputs, shadingData);
-        UNITY_LIGHT_ATTENUATION(atten, IN, shadingData.position);
 
-        fragColor = evaluateMaterial(inputs, shadingData, atten);
+        fragColor = evaluateMaterial(inputs, shadingData);
 
         #if defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2)
             float l = distance(shadingData.position, _WorldSpaceCameraPos);
