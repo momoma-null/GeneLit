@@ -97,5 +97,12 @@ Basically same as [Unity HDRP mapping](https://docs.unity3d.com/Packages/com.uni
 | B | Smoothness |
 | A | Normal X |
 
+# Height Map
+Gene Lit Shaders provides more accurate parallax than Standard Shader by sampling a height map twice.
+
+A height map and a directional light can be used to create a pseudo-shadow effect.(Height Map Shadow)
+
+![HeightMapComparision](https://user-images.githubusercontent.com/44657486/209775824-256d83e8-7b12-4d17-a981-f4db18f1e769.png)
+
 # Notice
 Filament code is included under the Apache license.Copyright (C) 2020 Google, Inc.
