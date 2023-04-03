@@ -102,6 +102,13 @@
             shadingData.lightmapUV = 0;
         #endif
 
+        #if defined(HANDLE_SHADOWS_BLENDING_IN_GI)
+            half bakedAtten = UnitySampleBakedOcclusion(shadingData.lightmapUV.xy, shadingData.position);
+            float zDist = dot(_WorldSpaceCameraPos - shadingData.position, UNITY_MATRIX_V[2].xyz);
+            float fadeDist = UnityComputeShadowFadeDistance(shadingData.position, zDist);
+            shadingData.atten = UnityMixRealtimeAndBakedShadows(shadingData.atten, bakedAtten, UnityComputeShadowFade(fadeDist));
+        #endif
+
         shadingData.uv = IN.uv;
     }
 
@@ -254,6 +261,7 @@
         #if defined(LIGHTMAP_ON)
             #if defined(LIGHTMAP_SHADOW_MIXING) && !defined(SHADOWS_SHADOWMASK) && defined(SHADOWS_SCREEN)
                 shadingData.ambient = SubtractMainLightWithRealtimeAttenuationFromLightmap(shadingData.ambient, shadingData.atten, 0, shadingData.normal);
+                shadingData.atten = 0;
             #endif
         #endif
 
