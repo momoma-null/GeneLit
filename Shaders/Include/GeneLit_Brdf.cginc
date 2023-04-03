@@ -236,7 +236,7 @@
 
     float Fd_Lambert()
     {
-        return 1.0 / PI;
+        return 1.0;// / PI;
     }
 
     float Fd_Burley(float roughness, float NoV, float NoL, float LoH)
@@ -245,7 +245,7 @@
         float f90 = 0.5 + 2.0 * roughness * LoH * LoH;
         float lightScatter = F_Schlick(1.0, f90, NoL);
         float viewScatter  = F_Schlick(1.0, f90, NoV);
-        return lightScatter * viewScatter * (1.0 / PI);
+        return lightScatter * viewScatter;// * (1.0 / PI);
     }
 
     // Energy conserving wrap diffuse term, does *not* include the divide by pi
