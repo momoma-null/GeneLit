@@ -285,7 +285,7 @@
         float3 viewDir = worldPos - _WorldSpaceCameraPos;
         float3 correctedNormal = cross(viewDir, cross(worldNormal, viewDir));
         correctedNormal += worldNormal * !dot(correctedNormal, correctedNormal);
-        worldNormal = lerp(worldNormal, normalize(correctedNormal), dot(worldNormal, viewDir) > 100.0);
+        worldNormal = lerp(worldNormal, normalize(correctedNormal), dot(worldNormal, viewDir) > 0.0);
         fixed3 worldTangent = UnityObjectToWorldDir(v.tangent.xyz);
         fixed tangentSign = v.tangent.w * unity_WorldTransformParams.w;
         fixed3 worldBinormal = cross(worldNormal, worldTangent) * tangentSign;
