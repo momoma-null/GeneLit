@@ -282,6 +282,8 @@
         o.uv = TexCoords(v);
         float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
         float3 worldNormal = UnityObjectToWorldNormal(v.normal);
+        float3 viewDir = worldPos - _WorldSpaceCameraPos;
+        worldNormal = lerp(worldNormal, normalize(cross(viewDir, cross(worldNormal, viewDir))), dot(worldNormal, viewDir) > 0);
         fixed3 worldTangent = UnityObjectToWorldDir(v.tangent.xyz);
         fixed tangentSign = v.tangent.w * unity_WorldTransformParams.w;
         fixed3 worldBinormal = cross(worldNormal, worldTangent) * tangentSign;
