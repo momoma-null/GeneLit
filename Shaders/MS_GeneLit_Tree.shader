@@ -109,9 +109,92 @@
 
         ENDCG
 
-        UsePass "MomomaShader/General/GeneLit/FORWARD"
-        UsePass "MomomaShader/General/GeneLit/FORWARD_DELTA"
-        UsePass "MomomaShader/General/GeneLit/ShadowCaster"
+        Pass
+        {
+            Name "FORWARD"
+            Tags { "LightMode"="ForwardBase" }
+
+            Cull [_CullMode]
+            Blend [_SrcBlend] [_DstBlend]
+            ZWrite [_ZWrite]
+
+            CGPROGRAM
+            #pragma target 3.5
+            #pragma vertex vertForward
+            #pragma fragment fragForward
+            #pragma multi_compile_fog
+            #pragma multi_compile_fwdbase
+            #pragma multi_compile_instancing
+            #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
+            #pragma shader_feature_local _TILEMODE_NORMAL_TILE _TILEMODE_NO_TILE _TILEMODE_TRIPLANAR
+            #pragma shader_feature_local _ANISOTROPY
+            #pragma shader_feature_local _CLEAR_COAT
+            #pragma shader_feature_local _SHEEN
+            #pragma shader_feature_local _MASKMAP
+            #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local _BENTNORMALMAP
+            #pragma shader_feature_local _PARALLAXMAP
+            #pragma shader_feature_local _DETAIL_MAP
+            #pragma shader_feature_local CAPSULE_AO
+            #pragma shader_feature_local REFRACTION_TYPE_NONE REFRACTION_TYPE_SOLID REFRACTION_TYPE_THIN
+            #pragma shader_feature_local REFLECTION_SPACE_CUBE REFLECTION_SPACE_CYLINDER
+
+            #include "Include/GeneLit_Core.cginc"
+            ENDCG
+        }
+
+        Pass
+        {
+            Name "FORWARD_DELTA"
+            Tags { "LightMode"="ForwardAdd" }
+
+            Cull [_CullMode]
+            Blend [_SrcBlend] One
+            Fog { Color (0,0,0,0) }
+            ZWrite Off
+
+            CGPROGRAM
+            #pragma target 3.5
+            #pragma vertex vertForward
+            #pragma fragment fragForward
+            #pragma multi_compile_fog
+            #pragma multi_compile_fwdadd_fullshadows
+            #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
+            #pragma shader_feature_local _TILEMODE_NORMAL_TILE _TILEMODE_NO_TILE _TILEMODE_TRIPLANAR
+            #pragma shader_feature_local _ANISOTROPY
+            #pragma shader_feature_local _CLEAR_COAT
+            #pragma shader_feature_local _SHEEN
+            #pragma shader_feature_local _MASKMAP
+            #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local _PARALLAXMAP
+            #pragma shader_feature_local _DETAIL_MAP
+            #pragma shader_feature_local REFRACTION_TYPE_NONE REFRACTION_TYPE_SOLID REFRACTION_TYPE_THIN
+
+            #include "Include/GeneLit_Core.cginc"
+            ENDCG
+        }
+
+        Pass
+        {
+            Name "ShadowCaster"
+            Tags { "LightMode" = "ShadowCaster" }
+
+            Cull [_CullMode]
+
+            CGPROGRAM
+            #pragma target 3.5
+            #pragma vertex vertShadowCaster
+            #pragma fragment fragShadowCaster
+            #pragma multi_compile_shadowcaster
+            #pragma multi_compile_instancing
+            #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
+            #pragma shader_feature_local _MASKMAP
+            #pragma shader_feature_local _PARALLAXMAP
+
+            #include "Include/GeneLit_Shadow.cginc"
+            ENDCG
+        }
+
         UsePass "MomomaShader/General/GeneLit/META"
     }
 }
