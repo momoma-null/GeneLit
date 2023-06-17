@@ -63,18 +63,18 @@
         // on build, unity_OcclusionMaskSelector may be 0 without any directional light
         unity_OcclusionMaskSelector = sum(unity_OcclusionMaskSelector) == 0 ? fixed4(1, 0, 0, 0) : unity_OcclusionMaskSelector;
 
-        float3 t = normalize(float3(IN.tSpace0.x, IN.tSpace1.x, IN.tSpace2.x));
-        float3 b = normalize(float3(IN.tSpace0.y, IN.tSpace1.y, IN.tSpace2.y));
-        float3 n = normalize(float3(IN.tSpace0.z, IN.tSpace1.z, IN.tSpace2.z));
+        float3 scaledTangent = float3(IN.tSpace0.x, IN.tSpace1.x, IN.tSpace2.x);
+        float3 worldNormal = facing ? normalize(float3(IN.tSpace0.z, IN.tSpace1.z, IN.tSpace2.z)) : normalize(float3(IN.tSpace0.y, IN.tSpace1.y, IN.tSpace2.y));
 
-        n = facing ? n : -n;
-        t = facing ? t : -t;
-        b = facing ? b : -b;
+        float tangentScale = length(scaledTangent);
+        float3 worldTangent = scaledTangent / tangentScale * (facing ? 1 : -1);
+        fixed tangentSign = sign(tangentScale - 2);
+        float3 worldBinormal = normalize(cross(worldNormal, worldTangent) * tangentSign);
 
-        shadingData.geometricNormal = n;
+        shadingData.geometricNormal = worldNormal;
 
         // We use unnormalized post-interpolation values, assuming mikktspace tangents
-        shadingData.tangentToWorld = transpose(float3x3(t, b, n));
+        shadingData.tangentToWorld = transpose(float3x3(worldTangent, worldBinormal, worldNormal));
 
         shadingData.position = float3(IN.tSpace0.w, IN.tSpace1.w, IN.tSpace2.w);
         shadingData.view = normalize(_WorldSpaceCameraPos - shadingData.position);
@@ -268,6 +268,13 @@
         shadingData.useDirectionalLightEstimation = material.directionalLightEstimation;
     }
 
+    float3 calculateCorrectedNormal(in float3 n, in float3 v)
+    {
+        float3 c = cross(v, cross(n, v));
+        c += n * !dot(c, c);
+        return lerp(n, normalize(c), dot(n, v) > 0.0);
+    }
+
     v2f vertForward(appdata_full v)
     {
         UNITY_SETUP_INSTANCE_ID(v);
@@ -282,16 +289,15 @@
         o.uv = TexCoords(v);
         float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
         float3 worldNormal = UnityObjectToWorldNormal(v.normal);
-        float3 viewDir = worldPos - _WorldSpaceCameraPos;
-        float3 correctedNormal = cross(viewDir, cross(worldNormal, viewDir));
-        correctedNormal += worldNormal * !dot(correctedNormal, correctedNormal);
-        worldNormal = lerp(worldNormal, normalize(correctedNormal), dot(worldNormal, viewDir) > 0.0);
+        float3 viewDir = normalize(worldPos - _WorldSpaceCameraPos);
+        float3 inverseWorldNormal = calculateCorrectedNormal(-worldNormal, viewDir);
+        float3 correctedWorldNormal = calculateCorrectedNormal(worldNormal, viewDir);
         fixed3 worldTangent = UnityObjectToWorldDir(v.tangent.xyz);
         fixed tangentSign = v.tangent.w * unity_WorldTransformParams.w;
-        fixed3 worldBinormal = cross(worldNormal, worldTangent) * tangentSign;
-        o.tSpace0 = float4(worldTangent.x, worldBinormal.x, worldNormal.x, worldPos.x);
-        o.tSpace1 = float4(worldTangent.y, worldBinormal.y, worldNormal.y, worldPos.y);
-        o.tSpace2 = float4(worldTangent.z, worldBinormal.z, worldNormal.z, worldPos.z);
+        worldTangent *= tangentSign + 2;
+        o.tSpace0 = float4(worldTangent.x, inverseWorldNormal.x, correctedWorldNormal.x, worldPos.x);
+        o.tSpace1 = float4(worldTangent.y, inverseWorldNormal.y, correctedWorldNormal.y, worldPos.y);
+        o.tSpace2 = float4(worldTangent.z, inverseWorldNormal.z, correctedWorldNormal.z, worldPos.z);
         o.color = v.color;
         o.ambientOrLightmapUV = VertexGIForward(v, worldPos, worldNormal);
         UNITY_TRANSFER_LIGHTING(o, v.texcoord1);
