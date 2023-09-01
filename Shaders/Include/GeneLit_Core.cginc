@@ -202,7 +202,7 @@
         #if defined(_ANISOTROPY)
             material.anisotropy = GENELIT_ACCESS_PROP(_Anisotropy);
             GENELIT_SAMPLE_TEX2D_SAMPLER(_TangentMap, _MainTex, uv, tangentMap)
-            material.anisotropyDirection = UnpackNormal(tangentMap);
+            material.anisotropyDirection = tangentMap.rgb;
         #endif
 
         #if defined(_CLEAR_COAT)

@@ -32,7 +32,7 @@
         [ToggleUI] _AlbedoAffectEmissive ("Albedo Affect Emissive", Float) = 0.0
 
         [IfDef(_ANISOTROPY)][SingleLine] _Anisotropy ("Anisotropy", Range(-1, 1)) = 0.5
-        [SingleLine(_Anisotropy, _ANISOTROPY)][Normal] _TangentMap ("Anisotropy", 2D) = "bump" {}
+        [SingleLine(_Anisotropy, _ANISOTROPY)] _TangentMap ("Anisotropy", 2D) = "red" {}
 
         [ShurikenHeader(Tree Inputs)]
         _TreeWind ("Wind Vector(xyz) & Time Scale(w)", Vector) = (1, 0, 0, 0.2)
