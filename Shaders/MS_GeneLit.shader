@@ -59,7 +59,7 @@
         [Toggle(CAPSULE_AO)] _Capsule_AO ("Capsule AO", float) = 0.0
         [IfDef(CAPSULE_AO)] _Capsule_AOStrength ("Capsule AO Strength", Range(0, 1)) = 0.8
         [IfDef(CAPSULE_AO)] _Capsule_ShadowStrength ("Capsule Shadow Strength", Range(0, 1)) = 0.5
-        [KeywordEnum(Cube, Cylinder)] Reflection_Space ("Reflection Space", Float) = 0.0
+        [KeywordEnum(Cube, Cylinder, Additional_Box)] Reflection_Space ("Reflection Space", Float) = 0.0
         [IntRange] _SkyboxFog ("Skybox Fog", Range(0, 7)) = 0.0
         [ToggleUI] _DirectionalLightEstimation ("Directional Light Estimation", Float) = 1.0
 
@@ -112,7 +112,7 @@
             #pragma shader_feature_local _DETAIL_MAP
             #pragma shader_feature_local CAPSULE_AO
             #pragma shader_feature_local REFRACTION_TYPE_NONE REFRACTION_TYPE_SOLID REFRACTION_TYPE_THIN
-            #pragma shader_feature_local REFLECTION_SPACE_CUBE REFLECTION_SPACE_CYLINDER
+            #pragma shader_feature_local REFLECTION_SPACE_CUBE REFLECTION_SPACE_CYLINDER REFLECTION_SPACE_ADDITIONAL_BOX
 
             #include "Include/GeneLit_Core.cginc"
             ENDCG
