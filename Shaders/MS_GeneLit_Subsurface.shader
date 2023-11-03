@@ -106,7 +106,7 @@
             #pragma shader_feature_local _PARALLAXMAP
             #pragma shader_feature_local _DETAIL_MAP
             #pragma shader_feature_local CAPSULE_AO
-            #pragma shader_feature_local REFLECTION_SPACE_CUBE REFLECTION_SPACE_CYLINDER
+            #pragma shader_feature_local REFLECTION_SPACE_CUBE REFLECTION_SPACE_CYLINDER REFLECTION_SPACE_ADDITIONAL_BOX
 
             #include "Include/GeneLit_Core.cginc"
             ENDCG
