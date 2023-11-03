@@ -30,7 +30,7 @@
             #ifdef LIGHTMAP_ON
                 ambientOrLightmapUV.xy = v.texcoord1.xy * unity_LightmapST.xy + unity_LightmapST.zw;
             #elif UNITY_SHOULD_SAMPLE_SH
-                #ifdef VERTEXLIGHT_ON
+                #if defined (VERTEXLIGHT_ON) && !defined(VERTEX_LIGHT_AS_PIXEL_LIGHT)
                     ambientOrLightmapUV.rgb = Shade4PointLights(
                     unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
                     unity_LightColor[0].rgb, unity_LightColor[1].rgb, unity_LightColor[2].rgb, unity_LightColor[3].rgb,

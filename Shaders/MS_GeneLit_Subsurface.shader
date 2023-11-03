@@ -58,6 +58,7 @@
         [KeywordEnum(Cube, Cylinder)] Reflection_Space ("Reflection Space", Float) = 0.0
         [IntRange] _SkyboxFog ("Skybox Fog", Range(0, 7)) = 0.0
         [ToggleUI] _DirectionalLightEstimation ("Directional Light Estimation", Float) = 1.0
+        [Toggle(VERTEX_LIGHT_AS_PIXEL_LIGHT)] _VertexLightAsPixelLight ("Use Vertex Light As Pixel Light", float) = 0.0
 
         [HideInInspector][NonModifiableTextureData] _DFG ("_DFG", 2D) = "black" {}
 
@@ -107,6 +108,7 @@
             #pragma shader_feature_local _DETAIL_MAP
             #pragma shader_feature_local CAPSULE_AO
             #pragma shader_feature_local REFLECTION_SPACE_CUBE REFLECTION_SPACE_CYLINDER REFLECTION_SPACE_ADDITIONAL_BOX
+            #pragma shader_feature_local VERTEX_LIGHT_AS_PIXEL_LIGHT
 
             #include "Include/GeneLit_Core.cginc"
             ENDCG
