@@ -169,8 +169,9 @@
             float3 direction = material.anisotropyDirection;
             direction.z = 0;
             pixel.anisotropy = material.anisotropy;
-            pixel.anisotropicT = normalize(mul(shadingData.tangentToWorld, direction));
-            pixel.anisotropicB = normalize(cross(shadingData.normal, pixel.anisotropicT));
+            float3 tempT = mul(shadingData.tangentToWorld, direction);
+            pixel.anisotropicB = normalize(cross(shadingData.normal, tempT));
+            pixel.anisotropicT = normalize(cross(pixel.anisotropicB, shadingData.normal));
         #endif
     }
 
