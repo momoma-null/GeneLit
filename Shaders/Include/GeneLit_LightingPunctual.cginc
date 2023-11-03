@@ -18,7 +18,7 @@ FilamentLight getPunctualLights(const ShadingData shadingData)
     FilamentLight light;
     light.colorIntensity = float4(_LightColor0.rgb, 1);
     light.l = normalize(posToLight + float3(0, 1e-8, 0));
-    light.attenuation = 1;
+    light.attenuation = shadingData.atten;
     light.NoL = saturate(dot(shadingData.normal, light.l));
     return light;
 }

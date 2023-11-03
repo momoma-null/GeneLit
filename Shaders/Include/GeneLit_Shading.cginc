@@ -219,12 +219,13 @@
         // until the very end but it costs more ALUs on mobile. The gains are
         // currently not worth the extra operations
         float3 color = 0.0;
-        float visibility = shadingData.atten;
+        float visibility = 1.0;
         FilamentLight light;
         UNITY_INITIALIZE_OUTPUT(FilamentLight, light)
         #if UNITY_PASS_FORWARDBASE
             light = getDirectionalLight(shadingData);
             float occlusion = material.ambientOcclusion;
+            visibility *= shadingData.atten;
 
             #if defined(CAPSULE_AO)
                 float capsuleAO, capsuleShadow;
