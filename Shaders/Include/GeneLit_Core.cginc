@@ -162,7 +162,7 @@
         #endif
 
         #if defined(_DETAIL_MAP)
-            float detailMask = mods.b;
+            float detailMask = mods.b * vertexColor.a;
             float2 detailUV = shadingData.uv.zw;
             float4 detailMap = UNITY_SAMPLE_TEX2D(_DetailMap, detailUV);
             float detailAlbedo = detailMap.r - 0.5;
