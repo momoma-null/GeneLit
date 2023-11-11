@@ -112,16 +112,9 @@
         shadingData.uv = IN.uv;
     }
 
-    void initMaterial(const ShadingData shadingData, inout MaterialInputs material)
+    void initMaterial(const ShadingData shadingData, inout MaterialInputs material, float4 vertexColor)
     {
         float4 color = GENELIT_ACCESS_PROP(_Color);
-        switch(GENELIT_ACCESS_PROP(_VertexColorMode))
-        {
-            case 1:material.baseColor *= color;break;
-            case 2:material.baseColor += color;break;
-            case 3:material.baseColor =  material.baseColor + color - material.baseColor * color;break;
-            default:material.baseColor = color;break;
-        }
         float2 uv = shadingData.uv.xy;
         #if defined(_TILEMODE_NO_TILE)
             SAMPLE_TEX2DTILE_WIEGHT(_MainTex, baseColor, uv)
@@ -136,7 +129,14 @@
             #endif
             float4 baseColor = UNITY_SAMPLE_TEX2D(_MainTex, uv);
         #endif
-        material.baseColor *= baseColor;
+        color *= baseColor;
+        switch(GENELIT_ACCESS_PROP(_VertexColorMode))
+        {
+            case 1:color.rgb *= vertexColor.rgb;break;
+            case 2:color.rgb += vertexColor.rgb;break;
+            case 3:color.rgb = color.rgb + vertexColor.rgb - color.rgb * vertexColor.rgb;break;
+        }
+        material.baseColor = color;
 
         #if defined(_MASKMAP)
             GENELIT_SAMPLE_TEX2D_SAMPLER(_MaskMap, _MainTex, uv, mods)
@@ -319,8 +319,7 @@
         // Initialize the inputs to sensible default values, see material_inputs.fs
         MaterialInputs inputs;
         UNITY_INITIALIZE_OUTPUT(MaterialInputs, inputs);
-        inputs.baseColor = IN.color;
-        initMaterial(shadingData, inputs);
+        initMaterial(shadingData, inputs, IN.color);
         prepareMaterial(inputs, shadingData);
 
         fragColor = evaluateMaterial(inputs, shadingData);
