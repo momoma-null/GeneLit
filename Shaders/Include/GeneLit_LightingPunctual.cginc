@@ -23,7 +23,7 @@ FilamentLight getPunctualLights(const ShadingData shadingData)
     return light;
 }
 
-void getVertexPunctualLights(const ShadingData shadingData, out FilamentLight lights[4])
+void getVertexPunctualLights(const ShadingData shadingData, float4 lightAttenSq, out FilamentLight lights[4])
 {
     // to light vectors
     float3 pos = shadingData.position;
@@ -47,7 +47,7 @@ void getVertexPunctualLights(const ShadingData shadingData, out FilamentLight li
     float4 corr = rsqrt(lengthSq);
     ndotl = saturate(ndotl * corr);
     // attenuation
-    float4 atten = 1.0 / (1.0 + lengthSq * unity_4LightAtten0);
+    float4 atten = 1.0 / (1.0 + lengthSq * lightAttenSq);
 
     FilamentLight light0, light1, light2, light3;
     
