@@ -54,6 +54,7 @@
         [IfDef(REFRACTION_TYPE_THIN)] _MicroThickness ("MicroThickness", Float) = 0.01
         [IfNDef(REFRACTION_TYPE_NONE)] _TransmittanceColor ("Transmittance Color", Color) = (0, 0, 0, 1)
         [IfNDef(REFRACTION_TYPE_NONE)] _Transmission ("Transmission", Range(0,1)) = 0.0
+        [IfNDef(REFRACTION_TYPE_NONE)][ToggleUI] _AlphaAffectTransmission ("Alpha Affect Transmission", Float) = 0.0
 
         [ShurikenHeader(Experimental)]
         [Toggle(CAPSULE_AO)] _Capsule_AO ("Capsule AO", float) = 0.0

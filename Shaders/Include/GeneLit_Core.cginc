@@ -219,6 +219,7 @@
             material.thickness = GENELIT_ACCESS_PROP(_Thickness);
             material.absorption = -log(GENELIT_ACCESS_PROP(_TransmittanceColor).rgb) / max(material.thickness, 1e-5);
             material.transmission = GENELIT_ACCESS_PROP(_Transmission);
+            material.transmission *= lerp(1.0, 1.0 - material.baseColor.a, GENELIT_ACCESS_PROP(_AlphaAffectTransmission));
             #if defined(REFRACTION_TYPE_THIN)
                 material.microThickness = GENELIT_ACCESS_PROP(_MicroThickness);
             #endif

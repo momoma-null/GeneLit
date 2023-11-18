@@ -71,6 +71,7 @@
         UNITY_DEFINE_INSTANCED_PROP(half, _Thickness)
         UNITY_DEFINE_INSTANCED_PROP(half4, _TransmittanceColor)
         UNITY_DEFINE_INSTANCED_PROP(half, _Transmission)
+        UNITY_DEFINE_INSTANCED_PROP(fixed, _AlphaAffectTransmission)
         #if defined(REFRACTION_TYPE_THIN)
             UNITY_DEFINE_INSTANCED_PROP(half, _MicroThickness)
         #endif
