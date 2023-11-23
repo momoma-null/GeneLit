@@ -3,7 +3,10 @@
 
     #define DFG_TYPE_CLOTH
 
+    UNITY_DECLARE_TEX2D_NOSAMPLER(_SheenMap);
+
     #define GENELIT_CUSTOM_INSTANCED_PROP \
+    UNITY_DEFINE_INSTANCED_PROP(half4, _SheenColor)\
     UNITY_DEFINE_INSTANCED_PROP(half4, _ClothSubsurfaceColor)
 
     #define GENELIT_CUSTOM_MATERIAL_INPUTS \
@@ -13,8 +16,17 @@
     #define GENELIT_CUSTOM_PIXEL_PARAMS \
     float3 subsurfaceColor;
 
+    #if defined(CUSTOM_SHEEN)
+        #define CLOTH_SHEEN_COLOR(material) \
+        GENELIT_SAMPLE_TEX2D_SAMPLER(_SheenMap, _MainTex, uv, sheenColor)\
+        material.sheenColor = sheenColor.rgb * GENELIT_ACCESS_PROP(_SheenColor).rgb;
+    #else
+        #define CLOTH_SHEEN_COLOR(material) \
+        material.sheenColor = sqrt(material.baseColor.rgb);
+    #endif
+
     #define GENELIT_INIT_CUSTOM_MATERIAL(material) \
-    material.sheenColor = sqrt(material.baseColor.rgb);\
+    CLOTH_SHEEN_COLOR(material)\
     material.subsurfaceColor = GENELIT_ACCESS_PROP(_ClothSubsurfaceColor).rgb;
 
     #define GENELIT_EVALUATE_CUSTOM_INDIRECT(pixel, shadingData, irradiance, Fd, Fr) \

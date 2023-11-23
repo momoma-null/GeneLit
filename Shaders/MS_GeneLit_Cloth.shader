@@ -33,6 +33,9 @@
         [SingleLine(_Anisotropy, _ANISOTROPY)] _TangentMap ("Anisotropy", 2D) = "red" {}
 
         [ShurikenHeader(Cloth Inputs)]
+        [Toggle(CUSTOM_SHEEN)] _CustomSheen ("Use Custom Sheen Color", float) = 0.0
+        [IfDef(CUSTOM_SHEEN)][SingleLine] _SheenColor ("Sheen Color", Color) = (1,1,1,1)
+        [IfDef(CUSTOM_SHEEN)][SingleLine(_SheenColor)] _SheenMap ("Sheen", 2D) = "white" {}
         _ClothSubsurfaceColor ("Subsurface Color", Color) = (0.5,0.5,0.5,1)
 
         [ShurikenHeader(Detail Inputs)]
@@ -102,6 +105,7 @@
             #pragma shader_feature_local _BENTNORMALMAP
             #pragma shader_feature_local _PARALLAXMAP
             #pragma shader_feature_local _DETAIL_MAP
+            #pragma shader_feature_local CUSTOM_SHEEN
             #pragma shader_feature_local CAPSULE_AO
             #pragma shader_feature_local REFLECTION_SPACE_CUBE REFLECTION_SPACE_CYLINDER REFLECTION_SPACE_ADDITIONAL_BOX
             #pragma shader_feature_local VERTEX_LIGHT_AS_PIXEL_LIGHT
