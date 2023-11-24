@@ -42,7 +42,7 @@
     #if defined(_CLEAR_COAT)
         float clearCoatLobe(const PixelParams pixel, const ShadingData shadingData, const float3 h, float NoH, float LoH, out float Fcc)
         {
-            #if defined(_CLEAR_COAT_NORMAL)
+            #if defined(_NORMALMAP) || defined(_CLEAR_COAT_NORMAL)
                 // If the material has a normal map, we want to use the geometric normal
                 // instead to avoid applying the normal map details to the clear coat layer
                 float clearCoatNoH = saturate(dot(shadingData.clearCoatNormal, h));
@@ -157,7 +157,7 @@
             float clearCoat = clearCoatLobe(pixel, shadingData, h, NoH, LoH, Fcc);
             float attenuation = 1.0 - Fcc;
 
-            #if defined(_CLEAR_COAT_NORMAL)
+            #if defined(_NORMALMAP) || defined(_CLEAR_COAT_NORMAL)
                 color *= attenuation * NoL;
 
                 // If the material has a normal map, we want to use the geometric normal

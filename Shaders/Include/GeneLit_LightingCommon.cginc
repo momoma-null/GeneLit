@@ -76,7 +76,7 @@
             float3 bentNormal;       // normalized transformed normal, in world space
         #endif
 
-        #if defined(_CLEAR_COAT_NORMAL)
+        #if defined(_CLEAR_COAT)
             float3 clearCoatNormal;  // normalized clear coat layer normal, in world space
         #endif
 

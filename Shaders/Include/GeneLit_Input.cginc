@@ -140,9 +140,7 @@
         #if defined(_CLEAR_COAT)
             float clearCoat;
             float clearCoatRoughness;
-            #if defined(_CLEAR_COAT_NORMAL)
-                float3 clearCoatNormal;
-            #endif
+            float3 clearCoatNormal;
         #endif
 
         #if defined(USE_REFRACTION)

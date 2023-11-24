@@ -286,7 +286,7 @@
     void evaluateClearCoatIBL(const PixelParams pixel, const ShadingData shadingData, float diffuseAO, inout float3 Fd, inout float3 Fr)
     {
         #if defined(_CLEAR_COAT)
-            #if defined(_CLEAR_COAT_NORMAL)
+            #if defined(_NORMALMAP) || defined(_CLEAR_COAT_NORMAL)
                 // We want to use the geometric normal for the clear coat layer
                 float clearCoatNoV = clampNoV(dot(shadingData.clearCoatNormal, shadingData.view));
                 float3 clearCoatR = reflect(-shadingData.view, shadingData.clearCoatNormal);

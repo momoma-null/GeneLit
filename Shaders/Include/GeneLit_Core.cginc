@@ -210,9 +210,7 @@
         #if defined(_CLEAR_COAT)
             material.clearCoat = GENELIT_ACCESS_PROP(_ClearCoat);
             material.clearCoatRoughness = GENELIT_ACCESS_PROP(_ClearCoatRoughness);
-            #if defined(_CLEAR_COAT_NORMAL)
-                material.clearCoatNormal = float3(0.0, 0.0, 1.0);
-            #endif
+            material.clearCoatNormal = float3(0.0, 0.0, 1.0);
         #endif
 
         #if defined(USE_REFRACTION)
@@ -257,9 +255,7 @@
         #endif
 
         #if defined(_CLEAR_COAT)
-            #if defined(_CLEAR_COAT_NORMAL)
-                shadingData.clearCoatNormal = normalize(mul(shadingData.tangentToWorld, material.clearCoatNormal));
-            #endif
+            shadingData.clearCoatNormal = normalize(mul(shadingData.tangentToWorld, material.clearCoatNormal));
         #endif
 
         #if defined(LIGHTMAP_ON)
