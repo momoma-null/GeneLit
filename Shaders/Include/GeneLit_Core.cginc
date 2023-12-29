@@ -30,11 +30,13 @@
             #ifdef LIGHTMAP_ON
                 ambientOrLightmapUV.xy = v.texcoord1.xy * unity_LightmapST.xy + unity_LightmapST.zw;
             #elif UNITY_SHOULD_SAMPLE_SH
-                #ifdef VERTEXLIGHT_ON
+                #if defined (VERTEXLIGHT_ON) && !defined(VERTEX_LIGHT_AS_PIXEL_LIGHT)
+                    float range = GENELIT_ACCESS_PROP(_VertexLightRangeMultiplier);
+                    float4 atten = unity_4LightAtten0 / (range * range);
                     ambientOrLightmapUV.rgb = Shade4PointLights(
                     unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
                     unity_LightColor[0].rgb, unity_LightColor[1].rgb, unity_LightColor[2].rgb, unity_LightColor[3].rgb,
-                    unity_4LightAtten0, posWorld, normalWorld);
+                    atten, posWorld, normalWorld);
                 #endif
 
                 ambientOrLightmapUV.rgb = ShadeSHPerVertex(normalWorld, ambientOrLightmapUV.rgb);
@@ -63,18 +65,18 @@
         // on build, unity_OcclusionMaskSelector may be 0 without any directional light
         unity_OcclusionMaskSelector = sum(unity_OcclusionMaskSelector) == 0 ? fixed4(1, 0, 0, 0) : unity_OcclusionMaskSelector;
 
-        float3 t = normalize(float3(IN.tSpace0.x, IN.tSpace1.x, IN.tSpace2.x));
-        float3 b = normalize(float3(IN.tSpace0.y, IN.tSpace1.y, IN.tSpace2.y));
-        float3 n = normalize(float3(IN.tSpace0.z, IN.tSpace1.z, IN.tSpace2.z));
+        float3 scaledTangent = float3(IN.tSpace0.x, IN.tSpace1.x, IN.tSpace2.x);
+        float3 worldNormal = facing ? normalize(float3(IN.tSpace0.z, IN.tSpace1.z, IN.tSpace2.z)) : normalize(float3(IN.tSpace0.y, IN.tSpace1.y, IN.tSpace2.y));
 
-        n = facing ? n : -n;
-        t = facing ? t : -t;
-        b = facing ? b : -b;
+        float tangentScale = length(scaledTangent);
+        float3 worldTangent = scaledTangent / tangentScale * (facing ? 1 : -1);
+        fixed tangentSign = sign(tangentScale - 2);
+        float3 worldBinormal = normalize(cross(worldNormal, worldTangent) * tangentSign);
 
-        shadingData.geometricNormal = n;
+        shadingData.geometricNormal = worldNormal;
 
         // We use unnormalized post-interpolation values, assuming mikktspace tangents
-        shadingData.tangentToWorld = transpose(float3x3(t, b, n));
+        shadingData.tangentToWorld = transpose(float3x3(worldTangent, worldBinormal, worldNormal));
 
         shadingData.position = float3(IN.tSpace0.w, IN.tSpace1.w, IN.tSpace2.w);
         shadingData.view = normalize(_WorldSpaceCameraPos - shadingData.position);
@@ -112,16 +114,9 @@
         shadingData.uv = IN.uv;
     }
 
-    void initMaterial(const ShadingData shadingData, inout MaterialInputs material)
+    void initMaterial(const ShadingData shadingData, inout MaterialInputs material, float4 vertexColor)
     {
         float4 color = GENELIT_ACCESS_PROP(_Color);
-        switch(GENELIT_ACCESS_PROP(_VertexColorMode))
-        {
-            case 1:material.baseColor *= color;break;
-            case 2:material.baseColor += color;break;
-            case 3:material.baseColor =  material.baseColor + color - material.baseColor * color;break;
-            default:material.baseColor = color;break;
-        }
         float2 uv = shadingData.uv.xy;
         #if defined(_TILEMODE_NO_TILE)
             SAMPLE_TEX2DTILE_WIEGHT(_MainTex, baseColor, uv)
@@ -136,7 +131,14 @@
             #endif
             float4 baseColor = UNITY_SAMPLE_TEX2D(_MainTex, uv);
         #endif
-        material.baseColor *= baseColor;
+        color *= baseColor;
+        switch(GENELIT_ACCESS_PROP(_VertexColorMode))
+        {
+            case 1:color.rgb *= vertexColor.rgb;break;
+            case 2:color.rgb += vertexColor.rgb;break;
+            case 3:color.rgb = color.rgb + vertexColor.rgb - color.rgb * vertexColor.rgb;break;
+        }
+        material.baseColor = color;
 
         #if defined(_MASKMAP)
             GENELIT_SAMPLE_TEX2D_SAMPLER(_MaskMap, _MainTex, uv, mods)
@@ -162,7 +164,7 @@
         #endif
 
         #if defined(_DETAIL_MAP)
-            float detailMask = mods.b;
+            float detailMask = mods.b * vertexColor.a;
             float2 detailUV = shadingData.uv.zw;
             float4 detailMap = UNITY_SAMPLE_TEX2D(_DetailMap, detailUV);
             float detailAlbedo = detailMap.r - 0.5;
@@ -202,21 +204,20 @@
         #if defined(_ANISOTROPY)
             material.anisotropy = GENELIT_ACCESS_PROP(_Anisotropy);
             GENELIT_SAMPLE_TEX2D_SAMPLER(_TangentMap, _MainTex, uv, tangentMap)
-            material.anisotropyDirection = UnpackNormal(tangentMap);
+            material.anisotropyDirection = tangentMap.rgb - 0.5;
         #endif
 
         #if defined(_CLEAR_COAT)
             material.clearCoat = GENELIT_ACCESS_PROP(_ClearCoat);
             material.clearCoatRoughness = GENELIT_ACCESS_PROP(_ClearCoatRoughness);
-            #if defined(_CLEAR_COAT_NORMAL)
-                material.clearCoatNormal = float3(0.0, 0.0, 1.0);
-            #endif
+            material.clearCoatNormal = float3(0.0, 0.0, 1.0);
         #endif
 
         #if defined(USE_REFRACTION)
             material.thickness = GENELIT_ACCESS_PROP(_Thickness);
             material.absorption = -log(GENELIT_ACCESS_PROP(_TransmittanceColor).rgb) / max(material.thickness, 1e-5);
             material.transmission = GENELIT_ACCESS_PROP(_Transmission);
+            material.transmission *= lerp(1.0, 1.0 - material.baseColor.a, GENELIT_ACCESS_PROP(_AlphaAffectTransmission));
             #if defined(REFRACTION_TYPE_THIN)
                 material.microThickness = GENELIT_ACCESS_PROP(_MicroThickness);
             #endif
@@ -229,6 +230,7 @@
 
         material.skyboxFog = GENELIT_ACCESS_PROP(_SkyboxFog);
         material.directionalLightEstimation = GENELIT_ACCESS_PROP(_DirectionalLightEstimation);
+        material.vertexLightRangeMultiplier = GENELIT_ACCESS_PROP(_VertexLightRangeMultiplier);
 
         GENELIT_INIT_CUSTOM_MATERIAL(material)
     }
@@ -253,9 +255,7 @@
         #endif
 
         #if defined(_CLEAR_COAT)
-            #if defined(_CLEAR_COAT_NORMAL)
-                shadingData.clearCoatNormal = normalize(mul(shadingData.tangentToWorld, material.clearCoatNormal));
-            #endif
+            shadingData.clearCoatNormal = normalize(mul(shadingData.tangentToWorld, material.clearCoatNormal));
         #endif
 
         #if defined(LIGHTMAP_ON)
@@ -266,6 +266,13 @@
         #endif
 
         shadingData.useDirectionalLightEstimation = material.directionalLightEstimation;
+    }
+
+    float3 calculateCorrectedNormal(in float3 n, in float3 v)
+    {
+        float3 c = cross(v, cross(n, v));
+        c += n * !dot(c, c);
+        return lerp(n, normalize(c), dot(n, v) > 0.0);
     }
 
     v2f vertForward(appdata_full v)
@@ -282,16 +289,15 @@
         o.uv = TexCoords(v);
         float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
         float3 worldNormal = UnityObjectToWorldNormal(v.normal);
-        float3 viewDir = worldPos - _WorldSpaceCameraPos;
-        float3 correctedNormal = cross(viewDir, cross(worldNormal, viewDir));
-        correctedNormal += worldNormal * !dot(correctedNormal, correctedNormal);
-        worldNormal = lerp(worldNormal, normalize(correctedNormal), dot(worldNormal, viewDir) > 0.0);
+        float3 viewDir = normalize(worldPos - _WorldSpaceCameraPos);
+        float3 inverseWorldNormal = calculateCorrectedNormal(-worldNormal, viewDir);
+        float3 correctedWorldNormal = calculateCorrectedNormal(worldNormal, viewDir);
         fixed3 worldTangent = UnityObjectToWorldDir(v.tangent.xyz);
         fixed tangentSign = v.tangent.w * unity_WorldTransformParams.w;
-        fixed3 worldBinormal = cross(worldNormal, worldTangent) * tangentSign;
-        o.tSpace0 = float4(worldTangent.x, worldBinormal.x, worldNormal.x, worldPos.x);
-        o.tSpace1 = float4(worldTangent.y, worldBinormal.y, worldNormal.y, worldPos.y);
-        o.tSpace2 = float4(worldTangent.z, worldBinormal.z, worldNormal.z, worldPos.z);
+        worldTangent *= tangentSign + 2;
+        o.tSpace0 = float4(worldTangent.x, inverseWorldNormal.x, correctedWorldNormal.x, worldPos.x);
+        o.tSpace1 = float4(worldTangent.y, inverseWorldNormal.y, correctedWorldNormal.y, worldPos.y);
+        o.tSpace2 = float4(worldTangent.z, inverseWorldNormal.z, correctedWorldNormal.z, worldPos.z);
         o.color = v.color;
         o.ambientOrLightmapUV = VertexGIForward(v, worldPos, worldNormal);
         UNITY_TRANSFER_LIGHTING(o, v.texcoord1);
@@ -313,8 +319,7 @@
         // Initialize the inputs to sensible default values, see material_inputs.fs
         MaterialInputs inputs;
         UNITY_INITIALIZE_OUTPUT(MaterialInputs, inputs);
-        inputs.baseColor = IN.color;
-        initMaterial(shadingData, inputs);
+        initMaterial(shadingData, inputs, IN.color);
         prepareMaterial(inputs, shadingData);
 
         fragColor = evaluateMaterial(inputs, shadingData);

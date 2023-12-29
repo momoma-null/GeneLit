@@ -32,7 +32,7 @@
         [ToggleUI] _AlbedoAffectEmissive ("Albedo Affect Emissive", Float) = 0.0
 
         [IfDef(_ANISOTROPY)][SingleLine] _Anisotropy ("Anisotropy", Range(-1, 1)) = 0.5
-        [SingleLine(_Anisotropy, _ANISOTROPY)][Normal] _TangentMap ("Anisotropy", 2D) = "bump" {}
+        [SingleLine(_Anisotropy, _ANISOTROPY)] _TangentMap ("Anisotropy", 2D) = "red" {}
 
         [ShurikenHeader(Detail Inputs)]
         [SingleLineScaleOffset(,_DETAIL_MAP)] _DetailMap ("Detail Map", 2D) = "grey" {}
@@ -54,14 +54,17 @@
         [IfDef(REFRACTION_TYPE_THIN)] _MicroThickness ("MicroThickness", Float) = 0.01
         [IfNDef(REFRACTION_TYPE_NONE)] _TransmittanceColor ("Transmittance Color", Color) = (0, 0, 0, 1)
         [IfNDef(REFRACTION_TYPE_NONE)] _Transmission ("Transmission", Range(0,1)) = 0.0
+        [IfNDef(REFRACTION_TYPE_NONE)][ToggleUI] _AlphaAffectTransmission ("Alpha Affect Transmission", Float) = 0.0
 
         [ShurikenHeader(Experimental)]
         [Toggle(CAPSULE_AO)] _Capsule_AO ("Capsule AO", float) = 0.0
         [IfDef(CAPSULE_AO)] _Capsule_AOStrength ("Capsule AO Strength", Range(0, 1)) = 0.8
         [IfDef(CAPSULE_AO)] _Capsule_ShadowStrength ("Capsule Shadow Strength", Range(0, 1)) = 0.5
-        [KeywordEnum(Cube, Cylinder)] Reflection_Space ("Reflection Space", Float) = 0.0
+        [KeywordEnum(Cube, Cylinder, Additional_Box)] Reflection_Space ("Reflection Space", Float) = 0.0
         [IntRange] _SkyboxFog ("Skybox Fog", Range(0, 7)) = 0.0
         [ToggleUI] _DirectionalLightEstimation ("Directional Light Estimation", Float) = 1.0
+        [Toggle(VERTEX_LIGHT_AS_PIXEL_LIGHT)] _VertexLightAsPixelLight ("Use Vertex Light As Pixel Light", float) = 0.0
+        _VertexLightRangeMultiplier ("Vertex Light Range Multiplier", Range(0.01, 25)) = 1.0
 
         [HideInInspector][NonModifiableTextureData] _DFG ("_DFG", 2D) = "black" {}
 
@@ -112,7 +115,8 @@
             #pragma shader_feature_local _DETAIL_MAP
             #pragma shader_feature_local CAPSULE_AO
             #pragma shader_feature_local REFRACTION_TYPE_NONE REFRACTION_TYPE_SOLID REFRACTION_TYPE_THIN
-            #pragma shader_feature_local REFLECTION_SPACE_CUBE REFLECTION_SPACE_CYLINDER
+            #pragma shader_feature_local REFLECTION_SPACE_CUBE REFLECTION_SPACE_CYLINDER REFLECTION_SPACE_ADDITIONAL_BOX
+            #pragma shader_feature_local VERTEX_LIGHT_AS_PIXEL_LIGHT
 
             #include "Include/GeneLit_Core.cginc"
             ENDCG

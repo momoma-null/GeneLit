@@ -169,8 +169,9 @@
             float3 direction = material.anisotropyDirection;
             direction.z = 0;
             pixel.anisotropy = material.anisotropy;
-            pixel.anisotropicT = normalize(mul(shadingData.tangentToWorld, direction));
-            pixel.anisotropicB = normalize(cross(shadingData.geometricNormal, pixel.anisotropicT));
+            float3 tempT = mul(shadingData.tangentToWorld, direction);
+            pixel.anisotropicB = normalize(cross(shadingData.normal, tempT));
+            pixel.anisotropicT = normalize(cross(pixel.anisotropicB, shadingData.normal));
         #endif
     }
 
@@ -219,12 +220,13 @@
         // until the very end but it costs more ALUs on mobile. The gains are
         // currently not worth the extra operations
         float3 color = 0.0;
-        float visibility = shadingData.atten;
+        float visibility = 1.0;
         FilamentLight light;
         UNITY_INITIALIZE_OUTPUT(FilamentLight, light)
         #if UNITY_PASS_FORWARDBASE
             light = getDirectionalLight(shadingData);
             float occlusion = material.ambientOcclusion;
+            visibility *= shadingData.atten;
 
             #if defined(CAPSULE_AO)
                 float capsuleAO, capsuleShadow;
@@ -246,6 +248,17 @@
             visibility *= computeHeightMapShadowing(shadingData, light);
         #endif
         color.rgb += surfaceShading(pixel, light, shadingData, visibility);
+
+        #if defined(UNITY_PASS_FORWARDBASE) && defined(VERTEX_LIGHT_AS_PIXEL_LIGHT)
+            FilamentLight lights[4];
+            float4 lightAttenSq = unity_4LightAtten0 / (material.vertexLightRangeMultiplier * material.vertexLightRangeMultiplier);
+            getVertexPunctualLights(shadingData, lightAttenSq, lights);
+            visibility = 1.0;
+            color.rgb += surfaceShading(pixel, lights[0], shadingData, visibility);
+            color.rgb += surfaceShading(pixel, lights[1], shadingData, visibility);
+            color.rgb += surfaceShading(pixel, lights[2], shadingData, visibility);
+            color.rgb += surfaceShading(pixel, lights[3], shadingData, visibility);
+        #endif
 
         return float4(color, computeDiffuseAlpha(material));
     }

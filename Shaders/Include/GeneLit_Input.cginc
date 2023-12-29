@@ -71,6 +71,7 @@
         UNITY_DEFINE_INSTANCED_PROP(half, _Thickness)
         UNITY_DEFINE_INSTANCED_PROP(half4, _TransmittanceColor)
         UNITY_DEFINE_INSTANCED_PROP(half, _Transmission)
+        UNITY_DEFINE_INSTANCED_PROP(fixed, _AlphaAffectTransmission)
         #if defined(REFRACTION_TYPE_THIN)
             UNITY_DEFINE_INSTANCED_PROP(half, _MicroThickness)
         #endif
@@ -87,6 +88,7 @@
     #endif
     UNITY_DEFINE_INSTANCED_PROP(fixed, _SkyboxFog)
     UNITY_DEFINE_INSTANCED_PROP(fixed, _DirectionalLightEstimation)
+    UNITY_DEFINE_INSTANCED_PROP(float, _VertexLightRangeMultiplier)
     #ifdef GENELIT_CUSTOM_INSTANCED_PROP
         GENELIT_CUSTOM_INSTANCED_PROP
     #endif
@@ -138,9 +140,7 @@
         #if defined(_CLEAR_COAT)
             float clearCoat;
             float clearCoatRoughness;
-            #if defined(_CLEAR_COAT_NORMAL)
-                float3 clearCoatNormal;
-            #endif
+            float3 clearCoatNormal;
         #endif
 
         #if defined(USE_REFRACTION)
@@ -159,6 +159,7 @@
 
         uint skyboxFog;
         bool directionalLightEstimation;
+        float vertexLightRangeMultiplier;
 
         #ifdef GENELIT_CUSTOM_MATERIAL_INPUTS
             GENELIT_CUSTOM_MATERIAL_INPUTS

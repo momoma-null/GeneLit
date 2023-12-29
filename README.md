@@ -27,11 +27,12 @@ More beautiful and accurate rendering than Unity Standard shaders.
   - Refraction
     - Thin
     - Solid sphere
-    - Using Reflection Probe.
+    - Using Reflection Probe
+    - Main texture alpha channel is used as Transmission
   - Subsurface Model
-    - No Sheen and Refraction.
+    - No Sheen and Refraction
   - Cloth Model
-    - No Metallic, Reflectance, Sheen and Refraction.
+    - No Metallic, Reflectance, Sheen and Refraction
   - Directional Light
   - Additional Light
   - Micro Shadowing
@@ -46,6 +47,7 @@ More beautiful and accurate rendering than Unity Standard shaders.
   - Detail Map
     - Choice of UV0~UV3
   - Vertex Color
+    - Vertex Color Alpha is used as Detail Mask
   - Vertex Light
   - Ambient Light
   - Reflection Probe
@@ -59,7 +61,7 @@ More beautiful and accurate rendering than Unity Standard shaders.
   - GPU Instancing
 - Special Features
   - Parallax Map
-    - More accurate unique method by sampling twice.
+    - More accurate unique method by sampling twice
   - Light Source Estimation from Spherical Harmonics
   - Accurate Fog
   - Tri Planar Sampling
@@ -68,10 +70,11 @@ More beautiful and accurate rendering than Unity Standard shaders.
   - Tree Shader for "Tree It"
 - Experimental Features
   - Capsule AO / Capsule Shadow
-    - A dedicated script is required.
-  - Cylinder Projection of Reflection
+    - A dedicated script is required
+  - Cylinder Projection of Reflection / Additive box Projection of Reflection
     - Only if using box projection
   - Skybox Fog
+  - Using vertex light as pixel light
 
 # Map Channel
 Basically same as [Unity HDRP mapping](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@15.0/manual/Mask-Map-and-Detail-Map.html)

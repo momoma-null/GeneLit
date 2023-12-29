@@ -96,8 +96,71 @@
         return worldRefl;
     }
 
+    #if defined(REFLECTION_SPACE_ADDITIONAL_BOX)
+
+        #define ADDITIONAL_BOX_COUNT 4
+
+        float4 _UdonAdditionalBoxPosition[ADDITIONAL_BOX_COUNT];
+        float4 _UdonAdditionalBoxRotation[ADDITIONAL_BOX_COUNT];
+        float4 _UdonAdditionalBoxSize[ADDITIONAL_BOX_COUNT];
+
+        inline float4 mulQuaternion(float4 q1, float4 q2)
+        {
+            return float4(cross(q1.xyz, q2.xyz) + q2.w * q1.xyz + q1.w * q2.xyz, q1.w * q2.w - dot(q1.xyz, q2.xyz));
+        }
+
+        inline float3 mulQuaternion(float4 q, float3 v)
+        {
+            float4 iq = float4(-q.xyz, q.w);
+            return mulQuaternion(q, mulQuaternion(float4(v, 0), iq)).xyz;
+        }
+
+        inline float boxIntersect(float3 ro, float3 rd, float3 size, float3 pos, float4 rot)
+        {
+            rot = float4(-rot.xyz, rot.w);
+            ro = mulQuaternion(rot, ro - pos);
+            rd = mulQuaternion(rot, rd);
+            float3 m = 1.0 / rd;
+            float3 n = m * ro;
+            float3 k = abs(m) * size * 0.5;
+            float3 t1 = -n - k;
+            float3 t2 = -n + k;
+            float tN = max(max(t1.x, t1.y), t1.z);
+            float tF = min(min(t2.x, t2.y), t2.z);
+            return (tN > tF || tF < 0.0) ? 1e10 : tN;
+        }
+
+        inline float3 AdditionalBoxProjectedCubemapDirection(float3 worldRefl, float3 worldPos, float4 cubemapCenter, float4 boxMin, float4 boxMax)
+        {
+            UNITY_BRANCH
+            if (cubemapCenter.w > 0.0)
+            {
+                float3 nrdir = normalize(worldRefl);
+                float3 rbmax = (boxMax.xyz - worldPos) / nrdir;
+                float3 rbmin = (boxMin.xyz - worldPos) / nrdir;
+
+                float3 rbminmax = (nrdir > 0.0f) ? rbmax : rbmin;
+
+                float fa = min(min(rbminmax.x, rbminmax.y), rbminmax.z);
+
+                UNITY_UNROLL
+                for (uint i = 0; i < ADDITIONAL_BOX_COUNT; ++i)
+                {
+                    float tN = boxIntersect(worldPos, nrdir, _UdonAdditionalBoxSize[i].xyz, _UdonAdditionalBoxPosition[i].xyz, _UdonAdditionalBoxRotation[i]);
+                    fa = min(fa, tN);
+                }
+
+                worldPos -= cubemapCenter.xyz;
+                worldRefl = worldPos + nrdir * fa;
+            }
+            return worldRefl;
+        }
+    #endif
+
     #if defined(REFLECTION_SPACE_CYLINDER)
         #define GENELIT_PROJECTED_DIRECTION CylinderProjectedCubemapDirection
+    #elif defined(REFLECTION_SPACE_ADDITIONAL_BOX)
+        #define GENELIT_PROJECTED_DIRECTION AdditionalBoxProjectedCubemapDirection
     #else
         #define GENELIT_PROJECTED_DIRECTION BoxProjectedCubemapDirection
     #endif
@@ -223,7 +286,7 @@
     void evaluateClearCoatIBL(const PixelParams pixel, const ShadingData shadingData, float diffuseAO, inout float3 Fd, inout float3 Fr)
     {
         #if defined(_CLEAR_COAT)
-            #if defined(_CLEAR_COAT_NORMAL)
+            #if defined(_NORMALMAP) || defined(_CLEAR_COAT_NORMAL)
                 // We want to use the geometric normal for the clear coat layer
                 float clearCoatNoV = clampNoV(dot(shadingData.clearCoatNormal, shadingData.view));
                 float3 clearCoatR = reflect(-shadingData.view, shadingData.clearCoatNormal);
