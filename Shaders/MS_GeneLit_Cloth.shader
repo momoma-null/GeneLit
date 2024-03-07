@@ -23,6 +23,7 @@
 
         [IfDef(_PARALLAXMAP)][SingleLine] _Parallax ("Height Scale", Range (0.005, 0.08)) = 0.02
         [IfNDef(_TILEMODE_NO_TILE)][SingleLine(_Parallax, _PARALLAXMAP)] _ParallaxMap ("Height Map", 2D) = "white" {}
+        [IfDef(_PARALLAXMAP)][Toggle(_PARALLAX_OCCLUSION)] _UseParallaxOcclusion ("Use Parallax Occlusion ( ! Slow ! )", Float) = 0
 
         [SingleLine][HDR] _EmissionColor ("Emission Color", Color) = (0,0,0,1)
         [Emission]
@@ -103,7 +104,7 @@
             #pragma shader_feature_local _MASKMAP
             #pragma shader_feature_local _NORMALMAP
             #pragma shader_feature_local _BENTNORMALMAP
-            #pragma shader_feature_local _PARALLAXMAP
+            #pragma shader_feature_local _PARALLAX_OCCLUSION _PARALLAXMAP
             #pragma shader_feature_local _DETAIL_MAP
             #pragma shader_feature_local CUSTOM_SHEEN
             #pragma shader_feature_local CAPSULE_AO
