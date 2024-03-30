@@ -30,7 +30,7 @@
     material.subsurfaceColor = GENELIT_ACCESS_PROP(_ClothSubsurfaceColor).rgb;
 
     #define GENELIT_EVALUATE_CUSTOM_INDIRECT(pixel, shadingData, irradiance, Fd, Fr) \
-    Fd *= Fd_Wrap(shadingData.NoV, 0.5) * saturate(pixel.subsurfaceColor + shadingData.NoV);
+    Fd *= (Fd_Wrap(shadingData.NoV, 0.5) - shadingData.NoV + 1.0) * saturate(pixel.subsurfaceColor + shadingData.NoV);
 
     #include "GeneLit_Input.cginc"
     #include "GeneLit_LightingCommon.cginc"
