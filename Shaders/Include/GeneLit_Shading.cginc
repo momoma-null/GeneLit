@@ -30,8 +30,6 @@
             return applyAlphaMask(material.baseColor.a, material.maskThreshold);
         #elif defined(_ALPHABLEND_ON) || defined(_ALPHAPREMULTIPLY_ON)
             return material.baseColor.a;
-        #elif defined(USE_REFRACTION)
-            return 1.0 - material.transmission * saturate(Luminance(material.absorption));
         #else
             return 1.0;
         #endif
