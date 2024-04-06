@@ -10,7 +10,11 @@
     #define SPECULAR_AO_SIMPLE          1
     #define SPECULAR_AO_BENT_NORMALS    2
 
-    #define SPECULAR_AMBIENT_OCCLUSION SPECULAR_AO_SIMPLE
+    #if defined(_BENTNORMALMAP)
+        #define SPECULAR_AMBIENT_OCCLUSION SPECULAR_AO_BENT_NORMALS
+    #else
+        #define SPECULAR_AMBIENT_OCCLUSION SPECULAR_AO_SIMPLE
+    #endif
     #define MULTI_BOUNCE_AMBIENT_OCCLUSION 1
 
     //------------------------------------------------------------------------------
