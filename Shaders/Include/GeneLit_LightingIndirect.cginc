@@ -428,18 +428,6 @@
         Fr = E * prefilteredRadiance(r, pixel.perceptualRoughness, shadingData.position);
 
         float diffuseAO = occlusion;
-
-        #if defined(_BENTNORMALMAP)
-            float specAO = specularAO(shadingData.NoV, diffuseAO, pixel.roughness, shadingData.bentNormal, shadingData.reflected);
-        #else
-            float specAO = specularAO(shadingData.NoV, diffuseAO, pixel.roughness, shadingData.normal, shadingData.reflected);
-        #endif
-
-        Fr *= singleBounceAO(specAO) * pixel.energyCompensation;
-
-        // diffuse layer
-        float diffuseBRDF = singleBounceAO(diffuseAO); // Fd_Lambert() is baked in the SH below
-
         #if defined(_BENTNORMALMAP)
             float3 diffuseNormal = shadingData.bentNormal;
         #else
@@ -447,6 +435,15 @@
         #endif
 
         float3 irradiance = diffuseIrradiance(diffuseNormal, shadingData);
+
+        float specAO = diffuseAO * LerpOneTo(saturate(Luminance(irradiance) * PI), shadingData.specularAO);
+        specAO = specularAO(shadingData.NoV, specAO, pixel.roughness, diffuseNormal, shadingData.reflected);
+
+        Fr *= singleBounceAO(specAO) * pixel.energyCompensation;
+
+        // diffuse layer
+        float diffuseBRDF = singleBounceAO(diffuseAO); // Fd_Lambert() is baked in the SH below
+
         irradiance *= (pixel.pseudoAmbient * 0.5 + 0.5);
         float3 Fd = pixel.diffuseColor * irradiance * saturate(1.0 - E) * diffuseBRDF;
 

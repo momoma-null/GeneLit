@@ -89,6 +89,7 @@
     UNITY_DEFINE_INSTANCED_PROP(fixed, _SkyboxFog)
     UNITY_DEFINE_INSTANCED_PROP(fixed, _DirectionalLightEstimation)
     UNITY_DEFINE_INSTANCED_PROP(float, _VertexLightRangeMultiplier)
+    UNITY_DEFINE_INSTANCED_PROP(fixed, _SpecularAO)
     #ifdef GENELIT_CUSTOM_INSTANCED_PROP
         GENELIT_CUSTOM_INSTANCED_PROP
     #endif
@@ -160,6 +161,7 @@
         uint skyboxFog;
         bool directionalLightEstimation;
         float vertexLightRangeMultiplier;
+        float specularAO;
 
         #ifdef GENELIT_CUSTOM_MATERIAL_INPUTS
             GENELIT_CUSTOM_MATERIAL_INPUTS

@@ -59,6 +59,7 @@
         [ToggleUI] _DirectionalLightEstimation ("Directional Light Estimation", Float) = 1.0
         [Toggle(VERTEX_LIGHT_AS_PIXEL_LIGHT)] _VertexLightAsPixelLight ("Use Vertex Light As Pixel Light", float) = 0.0
         _VertexLightRangeMultiplier ("Vertex Light Range Multiplier", Range(0.01, 25)) = 1.0
+        _SpecularAO ("Specular AO", Range(0, 1)) = 0.8
 
         [HideInInspector][NonModifiableTextureData] _DFG ("_DFG", 2D) = "black" {}
 

@@ -234,6 +234,7 @@
         material.skyboxFog = GENELIT_ACCESS_PROP(_SkyboxFog);
         material.directionalLightEstimation = GENELIT_ACCESS_PROP(_DirectionalLightEstimation);
         material.vertexLightRangeMultiplier = GENELIT_ACCESS_PROP(_VertexLightRangeMultiplier);
+        material.specularAO = GENELIT_ACCESS_PROP(_SpecularAO);
 
         GENELIT_INIT_CUSTOM_MATERIAL(material)
     }
@@ -269,6 +270,7 @@
         #endif
 
         shadingData.useDirectionalLightEstimation = material.directionalLightEstimation;
+        shadingData.specularAO = material.specularAO;
     }
 
     float3 calculateCorrectedNormal(in float3 n, in float3 v)

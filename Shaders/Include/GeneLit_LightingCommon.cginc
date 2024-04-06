@@ -91,6 +91,7 @@
         #endif
 
         bool useDirectionalLightEstimation;
+        float specularAO;
     };
 
     float computeMicroShadowing(float NoL, float visibility)
