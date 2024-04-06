@@ -196,6 +196,7 @@
             #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
             #pragma shader_feature_local _MASKMAP
             #pragma shader_feature_local _PARALLAXMAP
+            #pragma shader_feature_local REFRACTION_TYPE_NONE REFRACTION_TYPE_SOLID REFRACTION_TYPE_THIN
 
             #include "Include/GeneLit_Shadow.cginc"
             ENDCG

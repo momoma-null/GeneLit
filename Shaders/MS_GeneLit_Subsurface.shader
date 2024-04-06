@@ -144,7 +144,27 @@
             ENDCG
         }
 
-        UsePass "MomomaShader/General/GeneLit/ShadowCaster"
+        Pass
+        {
+            Name "ShadowCaster"
+            Tags { "LightMode" = "ShadowCaster" }
+
+            Cull [_CullMode]
+
+            CGPROGRAM
+            #pragma target 3.5
+            #pragma vertex vertShadowCaster
+            #pragma fragment fragShadowCaster
+            #pragma multi_compile_shadowcaster
+            #pragma multi_compile_instancing
+            #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
+            #pragma shader_feature_local _MASKMAP
+            #pragma shader_feature_local _PARALLAXMAP
+
+            #include "Include/GeneLit_Shadow.cginc"
+            ENDCG
+        }
+
         UsePass "MomomaShader/General/GeneLit/META"
     }
 }

@@ -5,12 +5,12 @@
     #include "GeneLit_Input.cginc"
     #include "GeneLit_Shading.cginc"
 
-    #if (defined(_ALPHABLEND_ON) || defined(_ALPHAPREMULTIPLY_ON)) && defined(UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS)
+    #if (defined(_ALPHABLEND_ON) || defined(_ALPHAPREMULTIPLY_ON)) && defined(UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS) || defined(USE_REFRACTION)
         #define UNITY_STANDARD_USE_DITHER_MASK 1
     #endif
 
     // Need to output UVs in shadow caster, since we need to sample texture and do clip/dithering based on it
-    #if defined(_ALPHATEST_ON) || defined(_ALPHABLEND_ON) || defined(_ALPHAPREMULTIPLY_ON)
+    #if defined(_ALPHATEST_ON) || defined(_ALPHABLEND_ON) || defined(_ALPHAPREMULTIPLY_ON) || defined(USE_REFRACTION)
         #define USE_SHADOW_UVS 1
     #endif
 
@@ -88,10 +88,14 @@
             #if defined(_ALPHATEST_ON)
                 clip(alpha - GENELIT_ACCESS_PROP(_Cutoff));
             #endif
-            #if defined(_ALPHABLEND_ON) || defined(_ALPHAPREMULTIPLY_ON)
+            #if defined(_ALPHABLEND_ON) || defined(_ALPHAPREMULTIPLY_ON) || defined(USE_REFRACTION)
                 #if defined(_ALPHAPREMULTIPLY_ON)
                     half oneMinusReflectivity = ShadowGetOneMinusReflectivity(i.tex);
                     alpha = 1 - oneMinusReflectivity + alpha * oneMinusReflectivity;
+                #endif
+                #if defined(USE_REFRACTION)
+                    half transmission = GENELIT_ACCESS_PROP(_Transmission);
+                    alpha = 1 - transmission * lerp(1.0, 1.0 - alpha, GENELIT_ACCESS_PROP(_AlphaAffectTransmission));
                 #endif
                 #if defined(UNITY_STANDARD_USE_DITHER_MASK)
                     // Use dither mask for alpha blended shadows, based on pixel position xy

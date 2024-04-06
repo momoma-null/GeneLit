@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using UnityEditor;
+﻿using UnityEditor;
+using UnityEngine;
 
 namespace MomomaAssets.GeneLit
 {
@@ -39,7 +39,10 @@ namespace MomomaAssets.GeneLit
             switch (blendMode)
             {
                 case 0:
-                    material.SetOverrideTag("RenderType", "");
+                    if (material.IsKeywordEnabled("REFRACTION_TYPE_SOLID") || material.IsKeywordEnabled("REFRACTION_TYPE_THIN"))
+                        material.SetOverrideTag("RenderType", "Transparent");
+                    else
+                        material.SetOverrideTag("RenderType", "");
                     material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
                     material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
                     material.SetInt("_ZWrite", 1);
