@@ -8,23 +8,27 @@
     #define GENELIT_CUSTOM_INSTANCED_PROP \
     UNITY_DEFINE_INSTANCED_PROP(half, _SubsurfaceThickness)\
     UNITY_DEFINE_INSTANCED_PROP(half, _SubsurfacePower)\
-    UNITY_DEFINE_INSTANCED_PROP(half4, _SubsurfaceColor)
+    UNITY_DEFINE_INSTANCED_PROP(half4, _SubsurfaceColor)\
+    UNITY_DEFINE_INSTANCED_PROP(half, _SubsurfaceDistortion)
 
     #define GENELIT_CUSTOM_MATERIAL_INPUTS \
     float subsurfaceThickness;\
     float subsurfacePower;\
-    float3 subsurfaceColor;
+    float3 subsurfaceColor;\
+    float subsurfaceDistortion;
 
     #define GENELIT_CUSTOM_PIXEL_PARAMS \
     float subsurfaceThickness;\
     float subsurfacePower;\
-    float3 subsurfaceColor;
+    float3 subsurfaceColor;\
+    float subsurfaceDistortion;
 
     #define GENELIT_INIT_CUSTOM_MATERIAL(material) \
     GENELIT_SAMPLE_TEX2D_SAMPLER(_SubsurfaceThicknessMap, _MainTex, uv, subsurfaceThickness)\
     material.subsurfaceThickness = subsurfaceThickness.g * GENELIT_ACCESS_PROP(_SubsurfaceThickness);\
     material.subsurfacePower = GENELIT_ACCESS_PROP(_SubsurfacePower);\
-    material.subsurfaceColor = GENELIT_ACCESS_PROP(_SubsurfaceColor).rgb;
+    material.subsurfaceColor = GENELIT_ACCESS_PROP(_SubsurfaceColor).rgb;\
+    material.subsurfaceDistortion = GENELIT_ACCESS_PROP(_SubsurfaceDistortion);
 
     #define GENELIT_EVALUATE_CUSTOM_INDIRECT(pixel, shadingData, irradiance, Fd, Fr) \
     float3 viewDependent = prefilteredRadiance(-shadingData.view, pixel.roughness, 1.0 + pixel.subsurfaceThickness, shadingData.position);\
@@ -40,6 +44,7 @@
         pixel.subsurfaceThickness = saturate(material.subsurfaceThickness);
         pixel.subsurfacePower = material.subsurfacePower;
         pixel.subsurfaceColor = material.subsurfaceColor;
+        pixel.subsurfaceDistortion = material.subsurfaceDistortion;
     }
 
     /**
@@ -75,7 +80,8 @@
         // subsurface scattering
         // Use a spherical gaussian approximation of pow() for forwardScattering
         // We could include distortion by adding shading_normal * distortion to light.l
-        float scatterVoH = saturate(dot(shadingData.view, -light.l));
+        float3 distortionH = normalize(-light.l + shadingData.normal * pixel.subsurfaceDistortion);
+        float scatterVoH = saturate(dot(shadingData.view, distortionH));
         float forwardScatter = exp2(scatterVoH * pixel.subsurfacePower - pixel.subsurfacePower);
         float backScatter = saturate(NoL * pixel.subsurfaceThickness + (1.0 - pixel.subsurfaceThickness)) * 0.5;
         float subsurface = lerp(backScatter, 1.0, forwardScatter) * (1.0 - pixel.subsurfaceThickness);

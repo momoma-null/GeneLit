@@ -40,6 +40,7 @@
         [SingleLine] _SubsurfaceThickness ("Thickness", Range(0,1)) = 0.5
         _SubsurfacePower ("Subsurface Power", Float) = 12.234
         _SubsurfaceColor ("Subsurface Color", Color) = (1,1,1,1)
+        _SubsurfaceDistortion ("Distortion", Range(0, 1)) = 1.0
 
         [ShurikenHeader(Detail Inputs)]
         [SingleLineScaleOffset(,_DETAIL_MAP)] _DetailMap ("Detail Map", 2D) = "grey" {}
