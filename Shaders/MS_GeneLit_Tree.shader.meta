@@ -6,11 +6,11 @@ ShaderImporter:
   - _MainTex: {instanceID: 0}
   - _MaskMap: {instanceID: 0}
   - _BumpMap: {instanceID: 0}
+  - _BentNormalMap: {instanceID: 0}
   - _ParallaxMap: {instanceID: 0}
   - _EmissionMap: {instanceID: 0}
-  - _DetailAlbedoMap: {instanceID: 0}
-  - _DetailMaskMap: {instanceID: 0}
-  - _DetailNormalMap: {instanceID: 0}
+  - _TangentMap: {instanceID: 0}
+  - _DetailMap: {instanceID: 0}
   nonModifiableTextures:
   - _DFG: {fileID: 2800000, guid: 8d84e6f2d3db3bb428506d48e9c8f1cd, type: 3}
   userData: 
