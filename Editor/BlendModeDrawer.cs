@@ -21,6 +21,7 @@ namespace MomomaAssets.GeneLit
 
         public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
         {
+            MaterialEditor.BeginProperty(position, prop);
             EditorGUI.BeginChangeCheck();
             var newValue = EditorGUI.Popup(position, label, (int)prop.floatValue, s_options);
             if (EditorGUI.EndChangeCheck())
@@ -32,6 +33,7 @@ namespace MomomaAssets.GeneLit
                     SetupBlendMode(material, newValue);
                 }
             }
+            MaterialEditor.EndProperty();
         }
 
         static void SetupBlendMode(Material material, int blendMode)
