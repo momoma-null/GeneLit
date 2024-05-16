@@ -125,7 +125,10 @@
             float3 oNorm = UnityWorldToObjectDir(shadingData.geometricNormal);
             SAMPLE_TEX2D_TRIPLANAR(_MainTex, baseColor, oPos, oNorm)
         #else
-            #if defined(_PARALLAXMAP)
+            #if defined(_PARALLAX_OCCLUSION)
+                half3 oViewDir = normalize(mul(shadingData.view, shadingData.tangentToWorld));
+                uv  = ParallaxOffsetMulti(uv, oViewDir);
+            #elif defined(_PARALLAXMAP)
                 half3 oViewDir = normalize(mul(shadingData.view, shadingData.tangentToWorld));
                 uv = ParallaxOffset2Step(uv, oViewDir);
             #endif
@@ -231,6 +234,7 @@
         material.skyboxFog = GENELIT_ACCESS_PROP(_SkyboxFog);
         material.directionalLightEstimation = GENELIT_ACCESS_PROP(_DirectionalLightEstimation);
         material.vertexLightRangeMultiplier = GENELIT_ACCESS_PROP(_VertexLightRangeMultiplier);
+        material.specularAO = GENELIT_ACCESS_PROP(_SpecularAO);
 
         GENELIT_INIT_CUSTOM_MATERIAL(material)
     }
@@ -266,6 +270,7 @@
         #endif
 
         shadingData.useDirectionalLightEstimation = material.directionalLightEstimation;
+        shadingData.specularAO = material.specularAO;
     }
 
     float3 calculateCorrectedNormal(in float3 n, in float3 v)

@@ -120,6 +120,7 @@ namespace MomomaAssets.GeneLit
             {
                 var value = (int)prop.floatValue;
                 EditorGUI.showMixedValue = prop.hasMixedValue;
+                MaterialEditor.BeginProperty(position, prop);
                 EditorGUI.BeginChangeCheck();
                 GUI.Box(position, GUIContent.none, ShurikenHeaderDecorator.Styles.HeaderStyle);
                 position.xMin += 4f;
@@ -130,6 +131,7 @@ namespace MomomaAssets.GeneLit
                     editor.RegisterPropertyChangeUndo("Material Keyword");
                     SetKeyword(prop, value);
                 }
+                MaterialEditor.EndProperty();
             }
             finally
             {

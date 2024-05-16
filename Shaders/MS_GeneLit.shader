@@ -25,6 +25,7 @@
 
         [IfDef(_PARALLAXMAP)][SingleLine] _Parallax ("Height Scale", Range (0.005, 0.08)) = 0.02
         [IfNDef(_TILEMODE_NO_TILE)][SingleLine(_Parallax, _PARALLAXMAP)] _ParallaxMap ("Height Map", 2D) = "white" {}
+        [IfDef(_PARALLAXMAP)][Toggle(_PARALLAX_OCCLUSION)] _UseParallaxOcclusion ("Use Parallax Occlusion ( ! Slow ! )", Float) = 0
 
         [SingleLine][HDR] _EmissionColor ("Emission Color", Color) = (0,0,0,1)
         [Emission]
@@ -65,6 +66,7 @@
         [ToggleUI] _DirectionalLightEstimation ("Directional Light Estimation", Float) = 1.0
         [Toggle(VERTEX_LIGHT_AS_PIXEL_LIGHT)] _VertexLightAsPixelLight ("Use Vertex Light As Pixel Light", float) = 0.0
         _VertexLightRangeMultiplier ("Vertex Light Range Multiplier", Range(0.01, 25)) = 1.0
+        _SpecularAO ("Specular AO", Range(0, 1)) = 0.8
 
         [HideInInspector][NonModifiableTextureData] _DFG ("_DFG", 2D) = "black" {}
 
@@ -111,7 +113,7 @@
             #pragma shader_feature_local _MASKMAP
             #pragma shader_feature_local _NORMALMAP
             #pragma shader_feature_local _BENTNORMALMAP
-            #pragma shader_feature_local _PARALLAXMAP
+            #pragma shader_feature_local _PARALLAX_OCCLUSION _PARALLAXMAP
             #pragma shader_feature_local _DETAIL_MAP
             #pragma shader_feature_local CAPSULE_AO
             #pragma shader_feature_local REFRACTION_TYPE_NONE REFRACTION_TYPE_SOLID REFRACTION_TYPE_THIN
@@ -169,6 +171,7 @@
             #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
             #pragma shader_feature_local _MASKMAP
             #pragma shader_feature_local _PARALLAXMAP
+            #pragma shader_feature_local REFRACTION_TYPE_NONE REFRACTION_TYPE_SOLID REFRACTION_TYPE_THIN
 
             #include "Include/GeneLit_Shadow.cginc"
             ENDCG

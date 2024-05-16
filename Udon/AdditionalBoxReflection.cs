@@ -1,4 +1,5 @@
 ﻿
+# if UDONSHARP
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
@@ -42,3 +43,4 @@ namespace MomomaAssets.Udon
         }
     }
 }
+#endif

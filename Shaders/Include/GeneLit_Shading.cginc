@@ -249,7 +249,7 @@
         #endif
         color.rgb += surfaceShading(pixel, light, shadingData, visibility);
 
-        #if defined(UNITY_PASS_FORWARDBASE) && defined(VERTEX_LIGHT_AS_PIXEL_LIGHT)
+        #if defined(UNITY_PASS_FORWARDBASE) && defined(VERTEX_LIGHT_AS_PIXEL_LIGHT) && !defined(LIGHTMAP_ON) && !defined(DYNAMICLIGHTMAP_ON)
             FilamentLight lights[4];
             float4 lightAttenSq = unity_4LightAtten0 / (material.vertexLightRangeMultiplier * material.vertexLightRangeMultiplier);
             getVertexPunctualLights(shadingData, lightAttenSq, lights);

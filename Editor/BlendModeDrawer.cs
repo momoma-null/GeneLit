@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using UnityEditor;
+﻿using UnityEditor;
+using UnityEngine;
 
 namespace MomomaAssets.GeneLit
 {
@@ -21,6 +21,7 @@ namespace MomomaAssets.GeneLit
 
         public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
         {
+            MaterialEditor.BeginProperty(position, prop);
             EditorGUI.BeginChangeCheck();
             var newValue = EditorGUI.Popup(position, label, (int)prop.floatValue, s_options);
             if (EditorGUI.EndChangeCheck())
@@ -32,6 +33,7 @@ namespace MomomaAssets.GeneLit
                     SetupBlendMode(material, newValue);
                 }
             }
+            MaterialEditor.EndProperty();
         }
 
         static void SetupBlendMode(Material material, int blendMode)
@@ -39,7 +41,10 @@ namespace MomomaAssets.GeneLit
             switch (blendMode)
             {
                 case 0:
-                    material.SetOverrideTag("RenderType", "");
+                    if (material.IsKeywordEnabled("REFRACTION_TYPE_SOLID") || material.IsKeywordEnabled("REFRACTION_TYPE_THIN"))
+                        material.SetOverrideTag("RenderType", "Transparent");
+                    else
+                        material.SetOverrideTag("RenderType", "");
                     material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
                     material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
                     material.SetInt("_ZWrite", 1);

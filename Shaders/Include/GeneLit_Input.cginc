@@ -25,7 +25,7 @@
     #if defined(_BENTNORMALMAP)
         UNITY_DECLARE_TEX2D_NOSAMPLER(_BentNormalMap);
     #endif
-    #if defined(_PARALLAXMAP)
+    #if defined(_PARALLAXMAP) || defined(_PARALLAX_OCCLUSION)
         UNITY_DECLARE_TEX2D_NOSAMPLER(_ParallaxMap);
     #endif
     UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissionMap);
@@ -40,7 +40,7 @@
     UNITY_INSTANCING_BUFFER_START(Props)
     UNITY_DEFINE_INSTANCED_PROP(half, _NoiseHeight)
     UNITY_DEFINE_INSTANCED_PROP(half, _VertexColorMode)
-    #if defined(_PARALLAXMAP)
+    #if defined(_PARALLAXMAP) || defined(_PARALLAX_OCCLUSION)
         UNITY_DEFINE_INSTANCED_PROP(half, _Parallax)
     #endif
     UNITY_DEFINE_INSTANCED_PROP(half4, _Color)
@@ -89,6 +89,7 @@
     UNITY_DEFINE_INSTANCED_PROP(fixed, _SkyboxFog)
     UNITY_DEFINE_INSTANCED_PROP(fixed, _DirectionalLightEstimation)
     UNITY_DEFINE_INSTANCED_PROP(float, _VertexLightRangeMultiplier)
+    UNITY_DEFINE_INSTANCED_PROP(fixed, _SpecularAO)
     #ifdef GENELIT_CUSTOM_INSTANCED_PROP
         GENELIT_CUSTOM_INSTANCED_PROP
     #endif
@@ -160,6 +161,7 @@
         uint skyboxFog;
         bool directionalLightEstimation;
         float vertexLightRangeMultiplier;
+        float specularAO;
 
         #ifdef GENELIT_CUSTOM_MATERIAL_INPUTS
             GENELIT_CUSTOM_MATERIAL_INPUTS
@@ -202,9 +204,41 @@
         }
     #endif
 
+    #if defined(_PARALLAX_OCCLUSION)
+        float4 parallaxCache;
+
+        float2 ParallaxOffsetMulti(float2 uv, half3 oViewDir)
+        {
+            const static uint RAY_STEP_COUNT = 16;
+            float maxHeight = GENELIT_ACCESS_PROP(_Parallax);
+            float2 uvShift = oViewDir.xy / (oViewDir.z + 0.001) * maxHeight;
+            float2 rayStep = uvShift / RAY_STEP_COUNT;
+            float2 rayUV = uv;
+            float height = 1.0 - UNITY_SAMPLE_TEX2D_SAMPLER(_ParallaxMap, _MainTex, rayUV).g;
+            float prevDiff = 1e-5;
+            float rayHeight = 0;
+            float rayHeightStep = 1.0 / RAY_STEP_COUNT;
+            UNITY_UNROLL
+            for (uint i = 0; i < RAY_STEP_COUNT && height > rayHeight; ++i)
+            {
+                rayUV -= rayStep;
+                prevDiff = height - rayHeight;
+                height = 1.0 - UNITY_SAMPLE_TEX2D_SAMPLER(_ParallaxMap, _MainTex, rayUV).g;
+                rayHeight += rayHeightStep;
+            }
+            float currentDiff = rayHeight - height;
+            float ratio = currentDiff / (currentDiff + prevDiff);
+            rayUV += rayStep * ratio;
+            height = rayHeight - rayHeightStep * ratio;
+
+            parallaxCache = float4(height, maxHeight, uvShift);
+            return rayUV;
+        }
+    #endif
+
     float computeHeightMapShadowing(const ShadingData shadingData, const FilamentLight light)
     {
-        #if defined(_PARALLAXMAP)
+        #if defined(_PARALLAXMAP) || defined(_PARALLAX_OCCLUSION)
             float h1 = parallaxCache.x;
             float3 oLitDir = normalize(mul(light.l, shadingData.tangentToWorld));
             float2 uvShift = oLitDir.xy / (oLitDir.z + 0.1) * parallaxCache.y * h1;

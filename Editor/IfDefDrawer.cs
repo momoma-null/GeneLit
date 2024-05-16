@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using UnityEngine;
+﻿
+using System;
 using UnityEditor;
+using UnityEngine;
 
 namespace MomomaAssets.GeneLit
 {
@@ -61,8 +60,6 @@ namespace MomomaAssets.GeneLit
 
     sealed class IfNDefDecorator : MaterialPropertyDrawer
     {
-        static readonly float s_helpBoxHeight = EditorStyles.helpBox.CalcHeight(GUIContent.none, 0f);
-
         readonly string _keyword;
 
         public IfNDefDecorator(string keyword)
