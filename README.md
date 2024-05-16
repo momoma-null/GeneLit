@@ -62,6 +62,7 @@ More beautiful and accurate rendering than Unity Standard shaders.
 - Special Features
   - Parallax Map
     - More accurate unique method by sampling twice
+    - or Parallax Occlusion mode
   - Light Source Estimation from Spherical Harmonics
   - Accurate Fog
   - Tri Planar Sampling
@@ -75,6 +76,7 @@ More beautiful and accurate rendering than Unity Standard shaders.
     - Only if using box projection
   - Skybox Fog
   - Using vertex light as pixel light
+  - Specular AO
 
 # Map Channel
 Basically same as [Unity HDRP mapping](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@15.0/manual/Mask-Map-and-Detail-Map.html)
