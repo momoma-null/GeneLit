@@ -15,7 +15,7 @@ namespace MomomaAssets.GeneLit
         {
             foreach (Material mat in prop.targets)
             {
-                SetupBlendMode(mat, mat.GetInt(prop.name));
+                SetupBlendMode(mat, mat.GetInt(prop.name), false);
             }
         }
 
@@ -30,14 +30,15 @@ namespace MomomaAssets.GeneLit
                 prop.floatValue = newValue;
                 foreach (Material material in prop.targets)
                 {
-                    SetupBlendMode(material, newValue);
+                    SetupBlendMode(material, newValue, true);
                 }
             }
             MaterialEditor.EndProperty();
         }
 
-        static void SetupBlendMode(Material material, int blendMode)
+        static void SetupBlendMode(Material material, int blendMode, bool overrideRenderQueue)
         {
+            var renderQueue = -1;
             switch (blendMode)
             {
                 case 0:
@@ -52,7 +53,7 @@ namespace MomomaAssets.GeneLit
                     material.DisableKeyword("_ALPHATEST_ON");
                     material.DisableKeyword("_ALPHABLEND_ON");
                     material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-                    material.renderQueue = -1;
+                    renderQueue = -1;
                     break;
                 case 1:
                     material.SetOverrideTag("RenderType", "TransparentCutout");
@@ -63,7 +64,7 @@ namespace MomomaAssets.GeneLit
                     material.EnableKeyword("_ALPHATEST_ON");
                     material.DisableKeyword("_ALPHABLEND_ON");
                     material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-                    material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.AlphaTest;
+                    renderQueue = (int)UnityEngine.Rendering.RenderQueue.AlphaTest;
                     break;
                 case 2:
                     material.SetOverrideTag("RenderType", "Transparent");
@@ -74,7 +75,7 @@ namespace MomomaAssets.GeneLit
                     material.DisableKeyword("_ALPHATEST_ON");
                     material.EnableKeyword("_ALPHABLEND_ON");
                     material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-                    material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+                    renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
                     break;
                 case 3:
                     material.SetOverrideTag("RenderType", "Transparent");
@@ -85,8 +86,12 @@ namespace MomomaAssets.GeneLit
                     material.DisableKeyword("_ALPHATEST_ON");
                     material.DisableKeyword("_ALPHABLEND_ON");
                     material.EnableKeyword("_ALPHAPREMULTIPLY_ON");
-                    material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+                    renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
                     break;
+            }
+            if (overrideRenderQueue)
+            {
+                material.renderQueue = renderQueue;
             }
         }
     }
