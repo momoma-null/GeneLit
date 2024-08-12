@@ -58,7 +58,7 @@ namespace MomomaAssets.Udon
                     footPos = player.GetPosition();
                 var headPos = player.GetBonePosition(HumanBodyBones.Head);
                 if (headPos.Equals(Vector3.zero))
-                    headPos = player.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position;
+                    headPos = footPos + Vector3.up * player.GetAvatarEyeHeightAsMeters();
                 topAndRadius[i] = headPos * 0.75f + footPos * 0.25f;
                 topAndRadius[i].w = (headPos - footPos).magnitude * 0.25f;
                 bottom[i] = headPos * 0.25f + footPos * 0.75f;
