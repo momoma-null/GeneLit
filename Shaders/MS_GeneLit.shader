@@ -6,6 +6,7 @@
         [BlendMode] _Mode ("Blend Mode", Float) = 0.0
         [Enum(UnityEngine.Rendering.CullMode)] _CullMode ("Cull Mode", Float) = 2.0
         [IfDef(_ALPHATEST_ON)] _Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
+        [Decal] _Offset ("Decal Mode", Float) = 0
 
         [ShurikenHeader(Surface Inputs)]
         [KeywordEnum(Normal_Tile, No_Tile, TriPlanar)] _TileMode ("Tile Mode", Float) = 0
@@ -80,6 +81,7 @@
         Tags { "RenderType"="Opaque" }
 
         AlphaToMask [_AlphaToMask]
+        Offset [_Offset], [_Offset]
 
         CGINCLUDE
         #define FILAMENT_QUALITY FILAMENT_QUALITY_HIGH
