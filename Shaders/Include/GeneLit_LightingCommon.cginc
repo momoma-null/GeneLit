@@ -83,6 +83,7 @@
         float2 normalizedViewportCoord;
         float atten;
         half3 ambient;
+        bool vertexLightOn;
         half4 lightmapUV;
         UVCoord uv;
 

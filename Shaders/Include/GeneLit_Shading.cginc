@@ -250,14 +250,18 @@
         color.rgb += surfaceShading(pixel, light, shadingData, visibility);
 
         #if defined(UNITY_PASS_FORWARDBASE) && defined(VERTEX_LIGHT_AS_PIXEL_LIGHT) && !defined(LIGHTMAP_ON) && !defined(DYNAMICLIGHTMAP_ON)
-            FilamentLight lights[4];
-            float4 lightAttenSq = unity_4LightAtten0 / (material.vertexLightRangeMultiplier * material.vertexLightRangeMultiplier);
-            getVertexPunctualLights(shadingData, lightAttenSq, lights);
-            visibility = 1.0;
-            color.rgb += surfaceShading(pixel, lights[0], shadingData, visibility);
-            color.rgb += surfaceShading(pixel, lights[1], shadingData, visibility);
-            color.rgb += surfaceShading(pixel, lights[2], shadingData, visibility);
-            color.rgb += surfaceShading(pixel, lights[3], shadingData, visibility);
+            UNITY_BRANCH
+            if (shadingData.vertexLightOn)
+            {
+                FilamentLight lights[4];
+                float4 lightAttenSq = unity_4LightAtten0 / (material.vertexLightRangeMultiplier * material.vertexLightRangeMultiplier);
+                getVertexPunctualLights(shadingData, lightAttenSq, lights);
+                visibility = 1.0;
+                color.rgb += surfaceShading(pixel, lights[0], shadingData, visibility);
+                color.rgb += surfaceShading(pixel, lights[1], shadingData, visibility);
+                color.rgb += surfaceShading(pixel, lights[2], shadingData, visibility);
+                color.rgb += surfaceShading(pixel, lights[3], shadingData, visibility);
+            }
         #endif
 
         return float4(color, computeDiffuseAlpha(material));

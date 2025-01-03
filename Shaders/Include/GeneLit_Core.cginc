@@ -30,13 +30,15 @@
             #ifdef LIGHTMAP_ON
                 ambientOrLightmapUV.xy = v.texcoord1.xy * unity_LightmapST.xy + unity_LightmapST.zw;
             #elif UNITY_SHOULD_SAMPLE_SH
-                #if defined (VERTEXLIGHT_ON) && !defined(VERTEX_LIGHT_AS_PIXEL_LIGHT)
+                #if defined(VERTEXLIGHT_ON) && !defined(VERTEX_LIGHT_AS_PIXEL_LIGHT)
                     float range = GENELIT_ACCESS_PROP(_VertexLightRangeMultiplier);
                     float4 atten = unity_4LightAtten0 / (range * range);
                     ambientOrLightmapUV.rgb = Shade4PointLights(
                     unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
                     unity_LightColor[0].rgb, unity_LightColor[1].rgb, unity_LightColor[2].rgb, unity_LightColor[3].rgb,
                     atten, posWorld, normalWorld);
+                #elif defined(VERTEXLIGHT_ON)
+                    ambientOrLightmapUV.a = 1;
                 #endif
 
                 ambientOrLightmapUV.rgb = ShadeSHPerVertex(normalWorld, ambientOrLightmapUV.rgb);
@@ -92,15 +94,18 @@
         #if defined(LIGHTMAP_ON)
             half4 bakedColorTex = UNITY_SAMPLE_TEX2D(unity_Lightmap, IN.ambientOrLightmapUV.xy);
             shadingData.ambient = DecodeLightmap(bakedColorTex);
+            shadingData.vertexLightOn = 0;
             shadingData.lightmapUV = IN.ambientOrLightmapUV;
             #if defined(DIRLIGHTMAP_COMBINED)
                 shadingData.bakedDir = UNITY_SAMPLE_TEX2D_SAMPLER(unity_LightmapInd, unity_Lightmap, IN.ambientOrLightmapUV.xy);
             #endif
         #elif defined(DYNAMICLIGHTMAP_ON)
             shadingData.ambient = 0;
+            shadingData.vertexLightOn = 0;
             shadingData.lightmapUV = IN.ambientOrLightmapUV;
         #else
             shadingData.ambient = IN.ambientOrLightmapUV.rgb;
+            shadingData.vertexLightOn = IN.ambientOrLightmapUV.a;
             shadingData.lightmapUV = 0;
         #endif
 
