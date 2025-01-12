@@ -73,6 +73,7 @@
         [Toggle(VERTEX_LIGHT_AS_PIXEL_LIGHT)] _VertexLightAsPixelLight ("Use Vertex Light As Pixel Light", float) = 0.0
         _VertexLightRangeMultiplier ("Vertex Light Range Multiplier", Range(0.01, 25)) = 1.0
         _SpecularAO ("Specular AO", Range(0, 1)) = 0.8
+        [Toggle(LTCGI)] _LTCGI("LTCGI", Int) = 0
 
         [HideInInspector][NonModifiableTextureData] _DFG ("_DFG", 2D) = "black" {}
 
@@ -119,7 +120,7 @@
         Pass
         {
             Name "FORWARD"
-            Tags { "LightMode"="ForwardBase" }
+            Tags { "LightMode"="ForwardBase" "LTCGI" = "_LTCGI" }
 
             Cull [_CullMode]
             Blend [_SrcBlend] [_DstBlend]
@@ -146,6 +147,7 @@
             #pragma shader_feature_local REFRACTION_TYPE_NONE REFRACTION_TYPE_SOLID REFRACTION_TYPE_THIN
             #pragma shader_feature_local REFLECTION_SPACE_CUBE REFLECTION_SPACE_CYLINDER REFLECTION_SPACE_ADDITIONAL_BOX
             #pragma shader_feature_local VERTEX_LIGHT_AS_PIXEL_LIGHT
+            #pragma shader_feature_local_fragment LTCGI
 
             #include "Include/GeneLit_Core.cginc"
             ENDCG

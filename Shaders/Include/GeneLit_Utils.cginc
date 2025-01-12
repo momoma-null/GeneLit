@@ -21,7 +21,7 @@
         #define saturateMediump(x) x
     #endif
 
-    #define atan2(x, y)        atan(y, x)
+    // #define atan2(x, y)        atan(y, x)
 
     //------------------------------------------------------------------------------
     // Scalar operations
