@@ -140,7 +140,7 @@
             #pragma shader_feature_local _TILEMODE_NORMAL_TILE _TILEMODE_NO_TILE _TILEMODE_TRIPLANAR
             #pragma shader_feature_local _MASKMAP
             #pragma shader_feature_local _NORMALMAP
-            #pragma shader_feature_local _PARALLAXMAP
+            #pragma shader_feature_local _ _PARALLAX_OCCLUSION _PARALLAXMAP
             #pragma shader_feature_local _DETAIL_MAP
 
             #include "Include/GeneLit_Core.cginc"
