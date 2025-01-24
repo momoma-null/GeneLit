@@ -43,7 +43,10 @@ More beautiful and accurate rendering than Unity Standard shaders.
       - Alpha to coverage
     - Transparent
     - Fade
+    - Additive
+    - Multiply
   - Culling Mode
+  - Decal Mode
   - Detail Map
     - Choice of UV0~UV3
   - Vertex Color
@@ -77,6 +80,7 @@ More beautiful and accurate rendering than Unity Standard shaders.
   - Skybox Fog
   - Using vertex light as pixel light
   - Specular AO
+  - Support for LTCGI
 
 # Map Channel
 Basically same as [Unity HDRP mapping](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@15.0/manual/Mask-Map-and-Detail-Map.html)
