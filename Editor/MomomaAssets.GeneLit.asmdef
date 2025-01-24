@@ -1,5 +1,6 @@
 {
     "name": "MomomaAssets.GeneLit",
+    "rootNamespace": "MomomaAssets.GeneLit",
     "references": [],
     "includePlatforms": [
         "Editor"

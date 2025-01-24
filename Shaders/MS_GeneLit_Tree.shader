@@ -6,6 +6,7 @@
         [BlendMode] _Mode ("Blend Mode", Float) = 0.0
         [Enum(UnityEngine.Rendering.CullMode)] _CullMode ("Cull Mode", Float) = 2.0
         [IfDef(_ALPHATEST_ON)] _Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
+        [Decal] _Offset ("Decal Mode", Float) = 0
 
         [ShurikenHeader(Surface Inputs)]
         [KeywordEnum(Normal_Tile, No_Tile, TriPlanar)] _TileMode ("Tile Mode", Float) = 0
@@ -72,6 +73,7 @@
         [Toggle(VERTEX_LIGHT_AS_PIXEL_LIGHT)] _VertexLightAsPixelLight ("Use Vertex Light As Pixel Light", float) = 0.0
         _VertexLightRangeMultiplier ("Vertex Light Range Multiplier", Range(0.01, 25)) = 1.0
         _SpecularAO ("Specular AO", Range(0, 1)) = 0.8
+        [Toggle(LTCGI)] _LTCGI("LTCGI", Int) = 0
 
         [HideInInspector][NonModifiableTextureData] _DFG ("_DFG", 2D) = "black" {}
 
@@ -85,6 +87,7 @@
         Tags { "RenderType"="Opaque" }
 
         AlphaToMask [_AlphaToMask]
+        Offset [_Offset], [_Offset]
 
         CGINCLUDE
         #define FILAMENT_QUALITY FILAMENT_QUALITY_HIGH
@@ -117,7 +120,7 @@
         Pass
         {
             Name "FORWARD"
-            Tags { "LightMode"="ForwardBase" }
+            Tags { "LightMode"="ForwardBase" "LTCGI" = "_LTCGI" }
 
             Cull [_CullMode]
             Blend [_SrcBlend] [_DstBlend]
@@ -138,12 +141,13 @@
             #pragma shader_feature_local _MASKMAP
             #pragma shader_feature_local _NORMALMAP
             #pragma shader_feature_local _BENTNORMALMAP
-            #pragma shader_feature_local _PARALLAX_OCCLUSION _PARALLAXMAP
+            #pragma shader_feature_local _ _PARALLAX_OCCLUSION _PARALLAXMAP
             #pragma shader_feature_local _DETAIL_MAP
             #pragma shader_feature_local CAPSULE_AO
             #pragma shader_feature_local REFRACTION_TYPE_NONE REFRACTION_TYPE_SOLID REFRACTION_TYPE_THIN
             #pragma shader_feature_local REFLECTION_SPACE_CUBE REFLECTION_SPACE_CYLINDER REFLECTION_SPACE_ADDITIONAL_BOX
             #pragma shader_feature_local VERTEX_LIGHT_AS_PIXEL_LIGHT
+            #pragma shader_feature_local_fragment LTCGI
 
             #include "Include/GeneLit_Core.cginc"
             ENDCG
@@ -172,7 +176,7 @@
             #pragma shader_feature_local _SHEEN
             #pragma shader_feature_local _MASKMAP
             #pragma shader_feature_local _NORMALMAP
-            #pragma shader_feature_local _PARALLAXMAP
+            #pragma shader_feature_local _ _PARALLAX_OCCLUSION _PARALLAXMAP
             #pragma shader_feature_local _DETAIL_MAP
             #pragma shader_feature_local REFRACTION_TYPE_NONE REFRACTION_TYPE_SOLID REFRACTION_TYPE_THIN
 

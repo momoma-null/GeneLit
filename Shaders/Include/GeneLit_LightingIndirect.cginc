@@ -9,6 +9,10 @@
     #include "GeneLit_Brdf.cginc"
     #include "GeneLit_AmbientOcclusion.cginc"
 
+    #if defined(LTCGI)
+        #include "Packages/at.pimaker.ltcgi/Shaders/LTCGI.cginc"
+    #endif
+
     //------------------------------------------------------------------------------
     // Image based lighting configuration
     //------------------------------------------------------------------------------
@@ -449,6 +453,9 @@
 
         GENELIT_EVALUATE_CUSTOM_INDIRECT(pixel, shadingData, irradiance, Fd, Fr)
 
+        #if defined(LTCGI)
+            LTCGI_Contribution(shadingData.position, shadingData.normal, shadingData.view, pixel.roughness, shadingData.lightmapUV.xy, Fd, Fr);
+        #endif
         // extra ambient occlusion term for the base and subsurface layers
         multiBounceAO(diffuseAO, pixel.diffuseColor, Fd);
         multiBounceSpecularAO(specAO, pixel.f0, Fr);
