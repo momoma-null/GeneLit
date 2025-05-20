@@ -13,6 +13,11 @@
     #include "Packages/at.pimaker.ltcgi/Shaders/LTCGI.cginc"
 #endif
 
+#if defined(LIGHTVOLUMES)
+    #include "Packages/red.sim.lightvolumes/Shaders/LightVolumes.cginc"
+    float3 L0, L1r, L1g, L1b;
+#endif
+
 //------------------------------------------------------------------------------
 // Image based lighting configuration
 //------------------------------------------------------------------------------
@@ -46,12 +51,15 @@ float3 prefilteredDFG(float perceptualRoughness, float NoV)
 float3 diffuseIrradiance(const float3 normalWorld, const ShadingData shadingData)
 {
     float3 irradiance = shadingData.ambient;
-    #if UNITY_SHOULD_SAMPLE_SH
-        irradiance = ShadeSHPerPixel(normalWorld, irradiance, shadingData.position);
-    #endif
 
     #if defined(LIGHTMAP_ON) && defined(DIRLIGHTMAP_COMBINED)
         irradiance = DecodeDirectionalLightmap(irradiance, shadingData.bakedDir, normalWorld);
+    #endif
+
+    #if defined(LIGHTVOLUMES)
+        irradiance += LightVolumeEvaluate(normalWorld, L0, L1r, L1g, L1b);
+    #elif UNITY_SHOULD_SAMPLE_SH
+        irradiance = ShadeSHPerPixel(normalWorld, irradiance, shadingData.position);
     #endif
 
     #ifdef DYNAMICLIGHTMAP_ON
@@ -208,6 +216,61 @@ inline half3 indirectSpecular(float3 r, float lod, float3 worldPos)
     #endif
 
     return specular;
+}
+
+#if defined(LIGHTVOLUMES)
+    float3 LightVolumeSpecular_GeneLit(float3 f0, float perceptualRoughness, float3 worldNormal, float3 viewDir, float3 L0, float3 L1r, float3 L1g, float3 L1b)
+    {
+        float3 specColor = max(float3(dot(reflect(-L1r, worldNormal), viewDir), dot(reflect(-L1g, worldNormal), viewDir), dot(reflect(-L1b, worldNormal), viewDir)), 0);
+
+        float3 rDir = LV_Normalize(LV_Normalize(L1r) + viewDir);
+        float3 gDir = LV_Normalize(LV_Normalize(L1g) + viewDir);
+        float3 bDir = LV_Normalize(LV_Normalize(L1b) + viewDir);
+
+        float rNh = saturate(dot(worldNormal, rDir));
+        float gNh = saturate(dot(worldNormal, gDir));
+        float bNh = saturate(dot(worldNormal, bDir));
+
+        float roughExp = perceptualRoughness * perceptualRoughness;
+
+        float rSpec = LV_DistributionGGX(rNh, roughExp);
+        float gSpec = LV_DistributionGGX(gNh, roughExp);
+        float bSpec = LV_DistributionGGX(bNh, roughExp);
+
+        float3 specs = (rSpec + gSpec + bSpec) * f0;
+        float3 coloredSpecs = specs * specColor;
+
+        float3 a = coloredSpecs + specs * L0;
+        float3 b = coloredSpecs * 4;
+
+        return max(lerp(b, a, perceptualRoughness), 0.0);
+    }
+
+    float3 LightVolumeSpecularDominant_GeneLit(float3 f0, float perceptualRoughness, float3 worldNormal, float3 viewDir, float3 L0, float3 L1r, float3 L1g, float3 L1b)
+    {
+        float3 dominantDir = L1r + L1g + L1b;
+        float3 dir = LV_Normalize(LV_Normalize(dominantDir) + viewDir);
+        float nh = saturate(dot(worldNormal, dir));
+
+        float roughExp = perceptualRoughness * perceptualRoughness;
+
+        float spec = LV_DistributionGGX(nh, roughExp);
+
+        return max(spec * L0 * f0, 0.0) * 2;
+    }
+#endif
+
+float3 additiveSpecular(const PixelParams pixel, const ShadingData shadingData)
+{
+    #if defined(LIGHTVOLUMES)
+        #if defined(LIGHTMAP_ON)
+            return LightVolumeSpecularDominant_GeneLit(pixel.f0, pixel.perceptualRoughness, shadingData.normal, shadingData.view, L0, L1r, L1g, L1b);
+        #else
+            return LightVolumeSpecular_GeneLit(pixel.f0, pixel.perceptualRoughness, shadingData.normal, shadingData.view, L0, L1r, L1g, L1b);
+        #endif
+    #else
+        return 0;
+    #endif
 }
 
 inline float perceptualRoughnessToLod(float perceptualRoughness)
@@ -425,11 +488,19 @@ void evaluateClearCoatIBL(const PixelParams pixel, const ShadingData shadingData
 
 void evaluateIBL(const PixelParams pixel, const ShadingData shadingData, float occlusion, inout float3 color)
 {
+    #if defined(LIGHTVOLUMES)
+        #if defined(LIGHTMAP_ON)
+            LightVolumeAdditiveSH(shadingData.position, L0, L1r, L1g, L1b);
+        #else
+            LightVolumeSH(shadingData.position, L0, L1r, L1g, L1b);
+        #endif
+    #endif
     // specular layer
     float3 Fr;
     float3 E = specularDFG(pixel);
     float3 r = getReflectedVector(pixel, shadingData.view, shadingData.normal, shadingData.reflected);
     Fr = E * prefilteredRadiance(r, pixel.perceptualRoughness, shadingData.position);
+    Fr += additiveSpecular(pixel, shadingData);
 
     float diffuseAO = occlusion;
     #if defined(_BENTNORMALMAP)

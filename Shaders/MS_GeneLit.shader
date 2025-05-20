@@ -68,7 +68,8 @@
         [Toggle(VERTEX_LIGHT_AS_PIXEL_LIGHT)] _VertexLightAsPixelLight ("Use Vertex Light As Pixel Light", float) = 0.0
         _VertexLightRangeMultiplier ("Vertex Light Range Multiplier", Range(0.01, 25)) = 1.0
         _SpecularAO ("Specular AO", Range(0, 1)) = 0.8
-        [Toggle(LTCGI)] _LTCGI("LTCGI", Int) = 0
+        [Toggle(LTCGI)] _LTCGI ("LTCGI", Int) = 0
+        [Toggle(LIGHTVOLUMES)] _LIGHTVOLUMES ("Light Volumes", Int) = 0
 
         [HideInInspector][NonModifiableTextureData] _DFG ("_DFG", 2D) = "black" {}
 
@@ -123,6 +124,7 @@
             #pragma shader_feature_local REFLECTION_SPACE_CUBE REFLECTION_SPACE_CYLINDER REFLECTION_SPACE_ADDITIONAL_BOX
             #pragma shader_feature_local VERTEX_LIGHT_AS_PIXEL_LIGHT
             #pragma shader_feature_local_fragment LTCGI
+            #pragma shader_feature_local_fragment LIGHTVOLUMES
 
             #include "Include/GeneLit_Core.cginc"
             ENDCG
