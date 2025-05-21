@@ -1,7 +1,7 @@
 {
   "name": "com.momoma.genelit",
   "displayName": "GeneLit Shaders",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "unity": "2022.3",
   "description": "GeneLit is an alternative to Standard Shader.",
   "author": {
