@@ -149,7 +149,7 @@
             #pragma shader_feature_local REFLECTION_SPACE_CUBE REFLECTION_SPACE_CYLINDER REFLECTION_SPACE_ADDITIONAL_BOX
             #pragma shader_feature_local VERTEX_LIGHT_AS_PIXEL_LIGHT
             #pragma shader_feature_local_fragment LTCGI
-            #pragma shader_feature_local_fragment LIGHTVOLUMES
+            #pragma shader_feature_local LIGHTVOLUMES
 
             #include "Include/GeneLit_Core.cginc"
             ENDCG
