@@ -41,7 +41,9 @@
                     ambientOrLightmapUV.a = 1;
                 #endif
 
-                ambientOrLightmapUV.rgb = ShadeSHPerVertex(normalWorld, ambientOrLightmapUV.rgb);
+                #if !defined(LIGHTVOLUMES)
+                    ambientOrLightmapUV.rgb = ShadeSHPerVertex(normalWorld, ambientOrLightmapUV.rgb);
+                #endif
             #endif
 
             #ifdef DYNAMICLIGHTMAP_ON

@@ -81,6 +81,7 @@ More beautiful and accurate rendering than Unity Standard shaders.
   - Using vertex light as pixel light
   - Specular AO
   - Support for LTCGI
+  - Support for VRC Light Volumes
 
 # Map Channel
 Basically same as [Unity HDRP mapping](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@15.0/manual/Mask-Map-and-Detail-Map.html)
