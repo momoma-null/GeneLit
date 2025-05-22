@@ -57,7 +57,11 @@ jobs:
       - name: Create Package Zip
         working-directory: "${{ env.packagePath }}"
         run: zip -r "${{ github.workspace }}/${{ env.zipFile }}" . \
-          -x ".github/*" ".gitignore"
+          -x "./.gitignore" \
+          -x "./.github/*" \
+          -x "./.github/**" \
+          -x "./.git/*" \
+          -x "./.git/**"
       
       # Build a list of .meta files for future use
       - name: Track Package Meta Files
