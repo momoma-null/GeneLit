@@ -144,6 +144,7 @@
             #pragma shader_feature_local _NORMALMAP
             #pragma shader_feature_local _ _PARALLAX_OCCLUSION _PARALLAXMAP
             #pragma shader_feature_local _DETAIL_MAP
+            #pragma shader_feature_local CAPSULE_AO
 
             #include "Include/GeneLit_Core.cginc"
             ENDCG

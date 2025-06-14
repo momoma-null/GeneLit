@@ -194,6 +194,17 @@
         #endif
     }
 
+    float3 evaluateVertexLight(const PixelParams pixel, const FilamentLight light, const ShadingData shadingData, const MaterialInputs material)
+    {
+        float visibility = 1.0;
+        #if defined(CAPSULE_AO)
+            float capsuleShadow;
+            clculateAllCapShadow(shadingData.position, light.l, dot(light.posToLight, light.posToLight), /* out */ capsuleShadow);
+            visibility *= lerp(1.0, capsuleShadow, material.capsuleShadowStrength);
+        #endif
+        return surfaceShading(pixel, light, shadingData, visibility);
+    }
+
     /**
     * This function evaluates all lights one by one:
     * - Image based lights (IBL)
@@ -245,6 +256,13 @@
             visibility *= computeMicroShadowing(light.NoL, occlusion);
         #elif UNITY_PASS_FORWARDADD
             light = getPunctualLights(shadingData);
+
+            #if defined(CAPSULE_AO)
+                float capsuleShadow;
+                clculateAllCapShadow(shadingData.position, light.l, dot(light.posToLight, light.posToLight), /* out */ capsuleShadow);
+                visibility *= lerp(1.0, capsuleShadow, material.capsuleShadowStrength);
+            #endif
+
             visibility *= computeHeightMapShadowing(shadingData, light);
         #endif
         color.rgb += surfaceShading(pixel, light, shadingData, visibility);
@@ -257,10 +275,10 @@
                 float4 lightAttenSq = unity_4LightAtten0 / (material.vertexLightRangeMultiplier * material.vertexLightRangeMultiplier);
                 getVertexPunctualLights(shadingData, lightAttenSq, lights);
                 visibility = 1.0;
-                color.rgb += surfaceShading(pixel, lights[0], shadingData, visibility);
-                color.rgb += surfaceShading(pixel, lights[1], shadingData, visibility);
-                color.rgb += surfaceShading(pixel, lights[2], shadingData, visibility);
-                color.rgb += surfaceShading(pixel, lights[3], shadingData, visibility);
+                color.rgb += evaluateVertexLight(pixel, lights[0], shadingData, material);
+                color.rgb += evaluateVertexLight(pixel, lights[1], shadingData, material);
+                color.rgb += evaluateVertexLight(pixel, lights[2], shadingData, material);
+                color.rgb += evaluateVertexLight(pixel, lights[3], shadingData, material);
             }
         #endif
 

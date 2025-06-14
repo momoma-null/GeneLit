@@ -13,6 +13,7 @@
         float3 l;
         float  attenuation;
         float  NoL;
+        float3 posToLight;
     };
 
     struct PixelParams

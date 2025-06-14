@@ -180,6 +180,7 @@
             #pragma shader_feature_local _NORMALMAP
             #pragma shader_feature_local _ _PARALLAX_OCCLUSION _PARALLAXMAP
             #pragma shader_feature_local _DETAIL_MAP
+            #pragma shader_feature_local CAPSULE_AO
             #pragma shader_feature_local REFRACTION_TYPE_NONE REFRACTION_TYPE_SOLID REFRACTION_TYPE_THIN
 
             #include "Include/GeneLit_Core.cginc"
