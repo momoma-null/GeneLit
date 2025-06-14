@@ -91,7 +91,7 @@
             fixed4 bakedDir;
         #endif
 
-        bool useDirectionalLightEstimation;
+        fixed directionalLightEstimation;
         float specularAO;
     };
 
