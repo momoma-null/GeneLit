@@ -40,8 +40,28 @@
         float ocrd = dot(oc, rd);
         float h = saturate((dot(oc, oc) - ocrd * ocrd) / (r * r) + ocrd * ocrd / k);
 
-        float s = h * h;
-        return r > 0 && ocrd < 0 ? (s * s * (3.0 - 2.0 * s)) : 1;
+        return r > 0 && ocrd < 0 ? (h * h * (3.0 - 2.0 * h)) : 1;
+    }
+
+    float capShadow(float3 ro, float3 rd, float3 a, float3 b, float r, float k, float ll)
+    {
+        float3 ba =  b - a;
+        float3 oa = ro - a;
+
+        // closest distance between ray and segment
+        float oard  = dot(oa, rd);
+        float bard  = dot(ba, rd);
+        float baba = dot(ba, ba);
+        float oaba = dot(oa, ba);
+        float th = saturate((oaba - oard * bard) / (baba - bard * bard + 0.000001));
+
+        float3 p = a + ba * th;
+        float3 oc = ro - p;
+        float ocrd = dot(oc, rd);
+        float ocrd2 = ocrd * ocrd;
+        float h = saturate((dot(oc, oc) - ocrd2) / (r * r) + ocrd2 / k);
+
+        return r > 0 && ocrd < 0 && ll > ocrd2 ? (h * h * (3.0 - 2.0 * h)) : 1;
     }
 
     void clculateAllCapOcclusion(float3 p, float3 n, float3 l, out float ao, out float shadow)
@@ -55,6 +75,18 @@
             float3 b = _UdonBottom[i].xyz;
             ao *= capOcclusion(p, n, t.xyz, b, t.w);
             shadow = min(capShadow(p, l, t.xyz, b, t.w, 4.0), shadow);
+        }
+    }
+
+    void clculateAllCapShadow(float3 p, float3 l, float ll, out float shadow)
+    {
+        shadow = 1;
+        UNITY_UNROLL
+        for (uint i = 0; i < CAPSULE_COUNT; ++i)
+        {
+            float4 t = _UdonTopAndRadius[i];
+            float3 b = _UdonBottom[i].xyz;
+            shadow = min(capShadow(p, l, t.xyz, b, t.w, 4.0, ll), shadow);
         }
     }
 #endif

@@ -22,11 +22,11 @@ FilamentLight getDirectionalLight(const ShadingData shadingData)
     {
         #if UNITY_SHOULD_SAMPLE_SH
             light.l = normalize(unity_SHAr.rgb * unity_ColorSpaceLuminance.r + unity_SHAg.rgb * unity_ColorSpaceLuminance.g + unity_SHAb.rgb * unity_ColorSpaceLuminance.b + float3(0, 1e-8, 0));
-            light.colorIntensity = float4(SHEvalLinearL0L1(half4(light.l, 1)), 0) * shadingData.useDirectionalLightEstimation;
+            light.colorIntensity = float4(SHEvalLinearL0L1(half4(light.l, 1)), 0) * shadingData.directionalLightEstimation;
         #elif defined(LIGHTMAP_ON) && defined(DIRLIGHTMAP_COMBINED)
             fixed4 bakedDirTex = shadingData.bakedDir;
             light.l = normalize(bakedDirTex.xyz - 0.5);
-            light.colorIntensity = float4(shadingData.ambient / max(1e-4h, bakedDirTex.w), 0) * shadingData.useDirectionalLightEstimation;
+            light.colorIntensity = float4(shadingData.ambient / max(1e-4h, bakedDirTex.w), 0) * shadingData.directionalLightEstimation;
         #else
             light.l = float3(0, 1, 0);
             light.colorIntensity = 0;

@@ -159,7 +159,7 @@
         #endif
 
         uint skyboxFog;
-        bool directionalLightEstimation;
+        fixed directionalLightEstimation;
         float vertexLightRangeMultiplier;
         float specularAO;
 

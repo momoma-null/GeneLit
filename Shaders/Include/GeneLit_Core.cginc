@@ -276,7 +276,7 @@
             #endif
         #endif
 
-        shadingData.useDirectionalLightEstimation = material.directionalLightEstimation;
+        shadingData.directionalLightEstimation = material.directionalLightEstimation;
         shadingData.specularAO = material.specularAO;
     }
 

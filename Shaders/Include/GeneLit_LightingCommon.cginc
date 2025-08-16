@@ -13,6 +13,7 @@
         float3 l;
         float  attenuation;
         float  NoL;
+        float3 posToLight;
     };
 
     struct PixelParams
@@ -91,7 +92,7 @@
             fixed4 bakedDir;
         #endif
 
-        bool useDirectionalLightEstimation;
+        fixed directionalLightEstimation;
         float specularAO;
     };
 
