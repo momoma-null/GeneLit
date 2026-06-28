@@ -1,109 +1,97 @@
-﻿using UnityEditor;
+﻿using System;
+using UnityEditor;
 using UnityEngine;
 
 namespace MomomaAssets.GeneLit
 {
-    class SingleLineDrawer : MaterialPropertyDrawer
+    sealed class SingleLineDrawer
     {
-        static bool s_drawing;
+        public static bool TryGetDrawer(ReadOnlySpan<char> name, out SingleLineDrawer drawer)
+        {
+            if (GeneLitGUI.TryGetAttributeWithArgument(name, "[SingleLine(", out var index, out var length))
+            {
+                var args = name.Slice(index, length);
+                var arg1Index = args.IndexOf(',');
+                var keyword = "";
+                string extraPropName;
+                if (arg1Index > -1)
+                {
+                    extraPropName = args[..arg1Index].ToString();
+                    keyword = args[(arg1Index + 1)..].ToString();
+                }
+                else
+                {
+                    extraPropName = args.ToString();
+                }
+                var label = name[(name.LastIndexOf(']') + 1)..].ToString();
+                var hasScaleOffset = GeneLitGUI.HasAttribute(name, "[ScaleOffset]");
+                drawer = new SingleLineDrawer(extraPropName, keyword, label, hasScaleOffset);
+                return true;
+            }
+            drawer = null;
+            return false;
+        }
 
-        protected readonly string _extraPropName;
-        protected readonly string _keyword;
+        readonly string _extraPropName;
+        readonly string _keyword;
+        readonly GUIContent _label;
+        readonly bool _hasScaleOffset;
 
-        public SingleLineDrawer() : this(default, default) { }
-
-        public SingleLineDrawer(string extraPropName) : this(extraPropName, default) { }
-
-        public SingleLineDrawer(string extraPropName, string keyword)
+        public SingleLineDrawer(string extraPropName, string keyword, string label, bool hasScaleOffset)
         {
             _extraPropName = extraPropName;
             _keyword = keyword;
+            _label = new GUIContent(label);
+            _hasScaleOffset = hasScaleOffset;
         }
 
-        public override void Apply(MaterialProperty prop)
+        public void ApplyMaterial(Material material, string name)
         {
             if (!string.IsNullOrEmpty(_keyword))
             {
-                foreach (Material mat in prop.targets)
-                {
-                    if (mat.GetTexture(prop.name) != null)
-                        mat.EnableKeyword(_keyword);
-                    else
-                        mat.DisableKeyword(_keyword);
-                }
+                var enabled = material.GetTexture(name) != null;
+                GeneLitGUI.SetKeyword(material, _keyword, enabled);
             }
         }
 
-        public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)
-            => 0;
-
-        public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
+        public void OnGUI(MaterialEditor materialEditor, MaterialProperty property, MaterialProperty[] properties)
         {
-            if (s_drawing)
+            var extraProp = Array.Find(properties, x => x.name == _extraPropName);
+            var oldLabelWidth = EditorGUIUtility.labelWidth;
+            try
             {
-                editor.DefaultShaderProperty(position, prop, label.text);
-            }
-            else if (prop.type == MaterialProperty.PropType.Texture)
-            {
-                var oldLabelWidth = EditorGUIUtility.labelWidth;
                 EditorGUIUtility.labelWidth = 0f;
-                s_drawing = true;
-                try
+                EditorGUI.BeginChangeCheck();
+                if (extraProp == null || (!string.IsNullOrEmpty(_keyword) && !GeneLitGUI.IsKeywordEnabled(materialEditor.targets, _keyword)))
                 {
-                    EditorGUI.BeginChangeCheck();
-                    if (string.IsNullOrEmpty(_extraPropName))
-                    {
-                        editor.TexturePropertySingleLine(label, prop);
-                    }
-                    else
-                    {
-                        var extraProp = MaterialEditor.GetMaterialProperty(prop.targets, _extraPropName);
-                        if (extraProp.type == MaterialProperty.PropType.Color && (extraProp.flags & MaterialProperty.PropFlags.HDR) > 0)
-                            editor.TexturePropertyWithHDRColor(label, prop, extraProp, false);
-                        else
-                            editor.TexturePropertySingleLine(label, prop, extraProp);
-                    }
-                    if (EditorGUI.EndChangeCheck())
-                    {
-                        if (!string.IsNullOrEmpty(_keyword))
-                        {
-                            var useTexture = prop.textureValue != null;
-                            foreach (Material mat in prop.targets)
-                            {
-                                if (useTexture)
-                                    mat.EnableKeyword(_keyword);
-                                else
-                                    mat.DisableKeyword(_keyword);
-                            }
-                        }
-                    }
-                    OnAfterSingleLine(prop, editor);
+                    materialEditor.TexturePropertySingleLine(_label, property);
                 }
-                finally
+                else
                 {
-                    s_drawing = false;
-                    EditorGUIUtility.labelWidth = oldLabelWidth;
+                    if (extraProp.type == MaterialProperty.PropType.Color && (extraProp.flags & MaterialProperty.PropFlags.HDR) > 0)
+                        materialEditor.TexturePropertyWithHDRColor(_label, property, extraProp, false);
+                    else
+                        materialEditor.TexturePropertySingleLine(_label, property, extraProp);
+                }
+                if (EditorGUI.EndChangeCheck())
+                {
+                    if (!string.IsNullOrEmpty(_keyword))
+                    {
+                        var useTexture = property.textureValue != null;
+                        GeneLitGUI.SetKeyword(materialEditor.targets, _keyword, useTexture);
+                    }
+                }
+                if (_hasScaleOffset && property.textureValue != null)
+                {
+                    using (new EditorGUI.IndentLevelScope(1))
+                    {
+                        materialEditor.TextureScaleOffsetProperty(property);
+                    }
                 }
             }
-        }
-
-        protected virtual void OnAfterSingleLine(MaterialProperty prop, MaterialEditor editor) { }
-    }
-
-    sealed class SingleLineScaleOffsetDrawer : SingleLineDrawer
-    {
-        public SingleLineScaleOffsetDrawer() : base() { }
-        public SingleLineScaleOffsetDrawer(string extraPropName) : base(extraPropName) { }
-        public SingleLineScaleOffsetDrawer(string extraPropName, string keyword) : base(extraPropName, keyword) { }
-
-        protected override void OnAfterSingleLine(MaterialProperty prop, MaterialEditor editor)
-        {
-            if (prop.textureValue != null || string.IsNullOrEmpty(_keyword))
+            finally
             {
-                using (new EditorGUI.IndentLevelScope(1))
-                {
-                    editor.TextureScaleOffsetProperty(prop);
-                }
+                EditorGUIUtility.labelWidth = oldLabelWidth;
             }
         }
     }

@@ -7,8 +7,6 @@ namespace MomomaAssets.GeneLit
     {
         const string k_EmissionKeyword = "_EMISSION";
 
-        bool _initialized = false;
-
         public EmissionDecorator() { }
 
         public override void Apply(MaterialProperty prop)
@@ -25,11 +23,6 @@ namespace MomomaAssets.GeneLit
 
         public override void OnGUI(Rect position, MaterialProperty prop, GUIContent label, MaterialEditor editor)
         {
-            if (!_initialized)
-            {
-                prop.ReplacePostDecorator(this);
-                _initialized = true;
-            }
             EditorGUI.BeginChangeCheck();
             editor.RegisterPropertyChangeUndo("Emission");
             editor.LightmapEmissionProperty(position, 0);
