@@ -12,15 +12,14 @@ namespace MomomaAssets.GeneLit
         static readonly Dictionary<string, HideDecorator> _hideDecorators = new();
         static readonly Dictionary<string, SingleLineDrawer> _singleLineDrawers = new();
 
-        public override void AssignNewShaderToMaterial(Material material, Shader oldShader, Shader newShader)
+        public override void ValidateMaterial(Material material)
         {
-            base.AssignNewShaderToMaterial(material, oldShader, newShader);
-
-            var propertyCount = newShader.GetPropertyCount();
+            var shader = material.shader;
+            var propertyCount = shader.GetPropertyCount();
             for (var i = 0; i < propertyCount; ++i)
             {
-                var displayName = newShader.GetPropertyDescription(i);
-                var key = GetKey(newShader, displayName);
+                var displayName = shader.GetPropertyDescription(i);
+                var key = GetKey(shader, displayName);
 
                 if (TryGetShurikenHeader(key, displayName, out var shurikenHeader))
                 {
@@ -28,7 +27,7 @@ namespace MomomaAssets.GeneLit
                 }
                 if (TryGetSingleLineDrawer(key, displayName, out var singleLineDrawer))
                 {
-                    singleLineDrawer.ApplyMaterial(material, newShader.GetPropertyName(i));
+                    singleLineDrawer.ApplyMaterial(material, shader.GetPropertyName(i));
                 }
             }
         }
