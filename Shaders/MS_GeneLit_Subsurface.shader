@@ -38,6 +38,7 @@
         _SubsurfaceThicknessMap ("[SingleLine(_SubsurfaceThickness)]Thickness Map", 2D) = "white" { }
         _SubsurfacePower ("Subsurface Power", Float) = 12.234
         _SubsurfaceColor ("Subsurface Color", Color) = (1, 1, 1, 1)
+        _SubsurfaceAlbedoBlend ("Albedo Blend", Range(0, 1)) = 0.0
         _SubsurfaceDistortion ("Distortion", Range(0, 1)) = 1.0
 
         _DetailMap ("[ShurikenHeader(Detail Inputs)][SingleLine(,_DETAIL_MAP)][ScaleOffset]Detail Map", 2D) = "grey" { }

@@ -9,12 +9,14 @@
     UNITY_DEFINE_INSTANCED_PROP(half, _SubsurfaceThickness)\
     UNITY_DEFINE_INSTANCED_PROP(half, _SubsurfacePower)\
     UNITY_DEFINE_INSTANCED_PROP(half4, _SubsurfaceColor)\
+    UNITY_DEFINE_INSTANCED_PROP(half, _SubsurfaceAlbedoBlend)\
     UNITY_DEFINE_INSTANCED_PROP(half, _SubsurfaceDistortion)
 
     #define GENELIT_CUSTOM_MATERIAL_INPUTS \
     float subsurfaceThickness;\
     float subsurfacePower;\
     float3 subsurfaceColor;\
+    float subsurfaceAlbedoBlend;\
     float subsurfaceDistortion;
 
     #define GENELIT_CUSTOM_PIXEL_PARAMS \
@@ -28,6 +30,7 @@
     material.subsurfaceThickness = subsurfaceThickness.g * GENELIT_ACCESS_PROP(_SubsurfaceThickness);\
     material.subsurfacePower = GENELIT_ACCESS_PROP(_SubsurfacePower);\
     material.subsurfaceColor = GENELIT_ACCESS_PROP(_SubsurfaceColor).rgb;\
+    material.subsurfaceAlbedoBlend = GENELIT_ACCESS_PROP(_SubsurfaceAlbedoBlend);\
     material.subsurfaceDistortion = GENELIT_ACCESS_PROP(_SubsurfaceDistortion);
 
     #define GENELIT_EVALUATE_CUSTOM_INDIRECT(pixel, shadingData, irradiance, Fd, Fr) \
@@ -43,7 +46,7 @@
     {
         pixel.subsurfaceThickness = saturate(material.subsurfaceThickness);
         pixel.subsurfacePower = material.subsurfacePower;
-        pixel.subsurfaceColor = material.subsurfaceColor;
+        pixel.subsurfaceColor = material.subsurfaceColor * lerp(1, material.baseColor.rgb, material.subsurfaceAlbedoBlend);
         pixel.subsurfaceDistortion = material.subsurfaceDistortion;
     }
 
