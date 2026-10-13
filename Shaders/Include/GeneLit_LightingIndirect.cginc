@@ -448,9 +448,9 @@ void evaluateIBL(const PixelParams pixel, const ShadingData shadingData, float o
 {
     #if defined(LIGHTVOLUMES)
         #if defined(LIGHTMAP_ON)
-            LightVolumeAdditiveSH(shadingData.position, L0, L1r, L1g, L1b);
+            LightVolumeAdditiveSH(shadingData.position, L0, L1r, L1g, L1b, 0, shadingData.normal);
         #else
-            LightVolumeSH(shadingData.position, L0, L1r, L1g, L1b);
+            LightVolumeSH(shadingData.position, L0, L1r, L1g, L1b, 0, shadingData.normal);
         #endif
     #endif
     // specular layer

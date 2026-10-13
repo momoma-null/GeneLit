@@ -2,69 +2,63 @@
 {
     Properties
     {
-        [ShurikenHeader(Surface Options)]
-        [BlendMode] _Mode ("Blend Mode", Float) = 0.0
+        [BlendMode] _Mode ("[ShurikenHeader(Surface Options)]Blend Mode", Float) = 0.0
         [Enum(UnityEngine.Rendering.CullMode)] _CullMode ("Cull Mode", Float) = 2.0
-        [IfDef(_ALPHATEST_ON)] _Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
+        _Cutoff ("[IfDef(_ALPHATEST_ON)]Alpha Cutoff", Range(0, 1)) = 0.5
         [Decal] _Offset ("Decal Mode", Float) = 0
 
-        [ShurikenHeader(Surface Inputs)]
-        [KeywordEnum(Normal_Tile, No_Tile, TriPlanar)] _TileMode ("Tile Mode", Float) = 0
-        [IfDef(_TILEMODE_NO_TILE)] _NoiseHeight ("Noise Height", Range(5.0, 20.0)) = 12.0
-        [Enum(None,0,Multiply,1,Add,2,Screen,3)] _VertexColorMode ("Vertex Color Mode", Float) = 0.0
-        [SingleLine] _Color ("Color", Color) = (1,1,1,1)
-        [SingleLineScaleOffset(_Color)] _MainTex ("Albedo", 2D) = "white" {}
-        [SingleLine(, _MASKMAP)] _MaskMap ("Mask Map", 2D) = "white" {}
-        _Glossiness ("Smoothness", Range(0,1)) = 0.5
-        _OcclusionStrength ("Occlusion", Range(0,1)) = 1.0
+        [KeywordEnum(Normal_Tile, No_Tile, TriPlanar)] _TileMode ("[ShurikenHeader(Surface Inputs)]Tile Mode", Float) = 0
+        _NoiseHeight ("[IfDef(_TILEMODE_NO_TILE)]Noise Height", Range(5.0, 20.0)) = 12.0
+        [Enum(None, 0, Multiply, 1, Add, 2, Screen, 3)] _VertexColorMode ("Vertex Color Mode", Float) = 0.0
+        _Color ("[Hide]Color", Color) = (1, 1, 1, 1)
+        _MainTex ("[SingleLine(_Color)][ScaleOffset]Albedo", 2D) = "white" { }
+        _MaskMap ("[SingleLine(,_MASKMAP)]Mask Map", 2D) = "white" { }
+        _Glossiness ("Smoothness", Range(0, 1)) = 0.5
+        _OcclusionStrength ("Occlusion", Range(0, 1)) = 1.0
 
-        [IfDef(_NORMALMAP)][SingleLine] _BumpScale ("Normal Scale", Float) = 1.0
-        [SingleLine(_BumpScale, _NORMALMAP)][Normal] _BumpMap ("Normal Map", 2D) = "bump" {}
-        [SingleLine(, _BENTNORMALMAP)][Normal] _BentNormalMap ("Bent Normal Map", 2D) = "bump" {}
+        _BumpScale ("[Hide]Normal Scale", Float) = 1.0
+        [Normal] _BumpMap ("[SingleLine(_BumpScale,_NORMALMAP)]Normal Map", 2D) = "bump" { }
+        [Normal] _BentNormalMap ("[SingleLine(,_BENTNORMALMAP)]Bent Normal Map", 2D) = "bump" { }
 
-        [IfDef(_PARALLAXMAP)][SingleLine] _Parallax ("Height Scale", Range (0.005, 0.08)) = 0.02
-        [IfNDef(_TILEMODE_NO_TILE)][SingleLine(_Parallax, _PARALLAXMAP)] _ParallaxMap ("Height Map", 2D) = "white" {}
-        [IfDef(_PARALLAXMAP)][Toggle(_PARALLAX_OCCLUSION)] _UseParallaxOcclusion ("Use Parallax Occlusion ( ! Slow ! )", Float) = 0
+        _Parallax ("[Hide]Height Scale", Range(0.005, 0.08)) = 0.02
+        _ParallaxMap ("[IfDef(!_TILEMODE_NO_TILE)][SingleLine(_Parallax,_PARALLAXMAP)]Height Map", 2D) = "white" { }
+        [Toggle(_PARALLAX_OCCLUSION)] _UseParallaxOcclusion ("[IfDef(_PARALLAXMAP)]Use Parallax Occlusion ( ! Slow ! )", Float) = 0
 
-        [SingleLine][HDR] _EmissionColor ("Emission Color", Color) = (0,0,0,1)
+        [HDR] _EmissionColor ("[Hide]Emission Color", Color) = (0, 0, 0, 1)
+        _EmissionMap ("[SingleLine(_EmissionColor)]Emission", 2D) = "white" { }
         [Emission]
-        [SingleLine(_EmissionColor)] _EmissionMap ("Emission", 2D) = "white" {}
         [ToggleUI] _AlbedoAffectEmissive ("Albedo Affect Emissive", Float) = 0.0
 
-        [IfDef(_ANISOTROPY)][SingleLine] _Anisotropy ("Anisotropy", Range(-1, 1)) = 0.5
-        [SingleLine(_Anisotropy, _ANISOTROPY)] _TangentMap ("Anisotropy", 2D) = "red" {}
+        _Anisotropy ("[Hide]Anisotropy", Range(-1, 1)) = 0.5
+        _TangentMap ("[SingleLine(_Anisotropy,_ANISOTROPY)]Anisotropy", 2D) = "red" { }
 
-        [ShurikenHeader(Cloth Inputs)]
-        [Toggle(CUSTOM_SHEEN)] _CustomSheen ("Use Custom Sheen Color", float) = 0.0
-        [IfDef(CUSTOM_SHEEN)][SingleLine] _SheenColor ("Sheen Color", Color) = (1,1,1,1)
-        [IfDef(CUSTOM_SHEEN)][SingleLine(_SheenColor)] _SheenMap ("Sheen", 2D) = "white" {}
-        _ClothSubsurfaceColor ("Subsurface Color", Color) = (0.5,0.5,0.5,1)
+        [Toggle(CUSTOM_SHEEN)] _CustomSheen ("[ShurikenHeader(Cloth Inputs)]Use Custom Sheen Color", float) = 0.0
+        _SheenColor ("[Hide]Sheen Color", Color) = (1, 1, 1, 1)
+        _SheenMap ("[IfDef(CUSTOM_SHEEN)][SingleLine(_SheenColor)]Sheen", 2D) = "white" { }
+        _ClothSubsurfaceColor ("Subsurface Color", Color) = (0.5, 0.5, 0.5, 1)
 
-        [ShurikenHeader(Detail Inputs)]
-        [SingleLineScaleOffset(,_DETAIL_MAP)] _DetailMap ("Detail Map", 2D) = "grey" {}
-        [IfDef(_DETAIL_MAP)][Enum(UV0,0,UV1,1,UV2,2,UV3,3)] _UVSec ("UV Set", Float) = 0
-        [IfDef(_DETAIL_MAP)] _DetailAlbedoScale ("Albedo Scale", Range(0, 2)) = 1.0
-        [IfDef(_DETAIL_MAP)] _DetailNormalScale ("Normal Scale", Range(0, 2)) = 1.0
-        [IfDef(_DETAIL_MAP)] _DetailSmoothnessScale ("Smoothness Scale", Range(0, 2)) = 1.0
+        _DetailMap ("[ShurikenHeader(Detail Inputs)][SingleLine(,_DETAIL_MAP)][ScaleOffset]Detail Map", 2D) = "grey" { }
+        [Enum(UV0, 0, UV1, 1, UV2, 2, UV3, 3)] _UVSec ("[IfDef(_DETAIL_MAP)]UV Set", Float) = 0
+        _DetailAlbedoScale ("[IfDef(_DETAIL_MAP)]Albedo Scale", Range(0, 2)) = 1.0
+        _DetailNormalScale ("[IfDef(_DETAIL_MAP)]Normal Scale", Range(0, 2)) = 1.0
+        _DetailSmoothnessScale ("[IfDef(_DETAIL_MAP)]Smoothness Scale", Range(0, 2)) = 1.0
 
-        [ToggleHeader(Clear Coat, _CLEAR_COAT)]
-        [IfDef(_CLEAR_COAT)] _ClearCoat ("Clear Coat", Range(0,1)) = 1.0
-        [IfDef(_CLEAR_COAT)] _ClearCoatRoughness ("Clear Coat Roughness", Range(0,1)) = 0.0
+        _ClearCoat ("[ShurikenHeader(Clear Coat,_CLEAR_COAT)][IfDef(_CLEAR_COAT)]Clear Coat", Range(0, 1)) = 1.0
+        _ClearCoatRoughness ("[IfDef(_CLEAR_COAT)]Clear Coat Roughness", Range(0, 1)) = 0.0
 
-        [ShurikenHeader(Experimental)]
-        [Toggle(CAPSULE_AO)] _Capsule_AO ("Capsule AO", float) = 0.0
-        [IfDef(CAPSULE_AO)] _Capsule_AOStrength ("Capsule AO Strength", Range(0, 1)) = 0.8
-        [IfDef(CAPSULE_AO)] _Capsule_ShadowStrength ("Capsule Shadow Strength", Range(0, 1)) = 0.5
+        [Toggle(CAPSULE_AO)] _Capsule_AO ("[ShurikenHeader(Experimental)]Capsule AO", float) = 0.0
+        _Capsule_AOStrength ("[IfDef(CAPSULE_AO)]Capsule AO Strength", Range(0, 1)) = 0.8
+        _Capsule_ShadowStrength ("[IfDef(CAPSULE_AO)]Capsule Shadow Strength", Range(0, 1)) = 0.5
         [KeywordEnum(Cube, Cylinder, Additional_Box)] Reflection_Space ("Reflection Space", Float) = 0.0
         [IntRange] _SkyboxFog ("Skybox Fog", Range(0, 7)) = 0.0
         _DirectionalLightEstimation ("Directional Light Estimation", Range(0, 1)) = 1.0
         [Toggle(VERTEX_LIGHT_AS_PIXEL_LIGHT)] _VertexLightAsPixelLight ("Use Vertex Light As Pixel Light", float) = 0.0
         _VertexLightRangeMultiplier ("Vertex Light Range Multiplier", Range(0.01, 25)) = 1.0
         _SpecularAO ("Specular AO", Range(0, 1)) = 0.8
-        [Toggle(LTCGI)] _LTCGI("LTCGI", Int) = 0
+        [Toggle(LTCGI)] _LTCGI ("LTCGI", Int) = 0
         [Toggle(LIGHTVOLUMES)] _LIGHTVOLUMES ("Light Volumes", Int) = 0
 
-        [HideInInspector][NonModifiableTextureData] _DFG ("_DFG", 2D) = "black" {}
+        [HideInInspector][NonModifiableTextureData] _DFG ("_DFG", 2D) = "black" { }
 
         [HideInInspector] _SrcBlend ("__src", Float) = 1.0
         [HideInInspector] _DstBlend ("__dst", Float) = 0.0
@@ -73,7 +67,7 @@
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        Tags { "RenderType" = "Opaque" }
 
         AlphaToMask [_AlphaToMask]
         Offset [_Offset], [_Offset]
@@ -89,7 +83,7 @@
         Pass
         {
             Name "FORWARD"
-            Tags { "LightMode"="ForwardBase" "LTCGI" = "_LTCGI" }
+            Tags { "LightMode" = "ForwardBase" "LTCGI" = "_LTCGI" }
 
             Cull [_CullMode]
             Blend [_SrcBlend] [_DstBlend]
@@ -125,11 +119,14 @@
         Pass
         {
             Name "FORWARD_DELTA"
-            Tags { "LightMode"="ForwardAdd" }
+            Tags { "LightMode" = "ForwardAdd" }
 
             Cull [_CullMode]
             Blend [_SrcBlend] One
-            Fog { Color (0,0,0,0) }
+            Fog
+            {
+                Color(0, 0, 0, 0)
+            }
             ZWrite Off
 
             CGPROGRAM
@@ -172,4 +169,5 @@
 
         UsePass "MomomaShader/General/GeneLit/META"
     }
+    CustomEditor "MomomaAssets.GeneLit.GeneLitGUI"
 }
